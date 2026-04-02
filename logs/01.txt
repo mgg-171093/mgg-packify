@@ -1,0 +1,228 @@
+ portal-retail-v2  portal-retail
+
+  ____           _        _   ____      _        _ _
+ |  _ \ ___  _ _| |_ __ _| | |  _ \ ___| |_ __ _(_) |
+ | |_) / _ \| '_| __/ _` | | | |_) / _ \ __/ _` | | |
+ |  __/ (_) | | | || (_| | | |  _ <  __/ || (_| | | |
+ |_|   \___/|_|  \__\__,_|_| |_| \_\___|\__\__,_|_|_|
+                                                      v2
+      Skandia México — Generador de Packages TUI
+
+╭───────────────────────────────────────────────────── Traceback (most recent call last) ─────────────────────────────────────────────────────╮
+│ C:\Users\ito_mgg\source\repos\portal-retail-v2\src\portal_retail\tui\screens\package_screen.py:207 in                                       │
+│ on_component_selector_components_changed                                                                                                    │
+│                                                                                                                                             │
+│   204 │   │   self, event: ComponentSelector.ComponentsChanged                                 ╭────────── locals ───────────╮              │
+│   205 │   ) -> None:                                                                           │ event = ComponentsChanged() │              │
+│   206 │   │   """Cuando el usuario cambia los componentes, reconstruye los inputs de detalle." │  self = PackageScreen()     │              │
+│ ❱ 207 │   │   self._rebuild_component_details(event.selected)                                  ╰─────────────────────────────╯              │
+│   208 │                                                                                                                                     │
+│   209 │   def _rebuild_component_details(self, tipos: list[ComponentType]) -> None:                                                         │
+│   210 │   │   """                                                                                                                           │
+│                                                                                                                                             │
+│ C:\Users\ito_mgg\source\repos\portal-retail-v2\src\portal_retail\tui\screens\package_screen.py:237 in _rebuild_component_details            │
+│                                                                                                                                             │
+│   234 │   │   │   label_tipo = COMPONENT_LABELS.get(ct, ct.value)                                                                           │
+│   235 │   │   │   new_widgets = _build_detail_widgets(ct, label_tipo)                                                                       │
+│   236 │   │   │   for w in new_widgets:                                                                                                     │
+│ ❱ 237 │   │   │   │   container.mount(w)                                                                                                    │
+│   238 │                                                                                                                                     │
+│   239 │   # ── Eventos de botones ────────────────────────────────────────────────────                                                      │
+│   240                                                                                                                                       │
+│                                                                                                                                             │
+│ ╭────────────────────────────────────────────────────────── locals ──────────────────────────────────────────────────────────╮              │
+│ │   container = Container(id='comp-details-container')                                                                       │              │
+│ │          ct = <ComponentType.LIFERAY_BUILD: 'liferay_build'>                                                               │              │
+│ │  label_tipo = 'Liferay (Deploy de build)'                                                                                  │              │
+│ │   lbl_title = Label(id='lbl-details-title', classes='section-title')                                                       │              │
+│ │ new_widgets = [Label(classes='comp-detail-section'), Label(classes='field-label'), Input(id='det_liferay_build_build_id')] │              │
+│ │        self = PackageScreen()                                                                                              │              │
+│ │       tipos = [<ComponentType.LIFERAY_BUILD: 'liferay_build'>, <ComponentType.API_IIS: 'api_iis'>]                         │              │
+│ │           w = Input(id='det_liferay_build_build_id')                                                                       │              │
+│ ╰────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯              │
+│                                                                                                                                             │
+│ C:\Users\ito_mgg\source\repos\portal-retail-v2\.venv\Lib\site-packages\textual\widget.py:1485 in mount                                      │
+│                                                                                                                                             │
+│   1482 │   │   else:                                                                                                                        │
+│   1483 │   │   │   parent = self                                                                                                            │
+│   1484 │   │                                                                                                                                │
+│ ❱ 1485 │   │   mounted = self.app._register(                                                                                                │
+│   1486 │   │   │   parent, *widgets, before=insert_before, after=insert_after                                                               │
+│   1487 │   │   )                                                                                                                            │
+│   1488                                                                                                                                      │
+│                                                                                                                                             │
+│ ╭───────────────────────── locals ──────────────────────────╮                                                                               │
+│ │         after = None                                      │                                                                               │
+│ │        before = None                                      │                                                                               │
+│ │  ids_to_mount = ['det_liferay_build_build_id']            │                                                                               │
+│ │  insert_after = None                                      │                                                                               │
+│ │ insert_before = None                                      │                                                                               │
+│ │        parent = Container(id='comp-details-container')    │                                                                               │
+│ │          self = Container(id='comp-details-container')    │                                                                               │
+│ │     widget_id = 'det_liferay_build_build_id'              │                                                                               │
+│ │       widgets = (Input(id='det_liferay_build_build_id'),) │                                                                               │
+│ ╰───────────────────────────────────────────────────────────╯                                                                               │
+│                                                                                                                                             │
+│ C:\Users\ito_mgg\source\repos\portal-retail-v2\.venv\Lib\site-packages\textual\app.py:3631 in _register                                     │
+│                                                                                                                                             │
+│   3628 │   │   │   │   raise AppError(f"Can't register {widget!r}; expected a Widget instance")                                             │
+│   3629 │   │   │   if widget not in self._registry:                                                                                         │
+│   3630 │   │   │   │   add_new_widget(widget)                                                                                               │
+│ ❱ 3631 │   │   │   │   self._register_child(parent, widget, before, after)                                                                  │
+│   3632 │   │   │   │   if widget._nodes:                                                                                                    │
+│   3633 │   │   │   │   │   self._register(widget, *widget._nodes, cache=cache)                                                              │
+│   3634 │   │   for widget in new_widgets:                                                                                                   │
+│                                                                                                                                             │
+│ ╭──────────────────────────────────────────────────────────────── locals ─────────────────────────────────────────────────────────────────╮ │
+│ │   add_new_widget = <built-in method append of list object at 0x0000014B4C15BA80>                                                        │ │
+│ │            after = None                                                                                                                 │ │
+│ │ apply_stylesheet = <bound method Stylesheet.apply of <Stylesheet                                                                        │ │
+│ │                    [('C:\\Users\\ito_mgg\\source\\repos\\portal-retail-v2\\src\\portal_retail\\tui\\app.tcss', ''),                     │ │
+│ │                    ('C:\\Users\\ito_mgg\\source\\repos\\portal-retail-v2\\.venv\\Lib\\site-packages\\textual\\app.py',                  │ │
+│ │                    'App.DEFAULT_CSS'),                                                                                                  │ │
+│ │                    ('C:\\Users\\ito_mgg\\source\\repos\\portal-retail-v2\\.venv\\Lib\\site-packages\\textual\\screen.py',               │ │
+│ │                    'Screen.DEFAULT_CSS'),                                                                                               │ │
+│ │                    ('C:\\Users\\ito_mgg\\source\\repos\\portal-retail-v2\\.venv\\Lib\\site-packages\\textual\\widget.py',               │ │
+│ │                    'Widget.DEFAULT_CSS'),                                                                                               │ │
+│ │                    ('C:\\Users\\ito_mgg\\source\\repos\\portal-retail-v2\\.venv\\Lib\\site-packages\\textual\\widgets\\_toast.py',      │ │
+│ │                    'ToastRack.DEFAULT_CSS'),                                                                                            │ │
+│ │                    ('C:\\Users\\ito_mgg\\source\\repos\\portal-retail-v2\\.venv\\Lib\\site-packages\\textual\\widgets\\_tooltip.py',    │ │
+│ │                    'Tooltip.DEFAULT_CSS'),                                                                                              │ │
+│ │                    ('C:\\Users\\ito_mgg\\source\\repos\\portal-retail-v2\\src\\portal_retail\\tui\\screens\\main_screen.py',            │ │
+│ │                    'MainScreen.DEFAULT_CSS'),                                                                                           │ │
+│ │                    ('C:\\Users\\ito_mgg\\source\\repos\\portal-retail-v2\\.venv\\Lib\\site-packages\\textual\\widgets\\_header.py',     │ │
+│ │                    'Header.DEFAULT_CSS'),                                                                                               │ │
+│ │                    ('C:\\Users\\ito_mgg\\source\\repos\\portal-retail-v2\\.venv\\Lib\\site-packages\\textual\\widgets\\_label.py',      │ │
+│ │                    'Label.DEFAULT_CSS'),                                                                                                │ │
+│ │                    ('C:\\Users\\ito_mgg\\source\\repos\\portal-retail-v2\\.venv\\Lib\\site-packages\\textual\\widgets\\_static.py',     │ │
+│ │                    'Static.DEFAULT_CSS'),                                                                                               │ │
+│ │                    ('C:\\Users\\ito_mgg\\source\\repos\\portal-retail-v2\\.venv\\Lib\\site-packages\\textual\\containers.py',           │ │
+│ │                    'Container.DEFAULT_CSS'),                                                                                            │ │
+│ │                    ('C:\\Users\\ito_mgg\\source\\repos\\portal-retail-v2\\.venv\\Lib\\site-packages\\textual\\widgets\\_footer.py',     │ │
+│ │                    'Footer.DEFAULT_CSS'),                                                                                               │ │
+│ │                    ('C:\\Users\\ito_mgg\\source\\repos\\portal-retail-v2\\.venv\\Lib\\site-packages\\textual\\containers.py',           │ │
+│ │                    'ScrollableContainer.DEFAULT_CSS'),                                                                                  │ │
+│ │                    ('C:\\Users\\ito_mgg\\source\\repos\\portal-retail-v2\\.venv\\Lib\\site-packages\\textual\\widgets\\_header.py',     │ │
+│ │                    'HeaderIcon.DEFAULT_CSS'),                                                                                           │ │
+│ │                    ('C:\\Users\\ito_mgg\\source\\repos\\portal-retail-v2\\.venv\\Lib\\site-packages\\textual\\widgets\\_header.py',     │ │
+│ │                    'HeaderTitle.DEFAULT_CSS'),                                                                                          │ │
+│ │                    ('C:\\Users\\ito_mgg\\source\\repos\\portal-retail-v2\\.venv\\Lib\\site-packages\\textual\\widgets\\_header.py',     │ │
+│ │                    'HeaderClock.DEFAULT_CSS'),                                                                                          │ │
+│ │                    ('C:\\Users\\ito_mgg\\source\\repos\\portal-retail-v2\\.venv\\Lib\\site-packages\\textual\\widgets\\_header.py',     │ │
+│ │                    'HeaderClockSpace.DEFAULT_CSS'),                                                                                     │ │
+│ │                    ('C:\\Users\\ito_mgg\\source\\repos\\portal-retail-v2\\.venv\\Lib\\site-packages\\textual\\widgets\\_button.py',     │ │
+│ │                    'Button.DEFAULT_CSS'),                                                                                               │ │
+│ │                    ('C:\\Users\\ito_mgg\\source\\repos\\portal-retail-v2\\.venv\\Lib\\site-packages\\textual\\widgets\\_footer.py',     │ │
+│ │                    'FooterKey.DEFAULT_CSS'),                                                                                            │ │
+│ │                    ('C:\\Users\\ito_mgg\\source\\repos\\portal-retail-v2\\src\\portal_retail\\tui\\screens\\package_screen.py',         │ │
+│ │                    'PackageScreen.DEFAULT_CSS'),                                                                                        │ │
+│ │                    ('C:\\Users\\ito_mgg\\source\\repos\\portal-retail-v2\\.venv\\Lib\\site-packages\\textual\\containers.py',           │ │
+│ │                    'VerticalScroll.DEFAULT_CSS'),                                                                                       │ │
+│ │                    ('C:\\Users\\ito_mgg\\source\\repos\\portal-retail-v2\\.venv\\Lib\\site-packages\\textual\\widgets\\_input.py',      │ │
+│ │                    'Input.DEFAULT_CSS'),                                                                                                │ │
+│ │                    ('C:\\Users\\ito_mgg\\source\\repos\\portal-retail-v2\\.venv\\Lib\\site-packages\\textual\\scroll_view.py',          │ │
+│ │                    'ScrollView.DEFAULT_CSS'),                                                                                           │ │
+│ │                    ('C:\\Users\\ito_mgg\\source\\repos\\portal-retail-v2\\.venv\\Lib\\site-packages\\textual\\widgets\\_select.py',     │ │
+│ │                    'Select.DEFAULT_CSS'),                                                                                               │ │
+│ │                    ('C:\\Users\\ito_mgg\\source\\repos\\portal-retail-v2\\.venv\\Lib\\site-packages\\textual\\containers.py',           │ │
+│ │                    'Vertical.DEFAULT_CSS'),                                                                                             │ │
+│ │                    ('C:\\Users\\ito_mgg\\source\\repos\\portal-retail-v2\\src\\portal_retail\\tui\\widgets\\component_selector.py',     │ │
+│ │                    'ComponentSelector.DEFAULT_CSS'),                                                                                    │ │
+│ │                    ('C:\\Users\\ito_mgg\\source\\repos\\portal-retail-v2\\.venv\\Lib\\site-packages\\textual\\widgets\\_select.py',     │ │
+│ │                    'SelectCurrent.DEFAULT_CSS'),                                                                                        │ │
+│ │                    ('C:\\Users\\ito_mgg\\source\\repos\\portal-retail-v2\\.venv\\Lib\\site-packages\\textual\\containers.py',           │ │
+│ │                    'Horizontal.DEFAULT_CSS'),                                                                                           │ │
+│ │                    ('C:\\Users\\ito_mgg\\source\\repos\\portal-retail-v2\\.venv\\Lib\\site-packages\\textual\\widgets\\_option_list.py… │ │
+│ │                    'OptionList.DEFAULT_CSS'),                                                                                           │ │
+│ │                    ('C:\\Users\\ito_mgg\\source\\repos\\portal-retail-v2\\.venv\\Lib\\site-packages\\textual\\widgets\\_selection_list… │ │
+│ │                    'SelectionList.DEFAULT_CSS')]>>                                                                                      │ │
+│ │           before = None                                                                                                                 │ │
+│ │            cache = {}                                                                                                                   │ │
+│ │      new_widgets = [Input(id='det_liferay_build_build_id')]                                                                             │ │
+│ │           parent = Container(id='comp-details-container')                                                                               │ │
+│ │             self = PortalRetailApp(                                                                                                     │ │
+│ │                    │   title='Portal Retail — Generador de Packages v2',                                                                │ │
+│ │                    │   classes={'-dark-mode'},                                                                                          │ │
+│ │                    │   pseudo_classes={'focus', 'dark'}                                                                                 │ │
+│ │                    )                                                                                                                    │ │
+│ │           widget = Input(id='det_liferay_build_build_id')                                                                               │ │
+│ │      widget_list = (Input(id='det_liferay_build_build_id'),)                                                                            │ │
+│ │          widgets = (Input(id='det_liferay_build_build_id'),)                                                                            │ │
+│ ╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯ │
+│                                                                                                                                             │
+│ C:\Users\ito_mgg\source\repos\portal-retail-v2\.venv\Lib\site-packages\textual\app.py:3577 in _register_child                               │
+│                                                                                                                                             │
+│   3574 │   │   │   │   # At this point we appear to not be adding before or after,                                                          │
+│   3575 │   │   │   │   # or we've got a before/after value that really means                                                                │
+│   3576 │   │   │   │   # "please append". So...                                                                                             │
+│ ❱ 3577 │   │   │   │   parent._nodes._append(child)                                                                                         │
+│   3578 │   │   │                                                                                                                            │
+│   3579 │   │   │   # Now that the widget is in the NodeList of its parent, sort out                                                         │
+│   3580 │   │   │   # the rest of the admin.                                                                                                 │
+│                                                                                                                                             │
+│ ╭─────────────────────────────────────────────────────────────── locals ───────────────────────────────────────────────────────────────╮    │
+│ │  after = None                                                                                                                        │    │
+│ │ before = None                                                                                                                        │    │
+│ │  child = Input(id='det_liferay_build_build_id')                                                                                      │    │
+│ │ parent = Container(id='comp-details-container')                                                                                      │    │
+│ │   self = PortalRetailApp(title='Portal Retail — Generador de Packages v2', classes={'-dark-mode'}, pseudo_classes={'focus', 'dark'}) │    │
+│ ╰──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯    │
+│                                                                                                                                             │
+│ C:\Users\ito_mgg\source\repos\portal-retail-v2\.venv\Lib\site-packages\textual\_node_list.py:129 in _append                                 │
+│                                                                                                                                             │
+│   126 │   │   │   self._nodes_set.add(widget)                                                                                               │
+│   127 │   │   │   widget_id = widget.id                                                                                                     │
+│   128 │   │   │   if widget_id is not None:                                                                                                 │
+│ ❱ 129 │   │   │   │   self._ensure_unique_id(widget_id)                                                                                     │
+│   130 │   │   │   │   self._nodes_by_id[widget_id] = widget                                                                                 │
+│   131 │   │   │   self.updated()                                                                                                            │
+│   132                                                                                                                                       │
+│                                                                                                                                             │
+│ ╭─────────────────────────────────── locals ────────────────────────────────────╮                                                           │
+│ │      self = <NodeList                                                         │                                                           │
+│ │             │   [                                                             │                                                           │
+│ │             │   │   Label(classes='comp-detail-section'),                     │                                                           │
+│ │             │   │   Label(classes='field-label'),                             │                                                           │
+│ │             │   │   Input(                                                    │                                                           │
+│ │             │   │   │   id='det_liferay_build_build_id',                      │                                                           │
+│ │             │   │   │   classes='-valid'                                      │                                                           │
+│ │             │   │   ),                                                        │                                                           │
+│ │             │   │   Label(classes='comp-detail-section'),                     │                                                           │
+│ │             │   │   Label(classes='field-label'),                             │                                                           │
+│ │             │   │   Input(id='det_liferay_build_build_id')                    │                                                           │
+│ │             │   ]                                                             │                                                           │
+│ │             >                                                                 │                                                           │
+│ │    widget = Input(id='det_liferay_build_build_id')                            │                                                           │
+│ │ widget_id = 'det_liferay_build_build_id'                                      │                                                           │
+│ ╰───────────────────────────────────────────────────────────────────────────────╯                                                           │
+│                                                                                                                                             │
+│ C:\Users\ito_mgg\source\repos\portal-retail-v2\.venv\Lib\site-packages\textual\_node_list.py:158 in _ensure_unique_id                       │
+│                                                                                                                                             │
+│   155 │   │   │   DuplicateIds: If the given ID is not unique.                                                                              │
+│   156 │   │   """                                                                                                                           │
+│   157 │   │   if widget_id in self._nodes_by_id:                                                                                            │
+│ ❱ 158 │   │   │   raise DuplicateIds(                                                                                                       │
+│   159 │   │   │   │   f"Tried to insert a widget with ID {widget_id!r}, but a widget already e                                              │
+│   160 │   │   │   │   "ensure all child widgets have a unique ID."                                                                          │
+│   161 │   │   │   )                                                                                                                         │
+│                                                                                                                                             │
+│ ╭─────────────────────────────────── locals ────────────────────────────────────╮                                                           │
+│ │      self = <NodeList                                                         │                                                           │
+│ │             │   [                                                             │                                                           │
+│ │             │   │   Label(classes='comp-detail-section'),                     │                                                           │
+│ │             │   │   Label(classes='field-label'),                             │                                                           │
+│ │             │   │   Input(                                                    │                                                           │
+│ │             │   │   │   id='det_liferay_build_build_id',                      │                                                           │
+│ │             │   │   │   classes='-valid'                                      │                                                           │
+│ │             │   │   ),                                                        │                                                           │
+│ │             │   │   Label(classes='comp-detail-section'),                     │                                                           │
+│ │             │   │   Label(classes='field-label'),                             │                                                           │
+│ │             │   │   Input(id='det_liferay_build_build_id')                    │                                                           │
+│ │             │   ]                                                             │                                                           │
+│ │             >                                                                 │                                                           │
+│ │ widget_id = 'det_liferay_build_build_id'                                      │                                                           │
+│ ╰───────────────────────────────────────────────────────────────────────────────╯                                                           │
+╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
+DuplicateIds: Tried to insert a widget with ID 'det_liferay_build_build_id', but a widget already exists with that ID
+(Input(id='det_liferay_build_build_id', classes='-valid')); ensure all child widgets have a unique ID.
+ ito_mgg   portal-retail-v2                                                                    

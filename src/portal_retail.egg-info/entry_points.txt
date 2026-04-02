@@ -1,0 +1,2 @@
+[console_scripts]
+portal-retail = portal_retail.main:main

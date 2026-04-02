@@ -1,0 +1,92 @@
+Metadata-Version: 2.4
+Name: portal-retail
+Version: 2.0.0
+Summary: Portal Retail — Generador de Packages de Instalación (TUI)
+Requires-Python: >=3.12
+Description-Content-Type: text/markdown
+Requires-Dist: textual>=0.50
+Requires-Dist: python-docx>=1.0
+Requires-Dist: platformdirs>=4.0
+Provides-Extra: dev
+Requires-Dist: pytest>=8.0; extra == "dev"
+Requires-Dist: ruff>=0.4; extra == "dev"
+
+# Portal Retail v2
+
+Generador de Packages de Instalación — TUI standalone con [Textual](https://textual.textualize.io/).
+
+Reescritura de `package_generator.py` v1 con persistencia de configuración, modo clone y auto-copy.
+
+## Requisitos
+
+- Python 3.12+
+- Windows (o cualquier plataforma con soporte terminal ANSI)
+
+## Instalación
+
+```bash
+# Clonar / descargar el repositorio
+cd C:\Users\ito_mgg\source\repos\portal-retail-v2
+
+# Crear entorno virtual
+python -m venv .venv
+.venv\Scripts\activate
+
+# Instalar dependencias
+pip install -e .
+
+# Instalar dependencias de desarrollo (pytest, ruff)
+pip install -e .[dev]
+```
+
+## Uso
+
+```bash
+# Iniciar la TUI
+python -m portal_retail
+
+# O con el entrypoint instalado
+portal-retail
+```
+
+## Estructura del proyecto
+
+```
+portal-retail-v2/
+├── pyproject.toml
+├── src/
+│   └── portal_retail/
+│       ├── main.py             # Entrypoint
+│       ├── core/               # Dominio: tipos, naming, config de package
+│       ├── services/           # Doc generation, folder creation, copy
+│       ├── config/             # Persistencia JSON de servidores
+│       └── tui/                # Screens y widgets Textual
+└── tests/
+    ├── unit/
+    └── integration/
+```
+
+## Desarrollo
+
+```bash
+# Lint
+ruff check src/
+
+# Tests
+pytest tests/
+```
+
+## Configuración persistida
+
+Los servidores QA/PROD se guardan automáticamente en:
+- Windows: `%APPDATA%\portal_retail\config.json`
+- Linux/Mac: `~/.config/portal_retail/config.json`
+
+## Generación de packages
+
+El formato del nombre de package es:
+```
+{ticket}-PortalRetail_{AMBIENTE}-{iteracion}
+```
+
+Ejemplo: `MX01-274906-PortalRetail_QA-01`

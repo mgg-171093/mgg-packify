@@ -1,0 +1,38 @@
+[build-system]
+requires = ["setuptools>=70", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "mgg-packgen"
+version = "2.0.0"
+description = "mgg-packgen — Generador de Packages de Instalación Portal Retail (TUI)"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "textual>=0.50",
+    "python-docx>=1.0",
+    "platformdirs>=4.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0",
+    "ruff>=0.4",
+]
+
+[project.scripts]
+mgg-packgen = "portal_retail.main:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.ruff]
+line-length = 100
+src = ["src"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
