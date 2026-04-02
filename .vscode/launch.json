@@ -1,0 +1,29 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "API: Python FastAPI",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "mgg_packgen_api.main",
+      "cwd": "${workspaceFolder}/api",
+      "console": "integratedTerminal",
+      "justMyCode": true
+    },
+    {
+      "name": "App: Flutter Windows",
+      "type": "dart",
+      "request": "launch",
+      "program": "${workspaceFolder}/app/lib/main.dart",
+      "deviceId": "windows",
+      "cwd": "${workspaceFolder}/app"
+    }
+  ],
+  "compounds": [
+    {
+      "name": "API + App (full stack)",
+      "configurations": ["API: Python FastAPI", "App: Flutter Windows"],
+      "stopAll": true
+    }
+  ]
+}

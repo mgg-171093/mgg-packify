@@ -1,0 +1,61 @@
+# ===== Python =====
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+*.egg
+dist/
+build/
+*.whl
+.eggs/
+*.pyo
+
+# Virtual environments
+.venv/
+venv/
+ENV/
+
+# Python tools
+.ruff_cache/
+.mypy_cache/
+.pytest_cache/
+htmlcov/
+.coverage
+.coverage.*
+coverage.xml
+
+# ===== Flutter / Dart =====
+# (app/.gitignore handles most Flutter specifics)
+**/doc/api/
+.dart_tool/
+.flutter-plugins-dependencies
+.pub-cache/
+.pub/
+
+# ===== IDE =====
+.idea/
+*.iml
+*.ipr
+*.iws
+*.sublime-workspace
+*.sublime-project
+*.code-workspace
+
+# ===== OS =====
+.DS_Store
+Thumbs.db
+Desktop.ini
+ehthumbs.db
+ehthumbs_vista.db
+
+# ===== Test output =====
+_TEST_package/
+TEST_*.docx
+
+# ===== Misc =====
+*.log
+*.swp
+*.swo
+*~
+.env
+.env.*
