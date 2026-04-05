@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "mgg-packgen-api"
 version = "3.0.0"
-description = "mgg-packgen API — FastAPI backend for Portal Retail Skandia México"
+description = "MGG-Packify API — FastAPI backend for Portal Retail Skandia México"
 requires-python = ">=3.12"
 dependencies = [
     "fastapi>=0.110",

@@ -1,6 +1,6 @@
-# mgg-packgen API
+# MGG-Packify API
 
-FastAPI backend for **mgg-packgen v3 — Portal Retail Skandia México**.  
+FastAPI backend for **MGG-Packify — Portal Retail Skandia México**.  
 Runs as a child process spawned by the Flutter app. Serves on `localhost:8787` and generates `.docx` installation packages.
 
 → See [root AGENTS.md](../AGENTS.md) for domain rules and critical context.  
@@ -53,7 +53,7 @@ The API starts on `http://localhost:8787`. The Flutter app also accepts an
 
 ```bash
 cd api
-python -m pytest          # run all 61 tests
+python -m pytest          # run all 87 tests
 python -m pytest -v       # verbose output
 python -m pytest tests/test_packages_derive.py  # single file
 ```
@@ -165,4 +165,4 @@ api/
 
 ---
 
-*Part of [mgg-packgen v3](../README.md) — Portal Retail Skandia México*
+*Part of [MGG-Packify](../README.md) — Portal Retail Skandia México*

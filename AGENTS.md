@@ -1,6 +1,6 @@
-# AGENTS.md — mgg-packgen v3
+# AGENTS.md — MGG-Packify
 
-Context file for AI agents and coding assistants working on mgg-packgen v3.
+Context file for AI agents and coding assistants working on MGG-Packify.
 
 See also: [ARCHITECTURE.md](./ARCHITECTURE.md) · [api/AGENTS.md](./api/AGENTS.md) · [app/AGENTS.md](./app/AGENTS.md)
 
@@ -48,7 +48,7 @@ See also: [ARCHITECTURE.md](./ARCHITECTURE.md) · [api/AGENTS.md](./api/AGENTS.m
 
 ## Project Overview
 
-**mgg-packgen v3** — Portal Retail Skandia México  
+**MGG-Packify** — Portal Retail Skandia México  
 Windows 11 desktop app that generates installation packages (.docx + folder structure).
 
 **Architecture**: Flutter desktop UI spawns a Python FastAPI process as a child. Flutter communicates via HTTP REST to `localhost:8787`.
@@ -277,11 +277,11 @@ colorScheme: ColorScheme.fromSeed(
 ## Test Commands
 
 ```bash
-# API tests (61 tests)
+# API tests (87 tests)
 cd api
 python -m pytest
 
-# Flutter tests (96 tests)
+# Flutter tests (161 tests)
 cd app
 flutter test
 

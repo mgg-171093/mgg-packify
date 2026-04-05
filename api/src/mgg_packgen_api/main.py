@@ -12,9 +12,9 @@ from fastapi import FastAPI
 from mgg_packgen_api.routes import health, packages, settings
 
 app = FastAPI(
-    title="mgg-packgen API",
+    title="MGG-Packify",
     version="3.0.0",
-    description="Backend FastAPI para mgg-packgen v3 — Portal Retail Skandia México",
+    description="MGG-Packify API",
 )
 
 app.include_router(health.router)

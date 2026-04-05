@@ -1,6 +1,6 @@
-# mgg-packgen — Flutter App
+# MGG-Packify — Flutter App
 
-Flutter Windows desktop app for **mgg-packgen v3 — Portal Retail Skandia México**.  
+Flutter Windows desktop app for **MGG-Packify — Portal Retail Skandia México**.  
 Generates installation packages (`.docx` + folder structure) for Portal Retail deployments.
 Communicates with a local Python FastAPI backend via HTTP REST on `localhost:8787`.
 
@@ -35,7 +35,7 @@ The app auto-spawns the Python API on startup (dev mode: skips spawn if port 878
 
 ```bash
 cd app
-flutter test                   # run all 96 tests
+flutter test                   # run all 161 tests
 flutter test test/path/file.dart  # run a single test file
 ```
 
@@ -73,7 +73,7 @@ These rules apply to **every** change in this codebase. Violating any of them br
 | **Navigation** | `context.go('/home')` | `Navigator.pop(context)` or `context.pop()` |
 | **State mutations** | Custom `save()` method on notifier | `await update((s) => ...)` — reserved Riverpod method |
 | **Python side** | Packages installed globally | Do NOT introduce a virtualenv |
-| **Tests** | All 96 tests green before merging | Never leave a failing test |
+| **Tests** | All 161 tests green before merging | Never leave a failing test |
 
 ### Why no `Navigator.pop()`?
 
@@ -99,4 +99,4 @@ All state mutations use a custom `save()` method pattern instead.
 
 ---
 
-*Part of [mgg-packgen v3](../README.md) — Portal Retail Skandia México*
+*Part of [MGG-Packify](../README.md) — Portal Retail Skandia México*

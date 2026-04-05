@@ -1,12 +1,16 @@
-# mgg-packgen v3
+<p align="center">
+  <img src="app/assets/logo-mgg.png" width="120" alt="MGG-Packify">
+</p>
+
+# MGG-Packify
 
 [![Python](https://img.shields.io/badge/Python-%E2%89%A53.12-3776AB?style=flat-square&logo=python&logoColor=white)](https://www.python.org/)
 [![Flutter](https://img.shields.io/badge/Flutter-3.41.4-02569B?style=flat-square&logo=flutter&logoColor=white)](https://flutter.dev/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.110+-009688?style=flat-square&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
 [![License](https://img.shields.io/badge/License-MIT-yellow?style=flat-square)](./LICENSE)
 [![Platform](https://img.shields.io/badge/Platform-Windows%2011-0078D4?style=flat-square&logo=windows&logoColor=white)](https://www.microsoft.com/windows/windows-11)
-[![API Tests](https://img.shields.io/badge/API%20Tests-61%20passing-brightgreen?style=flat-square)](./api/)
-[![Flutter Tests](https://img.shields.io/badge/Flutter%20Tests-96%20passing-brightgreen?style=flat-square)](./app/)
+[![API Tests](https://img.shields.io/badge/API%20Tests-87%20passing-brightgreen?style=flat-square)](./api/)
+[![Flutter Tests](https://img.shields.io/badge/Flutter%20Tests-161%20passing-brightgreen?style=flat-square)](./app/)
 
 **Portal Retail Skandia México** — Windows 11 desktop app that generates installation packages (`.docx` document + folder structure) for retail portal deployments. Covers all 8 component types: SQL scripts, API IIS/Docker services, Blob Storage, Liferay builds, Assets, and API Management.
 
@@ -152,7 +156,7 @@ The Flutter app polls `GET /health` on startup. Once the API responds, the app n
 ## Testing
 
 ```bash
-# API — 61 tests
+# API — 87 tests
 cd api
 python -m pytest
 
@@ -160,7 +164,7 @@ python -m pytest
 cd api
 python -m pytest -v
 
-# Flutter — 96 tests
+# Flutter — 161 tests
 cd app
 flutter test
 

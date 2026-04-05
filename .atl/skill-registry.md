@@ -1,4 +1,4 @@
-# Skill Registry — mgg-packify (mgg-packgen v3)
+# Skill Registry — mgg-packify (MGG-Packify)
 
 > Last updated by sdd-apply (project-docs-overhaul, task 7.1). Do not edit manually.
 
@@ -58,7 +58,7 @@ These conventions MUST be followed by any agent working on this codebase. Violat
 - **No virtualenv** — packages are installed globally; never create or activate a venv
 - Port **8787** is hardcoded in both Flutter (`api_client.dart`) and Python (`main.py`) — do NOT change it
 - Run API: `cd api && python -m mgg_packgen_api.main`
-- Run tests: `cd api && python -m pytest` (61 tests)
+- Run tests: `cd api && python -m pytest` (87 tests)
 
 ---
 

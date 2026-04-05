@@ -1,6 +1,6 @@
 # AGENTS.md — Flutter App
 
-Context for AI agents working on the Flutter desktop app of mgg-packgen v3.
+Context for AI agents working on the Flutter desktop app of MGG-Packify.
 See also: [Root AGENTS.md](../AGENTS.md) for domain rules, component types, and package name format.
 
 ---
@@ -25,7 +25,7 @@ See also: [Root AGENTS.md](../AGENTS.md) for domain rules, component types, and 
 cd app
 flutter run -d windows              # run in debug mode
 flutter build windows               # production build
-flutter test                        # run all 96 tests
+flutter test                        # run all 161 tests
 flutter test test/path/file.dart    # single test file
 dart run build_runner build --delete-conflicting-outputs  # regenerate mocks
 ```

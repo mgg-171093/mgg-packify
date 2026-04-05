@@ -1,4 +1,4 @@
-"""mgg-packgen API — FastAPI backend for Portal Retail Skandia México."""
+"""MGG-Packify API — FastAPI backend for Portal Retail Skandia México."""
 
 from __future__ import annotations
 

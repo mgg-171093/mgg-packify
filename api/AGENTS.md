@@ -1,6 +1,6 @@
 # AGENTS.md — API (Python FastAPI)
 
-Context for AI agents working on the Python backend of mgg-packgen v3.
+Context for AI agents working on the Python backend of MGG-Packify.
 
 > **Domain rules (8 component types, table mapping, expansion rules, package name format)**
 > live in the [root AGENTS.md](../AGENTS.md). Read it before touching any generation logic.
@@ -13,7 +13,7 @@ Context for AI agents working on the Python backend of mgg-packgen v3.
 |------|--------|
 | **No virtualenv** | Packages installed globally. If `import mgg_packgen_api` fails: `pip install -e api/` |
 | **Port 8787 is hardcoded** | Never change it. Flutter and API both reference it |
-| **All 61 tests must pass** | Run `python -m pytest` after every change |
+| **All 87 tests must pass** | Run `python -m pytest` after every change |
 | **liferay_build has NO folder** | Guarded in `folder_service.py` — do not remove that guard |
 | **UBICACIÓN = ambiente only** | Never concatenate `base_datos` into UBICACIÓN |
 | **QA → UAT only in docx** | Only in `gen_seccion_liferay_build()` — nowhere else |
@@ -37,7 +37,7 @@ mgg-packgen-api
 
 ```bash
 cd api
-python -m pytest              # all 61 tests
+python -m pytest              # all 87 tests
 python -m pytest -v           # verbose
 python -m pytest tests/test_packages_derive.py  # single file
 ```

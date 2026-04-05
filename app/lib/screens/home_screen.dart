@@ -25,22 +25,26 @@ class HomeScreen extends ConsumerWidget {
               children: [
                 // Logo + header
                 Center(
-                  child: Container(
-                    width: 80,
-                    height: 80,
-                    decoration: BoxDecoration(
-                      color: colorScheme.primaryContainer,
-                      borderRadius: BorderRadius.circular(20),
-                      border: Border.all(
-                        color: colorScheme.primary.withOpacity(0.4),
-                        width: 2,
-                      ),
-                    ),
-                    child: Icon(
-                      Icons.inventory_2_outlined,
-                      size: 40,
-                      color: colorScheme.primary,
-                    ),
+                  child: Builder(
+                    builder: (context) {
+                      final isDark = Theme.of(context).brightness == Brightness.dark;
+                      Widget logo = Image.asset(
+                        'assets/logo-mgg.png',
+                        width: 80,
+                        height: 80,
+                        fit: BoxFit.contain,
+                      );
+                      if (isDark) {
+                        logo = ColorFiltered(
+                          colorFilter: const ColorFilter.mode(
+                            Colors.white,
+                            BlendMode.srcIn,
+                          ),
+                          child: logo,
+                        );
+                      }
+                      return logo;
+                    },
                   ),
                 ),
                 const SizedBox(height: 16),

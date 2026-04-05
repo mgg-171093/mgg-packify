@@ -1,4 +1,4 @@
-# Architecture — mgg-packgen v3
+# Architecture — MGG-Packify
 
 Portal Retail Skandia México — generador de packages de instalación.  
 Windows 11 desktop app: Flutter UI + Python FastAPI backend (proceso hijo).
@@ -430,8 +430,8 @@ sequenceDiagram
 
 | Suite | Count | Command |
 |-------|-------|---------|
-| pytest (API) | 61 tests | `cd api && python -m pytest` |
-| flutter test | 96 tests | `cd app && flutter test` |
+| pytest (API) | 87 tests | `cd api && python -m pytest` |
+| flutter test | 161 tests | `cd app && flutter test` |
 
 All tests must remain green after any change. Zero code changes in this documentation update means zero regression risk.
 
