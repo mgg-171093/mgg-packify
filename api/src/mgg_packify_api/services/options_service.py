@@ -2,7 +2,7 @@
 Persistencia de listas de opciones configurables.
 
 Guarda y carga las listas de opciones (estatus, tipo_sql, tipo_blob) en
-%APPDATA%\\mgg_packgen_api\\options.json (Windows) usando platformdirs.
+%APPDATA%\\mgg_packify_api\\options.json (Windows) usando platformdirs.
 
 Si el archivo no existe o está corrupto, devuelve defaults silenciosamente.
 """
@@ -15,7 +15,7 @@ from pathlib import Path
 
 from platformdirs import user_data_dir
 
-from mgg_packgen_api.schemas.options import (
+from mgg_packify_api.schemas.options import (
     ApiDockerServiceEntry,
     ApiIisServiceEntry,
     OptionsSchema,
@@ -36,7 +36,7 @@ logger = logging.getLogger(__name__)
 #   "sql_databases": ["RAWRAPSIIF", "RAWRETAILDB"]
 # }
 
-_APP_NAME = "mgg_packgen_api"
+_APP_NAME = "mgg_packify_api"
 _OPTIONS_FILE = "options.json"
 _SCHEMA_VERSION = 3
 

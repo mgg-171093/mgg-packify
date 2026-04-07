@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mgg_packgen/widgets/package_name_preview.dart';
+import 'package:mgg_packify/widgets/package_name_preview.dart';
 
 void main() {
   Widget buildPreview({

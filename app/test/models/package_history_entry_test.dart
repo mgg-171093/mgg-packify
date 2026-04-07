@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mgg_packgen/models/package_history_entry.dart';
+import 'package:mgg_packify/models/package_history_entry.dart';
 
 void main() {
   group('PackageHistoryEntry', () {

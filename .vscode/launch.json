@@ -5,7 +5,7 @@
       "name": "API: Python FastAPI",
       "type": "debugpy",
       "request": "launch",
-      "module": "mgg_packgen_api.main",
+      "module": "mgg_packify_api.main",
       "cwd": "${workspaceFolder}/api",
       "console": "integratedTerminal",
       "justMyCode": true

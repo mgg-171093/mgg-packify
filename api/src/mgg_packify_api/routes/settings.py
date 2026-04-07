@@ -7,17 +7,17 @@ from __future__ import annotations
 
 from fastapi import APIRouter
 
-from mgg_packgen_api.schemas.options import OptionsSchema
-from mgg_packgen_api.schemas.settings import (
+from mgg_packify_api.schemas.options import OptionsSchema
+from mgg_packify_api.schemas.settings import (
     SettingsSaveResponse,
     SettingsSchema,
     ServerSettings,
     ServersSettings,
     LastUsedSettings,
 )
-from mgg_packgen_api.services.options_service import OptionsManager
-from mgg_packgen_api.services.package import ServerConfig
-from mgg_packgen_api.services.settings_service import SettingsManager
+from mgg_packify_api.services.options_service import OptionsManager
+from mgg_packify_api.services.package import ServerConfig
+from mgg_packify_api.services.settings_service import SettingsManager
 
 router = APIRouter()
 

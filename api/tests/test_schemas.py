@@ -7,7 +7,7 @@ from __future__ import annotations
 import pytest
 from pydantic import ValidationError
 
-from mgg_packgen_api.schemas.package import ConfigItemIn
+from mgg_packify_api.schemas.package import ConfigItemIn
 
 
 class TestConfigItemIn:

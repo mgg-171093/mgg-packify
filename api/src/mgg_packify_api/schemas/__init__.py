@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from mgg_packgen_api.schemas.package import (
+from mgg_packify_api.schemas.package import (
     ArchivoItemIn,
     CloneRequest,
     CloneResponse,
@@ -14,7 +14,7 @@ from mgg_packgen_api.schemas.package import (
     PackageListItem,
     PackageListResponse,
 )
-from mgg_packgen_api.schemas.settings import (
+from mgg_packify_api.schemas.settings import (
     LastUsedSettings,
     ServerSettings,
     ServersSettings,

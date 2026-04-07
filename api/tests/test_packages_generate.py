@@ -221,10 +221,10 @@ def test_generate_api_iis_publicar_true_success(
     - steps contiene una entrada con ok=True
     - la generación del package completa normalmente (ok=True)
     """
-    from mgg_packgen_api.services.publish_service import PublishResult
-    from mgg_packgen_api.services.options_service import OptionsManager
-    from mgg_packgen_api.schemas.options import ApiIisServiceEntry, OptionsSchema
-    from mgg_packgen_api import routes
+    from mgg_packify_api.services.publish_service import PublishResult
+    from mgg_packify_api.services.options_service import OptionsManager
+    from mgg_packify_api.schemas.options import ApiIisServiceEntry, OptionsSchema
+    from mgg_packify_api import routes
 
     # Configurar un OptionsManager con "SvcA" en el catálogo
     options_file = tmp_path / "options.json"
@@ -236,7 +236,7 @@ def test_generate_api_iis_publicar_true_success(
     # Monkeypatch publish_api_iis para devolver éxito
     mock_result = PublishResult(nombre="SvcA", ok=True, zip_path="/tmp/SvcA.zip")
     with patch(
-        "mgg_packgen_api.routes.packages.publish_service.publish_api_iis",
+        "mgg_packify_api.routes.packages.publish_service.publish_api_iis",
         return_value=mock_result,
     ):
         payload = _api_iis_payload(str(tmp_path), publicar=True)
@@ -262,10 +262,10 @@ def test_generate_api_iis_publicar_true_failure(
     - steps tiene entrada con ok=False y error="build failed"
     - el package (carpetas + docx) se generó igual
     """
-    from mgg_packgen_api.services.publish_service import PublishResult
-    from mgg_packgen_api.services.options_service import OptionsManager
-    from mgg_packgen_api.schemas.options import ApiIisServiceEntry, OptionsSchema
-    from mgg_packgen_api import routes
+    from mgg_packify_api.services.publish_service import PublishResult
+    from mgg_packify_api.services.options_service import OptionsManager
+    from mgg_packify_api.schemas.options import ApiIisServiceEntry, OptionsSchema
+    from mgg_packify_api import routes
 
     # Configurar catálogo con "SvcA"
     options_file = tmp_path / "options.json"
@@ -277,7 +277,7 @@ def test_generate_api_iis_publicar_true_failure(
     # Monkeypatch publish_api_iis para devolver fallo
     mock_result = PublishResult(nombre="SvcA", ok=False, error="build failed")
     with patch(
-        "mgg_packgen_api.routes.packages.publish_service.publish_api_iis",
+        "mgg_packify_api.routes.packages.publish_service.publish_api_iis",
         return_value=mock_result,
     ):
         payload = _api_iis_payload(str(tmp_path), publicar=True)
@@ -311,9 +311,9 @@ def test_generate_api_iis_publicar_true_not_in_catalog(
     - respuesta 200 (non-fatal)
     - steps tiene entrada con ok=False y error="Servicio no encontrado en catálogo"
     """
-    from mgg_packgen_api.services.options_service import OptionsManager
-    from mgg_packgen_api.schemas.options import OptionsSchema
-    from mgg_packgen_api import routes
+    from mgg_packify_api.services.options_service import OptionsManager
+    from mgg_packify_api.schemas.options import OptionsSchema
+    from mgg_packify_api import routes
 
     # Catálogo vacío — SvcA no existe
     options_file = tmp_path / "options.json"
@@ -346,10 +346,10 @@ def test_zip_in_componentes(
     Con publicar=True, el dest_dir pasado a publish_api_iis debe ser
     package_dir / "Componentes" / "API".
     """
-    from mgg_packgen_api.services.publish_service import PublishResult
-    from mgg_packgen_api.services.options_service import OptionsManager
-    from mgg_packgen_api.schemas.options import ApiIisServiceEntry, OptionsSchema
-    from mgg_packgen_api import routes
+    from mgg_packify_api.services.publish_service import PublishResult
+    from mgg_packify_api.services.options_service import OptionsManager
+    from mgg_packify_api.schemas.options import ApiIisServiceEntry, OptionsSchema
+    from mgg_packify_api import routes
 
     # Catálogo con SvcZip
     options_file = tmp_path / "options.json"
@@ -365,7 +365,7 @@ def test_zip_in_componentes(
         return PublishResult(nombre=nombre, ok=True, zip_path=str(dest_dir / f"{nombre}.zip"))
 
     with patch(
-        "mgg_packgen_api.routes.packages.publish_service.publish_api_iis",
+        "mgg_packify_api.routes.packages.publish_service.publish_api_iis",
         side_effect=fake_publish,
     ):
         payload = {

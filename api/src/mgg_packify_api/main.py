@@ -9,12 +9,12 @@ from __future__ import annotations
 
 from fastapi import FastAPI
 
-from mgg_packgen_api.routes import health, packages, settings
+from mgg_packify_api.routes import health, packages, settings
 
 app = FastAPI(
-    title="mgg-packgen API",
+    title="MGG-Packify",
     version="3.0.0",
-    description="Backend FastAPI para mgg-packgen v3 — Portal Retail Skandia México",
+    description="MGG-Packify API",
 )
 
 app.include_router(health.router)
@@ -26,13 +26,13 @@ def start() -> None:
     """
     Arranca el servidor uvicorn en localhost:8787.
 
-    Usado como entry point del script instalado (mgg-packgen-api).
+    Usado como entry point del script instalado (mgg-packify-api).
     Flutter lanza este proceso hijo al iniciar.
     """
     import uvicorn
 
     uvicorn.run(
-        "mgg_packgen_api.main:app",
+        "mgg_packify_api.main:app",
         host="127.0.0.1",
         port=8787,
         reload=False,

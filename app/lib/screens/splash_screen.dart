@@ -82,24 +82,23 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
               // Logo / icon
               Builder(
                 builder: (context) {
-                  final colorScheme = Theme.of(context).colorScheme;
-                  return Container(
+                  final isDark = Theme.of(context).brightness == Brightness.dark;
+                  Widget img = Image.asset(
+                    'assets/logo-mgg.png',
                     width: 96,
                     height: 96,
-                    decoration: BoxDecoration(
-                      color: colorScheme.primaryContainer,
-                      borderRadius: BorderRadius.circular(24),
-                      border: Border.all(
-                        color: colorScheme.primary.withOpacity(0.4),
-                        width: 2,
-                      ),
-                    ),
-                    child: Icon(
-                      Icons.inventory_2_outlined,
-                      size: 48,
-                      color: colorScheme.primary,
-                    ),
+                    fit: BoxFit.contain,
                   );
+                  if (isDark) {
+                    img = ColorFiltered(
+                      colorFilter: const ColorFilter.mode(
+                        Colors.white,
+                        BlendMode.srcIn,
+                      ),
+                      child: img,
+                    );
+                  }
+                  return img;
                 },
               ),
               const SizedBox(height: 24),

@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
-import 'package:mgg_packgen/core/api_client.dart';
-import 'package:mgg_packgen/models/options_model.dart';
-import 'package:mgg_packgen/models/package_list_item.dart';
-import 'package:mgg_packgen/models/settings_model.dart';
-import 'package:mgg_packgen/screens/clone_screen.dart';
+import 'package:mgg_packify/core/api_client.dart';
+import 'package:mgg_packify/models/options_model.dart';
+import 'package:mgg_packify/models/package_list_item.dart';
+import 'package:mgg_packify/models/settings_model.dart';
+import 'package:mgg_packify/screens/clone_screen.dart';
 
 // ─────────────────────────────────────────────
 // Stub ApiClient — returns empty/safe defaults

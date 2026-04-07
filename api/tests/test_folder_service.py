@@ -10,9 +10,9 @@ from pathlib import Path
 
 import pytest
 
-from mgg_packgen_api.services.component import ComponentConfig, ComponentType
-from mgg_packgen_api.services.folder_service import create_package_folders
-from mgg_packgen_api.services.package import PackageConfig
+from mgg_packify_api.services.component import ComponentConfig, ComponentType
+from mgg_packify_api.services.folder_service import create_package_folders
+from mgg_packify_api.services.package import PackageConfig
 
 
 def _make_sql_config(

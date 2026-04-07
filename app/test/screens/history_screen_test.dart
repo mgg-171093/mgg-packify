@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
-import 'package:mgg_packgen/models/package_history_entry.dart';
-import 'package:mgg_packgen/providers/history_provider.dart';
-import 'package:mgg_packgen/providers/package_form_provider.dart';
-import 'package:mgg_packgen/screens/history_screen.dart';
+import 'package:mgg_packify/models/package_history_entry.dart';
+import 'package:mgg_packify/providers/history_provider.dart';
+import 'package:mgg_packify/providers/package_form_provider.dart';
+import 'package:mgg_packify/screens/history_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 // ─────────────────────────────────────────────

@@ -12,9 +12,9 @@ from __future__ import annotations
 
 import pytest
 
-from mgg_packgen_api.routes.packages import _derive_component_config
-from mgg_packgen_api.schemas.package import ArchivoItemIn, ComponentIn, InstanceIn
-from mgg_packgen_api.services.component import ComponentConfig, ComponentType
+from mgg_packify_api.routes.packages import _derive_component_config
+from mgg_packify_api.schemas.package import ArchivoItemIn, ComponentIn, InstanceIn
+from mgg_packify_api.services.component import ComponentConfig, ComponentType
 
 
 # ─────────────────────────────────────────────────────────────────────────────

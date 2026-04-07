@@ -1,5 +1,5 @@
 """
-Tests unitarios para mgg_packgen_api.services.publish_service
+Tests unitarios para mgg_packify_api.services.publish_service
 
 Cubre:
   - detect_framework: detección de .NET Framework (v) y .NET Core
@@ -15,8 +15,8 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from mgg_packgen_api.services import publish_service
-from mgg_packgen_api.services.publish_service import (
+from mgg_packify_api.services import publish_service
+from mgg_packify_api.services.publish_service import (
     PublishResult,
     detect_framework,
     find_msbuild,

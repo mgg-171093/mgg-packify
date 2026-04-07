@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
-import 'package:mgg_packgen/core/api_client.dart';
-import 'package:mgg_packgen/screens/new_package_screen.dart';
+import 'package:mgg_packify/core/api_client.dart';
+import 'package:mgg_packify/screens/new_package_screen.dart';
 
 /// Minimal stub ApiClient that does nothing (never called in validation tests)
 class _StubApiClient extends ApiClient {

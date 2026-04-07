@@ -2,9 +2,9 @@ import 'dart:async';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mgg_packgen/core/api_client.dart';
-import 'package:mgg_packgen/models/options_model.dart';
-import 'package:mgg_packgen/providers/options_provider.dart';
+import 'package:mgg_packify/core/api_client.dart';
+import 'package:mgg_packify/models/options_model.dart';
+import 'package:mgg_packify/providers/options_provider.dart';
 
 // ─────────────────────────────────────────────
 // Fake ApiClient — controls what getOptions / putOptions return
