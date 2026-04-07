@@ -26,7 +26,7 @@ graph TB
         Flutter["Flutter App<br/>Riverpod 2.x + go_router 14"]
         API["Python FastAPI<br/>uvicorn · port 8787"]
         FS["Filesystem<br/>Package folders + .docx"]
-        Config["%APPDATA%\\mgg_packgen_api\\<br/>config.json · options.json"]
+        Config["%APPDATA%\\mgg_packify_api\\<br/>config.json · options.json"]
         SharedPrefs["SharedPreferences<br/>history · templates · theme"]
     end
 
@@ -141,7 +141,7 @@ Open the project in VS Code and use the **API + App (full stack)** compound laun
 ```bash
 # Terminal 1 — API backend
 cd api
-python -m mgg_packgen_api.main
+python -m mgg_packify_api.main
 # → Listening on http://127.0.0.1:8787
 
 # Terminal 2 — Flutter app

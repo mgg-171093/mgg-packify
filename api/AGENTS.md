@@ -11,7 +11,7 @@ Context for AI agents working on the Python backend of MGG-Packify.
 
 | Rule | Detail |
 |------|--------|
-| **No virtualenv** | Packages installed globally. If `import mgg_packgen_api` fails: `pip install -e api/` |
+| **No virtualenv** | Packages installed globally. If `import mgg_packify_api` fails: `pip install -e api/` |
 | **Port 8787 is hardcoded** | Never change it. Flutter and API both reference it |
 | **All 87 tests must pass** | Run `python -m pytest` after every change |
 | **liferay_build has NO folder** | Guarded in `folder_service.py` — do not remove that guard |
@@ -27,10 +27,10 @@ Context for AI agents working on the Python backend of MGG-Packify.
 ```bash
 # From repo root
 cd api
-python -m mgg_packgen_api.main
+python -m mgg_packify_api.main
 
 # Or as installed script
-mgg-packgen-api
+mgg-packify-api
 ```
 
 ## Testing
@@ -49,7 +49,7 @@ python -m pytest tests/test_packages_derive.py  # single file
 ```
 api/
 ├── pyproject.toml
-└── src/mgg_packgen_api/
+└── src/mgg_packify_api/
     ├── main.py               ← FastAPI app + uvicorn entry point
     ├── routes/
     │   ├── health.py         ← GET /health
@@ -438,7 +438,7 @@ publish_api_iis(nombre, ruta, dest_dir)
 
 ### `config.json` — `services/settings_service.py`
 
-Path: `%APPDATA%\mgg_packgen_api\config.json` (via `platformdirs.user_data_dir()`)
+Path: `%APPDATA%\mgg_packify_api\config.json` (via `platformdirs.user_data_dir()`)
 
 ```json
 {
@@ -461,7 +461,7 @@ Behavior: missing file → returns defaults silently. Corrupt JSON → resets to
 
 ### `options.json` — `services/options_service.py`
 
-Path: `%APPDATA%\mgg_packgen_api\options.json` (via `platformdirs.user_data_dir()`)
+Path: `%APPDATA%\mgg_packify_api\options.json` (via `platformdirs.user_data_dir()`)
 
 ```json
 {

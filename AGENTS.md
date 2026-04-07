@@ -26,7 +26,7 @@ See also: [ARCHITECTURE.md](./ARCHITECTURE.md) · [api/AGENTS.md](./api/AGENTS.m
 ### Python API
 
 - **No virtualenv** — packages installed globally
-- Run API: `cd api && python -m mgg_packgen_api.main`
+- Run API: `cd api && python -m mgg_packify_api.main`
 - API port: **8787** (hardcoded in both Flutter and Python — do NOT change)
 - Run tests: `cd api && python -m pytest`
 
@@ -67,7 +67,7 @@ mgg-packify/
 │   ├── AGENTS.md         ← API endpoints, JSON examples, Python gotchas
 │   ├── README.md         ← API install/run/test for humans
 │   ├── pyproject.toml
-│   └── src/mgg_packgen_api/
+│   └── src/mgg_packify_api/
 │       ├── main.py
 │       ├── routes/       health.py, packages.py, settings.py
 │       ├── schemas/      options.py, package.py, settings.py
@@ -132,8 +132,8 @@ mgg-packify/
 | Provider | File | Riverpod type | Persistence | Key methods |
 |----------|------|---------------|-------------|-------------|
 | `packageFormProvider` | `package_form_provider.dart` | `NotifierProvider<PackageFormNotifier, PackageFormState>` | In-memory only | `updateTicket`, `toggleComponent`, `addInstance`, `removeInstance`, `updateInstance`, `prefill`, `prefillFromHistory`, `applyTemplate`, `reset` |
-| `settingsProvider` | `settings_provider.dart` | `AsyncNotifierProvider<SettingsNotifier, SettingsModel>` | API → `%APPDATA%\mgg_packgen_api\config.json` | `save(settings)`, `clear()` |
-| `optionsProvider` | `options_provider.dart` | `AsyncNotifierProvider<OptionsNotifier, OptionsModel>` | API → `%APPDATA%\mgg_packgen_api\options.json` | `save(options)` |
+| `settingsProvider` | `settings_provider.dart` | `AsyncNotifierProvider<SettingsNotifier, SettingsModel>` | API → `%APPDATA%\mgg_packify_api\config.json` | `save(settings)`, `clear()` |
+| `optionsProvider` | `options_provider.dart` | `AsyncNotifierProvider<OptionsNotifier, OptionsModel>` | API → `%APPDATA%\mgg_packify_api\options.json` | `save(options)` |
 | `historyProvider` | `history_provider.dart` | `AsyncNotifierProvider<HistoryNotifier, List<PackageHistoryEntry>>` | SharedPreferences key: `history_entries` (cap 50) | `add(entry)`, `delete(index)`, `clear()` |
 | `templatesProvider` | `templates_provider.dart` | `AsyncNotifierProvider<TemplatesNotifier, List<PackageTemplate>>` | SharedPreferences key: `templates_list` | `save(template)`, `delete(index)` |
 | `themeModeProvider` | `theme_mode_provider.dart` | `AsyncNotifierProvider<ThemeModeNotifier, ThemeMode>` | SharedPreferences key: `theme_mode` | `setMode(mode)`, `toggle()` |
@@ -225,7 +225,7 @@ ambiente_display = "UAT" if ambiente == "QA" else ambiente
 
 ## Config Persistence
 
-### API-Side (Python — `%APPDATA%\mgg_packgen_api\`)
+### API-Side (Python — `%APPDATA%\mgg_packify_api\`)
 
 | File | Content |
 |------|---------|
@@ -302,10 +302,10 @@ dart run build_runner build --delete-conflicting-outputs
 |------|-------------|
 | `PROMPT_V3.md` | **Original spec** — authoritative for any domain rule question |
 | `ARCHITECTURE.md` | System diagrams, data flow, tech stack, domain model |
-| `api/src/mgg_packgen_api/routes/packages.py` | `_derive_component_config()` — expansion logic |
-| `api/src/mgg_packgen_api/services/doc_generator.py` | .docx generation (903 lines) |
-| `api/src/mgg_packgen_api/services/component.py` | `ComponentType` enum + canonical order |
-| `api/src/mgg_packgen_api/services/publish_service.py` | IIS publish pipeline (beyond-spec) |
+| `api/src/mgg_packify_api/routes/packages.py` | `_derive_component_config()` — expansion logic |
+| `api/src/mgg_packify_api/services/doc_generator.py` | .docx generation (903 lines) |
+| `api/src/mgg_packify_api/services/component.py` | `ComponentType` enum + canonical order |
+| `api/src/mgg_packify_api/services/publish_service.py` | IIS publish pipeline (beyond-spec) |
 | `app/lib/app.dart` | go_router flat config + ThemeData (seed: `Colors.blue`) |
 | `app/lib/core/api_client.dart` | HTTP client + all API methods + `apiClientProvider` |
 | `app/lib/core/server_manager.dart` | Python process spawn/kill logic |

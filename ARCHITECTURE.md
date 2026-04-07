@@ -56,7 +56,7 @@ Windows 11 desktop app: Flutter UI + Python FastAPI backend (proceso hijo).
 | REST Framework | fastapi | ≥0.110 | HTTP endpoints |
 | ASGI Server | uvicorn[standard] | ≥0.29 | Server runner on port 8787 |
 | Document Gen | python-docx | ≥1.0 | `.docx` generation |
-| Config Paths | platformdirs | ≥4.0 | `%APPDATA%\mgg_packgen_api\` |
+| Config Paths | platformdirs | ≥4.0 | `%APPDATA%\mgg_packify_api\` |
 | Validation | pydantic | ≥2.0 | Request/response schemas |
 | Linter | ruff | ≥0.4 | Lint + format |
 | Test Runner | pytest | ≥8.0 | API test suite |
@@ -72,7 +72,7 @@ graph TB
         Flutter["Flutter App\nRiverpod + go_router\napp/lib/"]
         API["Python FastAPI\nuvicorn :8787\napi/src/"]
         FS["Filesystem\nPackage folders + .docx\n{ruta_packages}/"]
-        Config["%APPDATA%\nmgg_packgen_api\\\nconfig.json + options.json"]
+        Config["%APPDATA%\nmgg_packify_api\\\nconfig.json + options.json"]
         SharedPrefs["SharedPreferences\nhistory_entries\ntemplates_list\ntheme_mode"]
     end
 
@@ -89,8 +89,8 @@ graph TB
 
 | Mode | Behavior |
 |------|----------|
-| **Release** | Launches `mgg-packgen-api.exe` from same directory as Flutter `.exe` |
-| **Dev** | Checks port 8787 (300 ms timeout); if listening → skip launch; if not → `python -m mgg_packgen_api.main` from `api/` |
+| **Release** | Launches `mgg-packify-api.exe` from same directory as Flutter `.exe` |
+| **Dev** | Checks port 8787 (300 ms timeout); if listening → skip launch; if not → `python -m mgg_packify_api.main` from `api/` |
 | **Shutdown** | `Process.kill()` on `AppLifecycleState.detached` |
 | **Override** | `MGG_API_PATH` env var overrides the API path resolution |
 
@@ -342,7 +342,7 @@ Example: `INC-1234-PortalRetail_QA-03`
 
 ## Config Persistence
 
-### Python side (`%APPDATA%\mgg_packgen_api\` via `platformdirs`)
+### Python side (`%APPDATA%\mgg_packify_api\` via `platformdirs`)
 
 | File | Contents | Endpoint |
 |------|----------|----------|
@@ -454,7 +454,7 @@ mgg-packify/
 │   ├── AGENTS.md              ← API-specific AI context (endpoints + JSON examples)
 │   ├── README.md              ← API developer quickstart
 │   ├── pyproject.toml         ← dependencies + ruff config
-│   └── src/mgg_packgen_api/
+│   └── src/mgg_packify_api/
 │       ├── main.py            ← uvicorn entry point (:8787)
 │       ├── routes/
 │       │   ├── health.py      ← GET /health

@@ -41,7 +41,7 @@ pip install -e "api/[dev]"
 
 ```bash
 cd api
-python -m mgg_packgen_api.main
+python -m mgg_packify_api.main
 ```
 
 The API starts on `http://localhost:8787`. The Flutter app also accepts an
@@ -98,8 +98,8 @@ The API persists configuration to Windows AppData:
 
 | File | Path | Contents |
 |------|------|----------|
-| `config.json` | `%APPDATA%\mgg_packgen_api\config.json` | Server hostnames for QA and PROD environments; last-used form values |
-| `options.json` | `%APPDATA%\mgg_packgen_api\options.json` | Configurable lists: estatus, SQL tipo, Blob tipo, API services, SQL databases |
+| `config.json` | `%APPDATA%\mgg_packify_api\config.json` | Server hostnames for QA and PROD environments; last-used form values |
+| `options.json` | `%APPDATA%\mgg_packify_api\options.json` | Configurable lists: estatus, SQL tipo, Blob tipo, API services, SQL databases |
 
 These files are created automatically with defaults on first run if they don't exist.
 
@@ -112,13 +112,13 @@ These files are created automatically with defaults on first run if they don't e
 The API port is **hardcoded to 8787** in both this backend and the Flutter app. Do **not** change it.
 
 ```python
-# api/src/mgg_packgen_api/main.py
+# api/src/mgg_packify_api/main.py
 uvicorn.run(app, host="127.0.0.1", port=8787)
 ```
 
 ### No Virtualenv
 
-Packages are installed globally by design. The Flutter app spawns `python -m mgg_packgen_api.main`
+Packages are installed globally by design. The Flutter app spawns `python -m mgg_packify_api.main`
 directly — there is no virtualenv activation step. Do not introduce one.
 
 ### doc_generator.py — XML Sections
@@ -143,7 +143,7 @@ Do not change this value.
 ```text
 api/
 ├── pyproject.toml                        ← project metadata, dependencies, ruff config
-└── src/mgg_packgen_api/
+└── src/mgg_packify_api/
     ├── main.py                           ← FastAPI app + uvicorn entry point
     ├── routes/
     │   ├── health.py                     ← GET /health

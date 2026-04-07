@@ -24,7 +24,7 @@
 | State | Riverpod 2.x (`Notifier` / `AsyncNotifier` / `StateProvider` / `FutureProvider.family`) |
 | Navigation | go_router (flat config, no Navigator stack) |
 | Backend | Python 3.12 + FastAPI + uvicorn on port 8787 |
-| Persistence | SharedPreferences (Flutter) + `%APPDATA%\mgg_packgen_api\` (Python) |
+| Persistence | SharedPreferences (Flutter) + `%APPDATA%\mgg_packify_api\` (Python) |
 
 ---
 
@@ -57,7 +57,7 @@ These conventions MUST be followed by any agent working on this codebase. Violat
 
 - **No virtualenv** — packages are installed globally; never create or activate a venv
 - Port **8787** is hardcoded in both Flutter (`api_client.dart`) and Python (`main.py`) — do NOT change it
-- Run API: `cd api && python -m mgg_packgen_api.main`
+- Run API: `cd api && python -m mgg_packify_api.main`
 - Run tests: `cd api && python -m pytest` (87 tests)
 
 ---

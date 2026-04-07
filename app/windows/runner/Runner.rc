@@ -92,9 +92,9 @@ BEGIN
             VALUE "CompanyName", "dev.mgg" "\0"
             VALUE "FileDescription", "MGG-Packify" "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
-            VALUE "InternalName", "mgg_packgen" "\0"
+            VALUE "InternalName", "mgg_packify" "\0"
             VALUE "LegalCopyright", "Copyright (C) 2026 dev.mgg. All rights reserved." "\0"
-            VALUE "OriginalFilename", "mgg_packgen.exe" "\0"
+            VALUE "OriginalFilename", "mgg_packify.exe" "\0"
             VALUE "ProductName", "MGG-Packify" "\0"
             VALUE "ProductVersion", VERSION_AS_STRING "\0"
         END

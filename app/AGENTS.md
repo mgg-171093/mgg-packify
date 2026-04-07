@@ -275,8 +275,8 @@ showDialog(
 | Provider | File | Riverpod type | Persistence | Key methods |
 |----------|------|---------------|-------------|-------------|
 | `packageFormProvider` | `package_form_provider.dart` | `NotifierProvider<PackageFormNotifier, PackageFormState>` | In-memory only | `updateTicket`, `toggleComponent`, `addInstance`, `removeInstance`, `updateInstance`, `prefill`, `prefillFromHistory`, `applyTemplate`, `reset` |
-| `settingsProvider` | `settings_provider.dart` | `AsyncNotifierProvider<SettingsNotifier, SettingsModel>` | API → `%APPDATA%\mgg_packgen_api\config.json` | `save(settings)`, `clear()` |
-| `optionsProvider` | `options_provider.dart` | `AsyncNotifierProvider<OptionsNotifier, OptionsModel>` | API → `%APPDATA%\mgg_packgen_api\options.json` | `save(options)` |
+| `settingsProvider` | `settings_provider.dart` | `AsyncNotifierProvider<SettingsNotifier, SettingsModel>` | API → `%APPDATA%\mgg_packify_api\config.json` | `save(settings)`, `clear()` |
+| `optionsProvider` | `options_provider.dart` | `AsyncNotifierProvider<OptionsNotifier, OptionsModel>` | API → `%APPDATA%\mgg_packify_api\options.json` | `save(options)` |
 | `historyProvider` | `history_provider.dart` | `AsyncNotifierProvider<HistoryNotifier, List<PackageHistoryEntry>>` | SharedPreferences key: `history_entries` (cap 50) | `add(entry)`, `delete(index)`, `clear()` |
 | `templatesProvider` | `templates_provider.dart` | `AsyncNotifierProvider<TemplatesNotifier, List<PackageTemplate>>` | SharedPreferences key: `templates_list` | `save(template)`, `delete(index)` |
 | `themeModeProvider` | `theme_mode_provider.dart` | `AsyncNotifierProvider<ThemeModeNotifier, ThemeMode>` | SharedPreferences key: `theme_mode` | `setMode(mode)`, `toggle()` |
@@ -337,7 +337,7 @@ The `_AppWithLifecycle` widget observes `AppLifecycleState.detached` to call `st
 Dev mode behavior:
 1. Checks if port 8787 is already listening (300ms timeout)
 2. If yes → skips launching (you can run API separately from VS Code)
-3. If no → launches `python -m mgg_packgen_api.main` from `api/` working directory
+3. If no → launches `python -m mgg_packify_api.main` from `api/` working directory
 4. Env var `MGG_API_PATH` overrides path resolution
 
 ---
