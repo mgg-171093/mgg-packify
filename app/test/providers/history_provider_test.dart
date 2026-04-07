@@ -2,8 +2,8 @@ import 'dart:convert';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mgg_packgen/models/package_history_entry.dart';
-import 'package:mgg_packgen/providers/history_provider.dart';
+import 'package:mgg_packify/models/package_history_entry.dart';
+import 'package:mgg_packify/providers/history_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 // Helper — builds a PackageHistoryEntry with only packageName required,

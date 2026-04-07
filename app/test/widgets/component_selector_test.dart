@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mgg_packgen/models/component_config.dart';
-import 'package:mgg_packgen/widgets/component_selector.dart';
+import 'package:mgg_packify/models/component_config.dart';
+import 'package:mgg_packify/widgets/component_selector.dart';
 
 void main() {
   group('ComponentSelector', () {

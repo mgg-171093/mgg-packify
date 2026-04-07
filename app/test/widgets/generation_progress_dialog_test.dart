@@ -2,8 +2,8 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mgg_packgen/models/generate_result.dart';
-import 'package:mgg_packgen/widgets/generation_progress_dialog.dart';
+import 'package:mgg_packify/models/generate_result.dart';
+import 'package:mgg_packify/widgets/generation_progress_dialog.dart';
 
 // ─────────────────────────────────────────────
 // Helpers

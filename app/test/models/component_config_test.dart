@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mgg_packgen/models/component_config.dart';
+import 'package:mgg_packify/models/component_config.dart';
 
 void main() {
   // ─────────────────────────────────────────────

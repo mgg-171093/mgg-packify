@@ -4,7 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class ServerManager {
   Process? _process;
-  static const _execName = 'mgg-packgen-api.exe';
+  static const _execName = 'mgg-packify-api.exe';
 
   Future<void> start() async {
     if (kReleaseMode) {
@@ -63,7 +63,7 @@ class ServerManager {
     try {
       _process = await Process.start(
         'python',
-        ['-m', 'mgg_packgen_api.main'],
+        ['-m', 'mgg_packify_api.main'],
         workingDirectory: workDir,
         mode: ProcessStartMode.normal,
       );

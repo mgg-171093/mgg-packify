@@ -1,9 +1,9 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mgg_packgen/models/component_config.dart';
-import 'package:mgg_packgen/models/generate_result.dart';
-import 'package:mgg_packgen/models/package_config.dart';
-import 'package:mgg_packgen/models/settings_model.dart';
-import 'package:mgg_packgen/models/options_model.dart';
+import 'package:mgg_packify/models/component_config.dart';
+import 'package:mgg_packify/models/generate_result.dart';
+import 'package:mgg_packify/models/package_config.dart';
+import 'package:mgg_packify/models/settings_model.dart';
+import 'package:mgg_packify/models/options_model.dart';
 
 void main() {
   group('ComponentInstanceState.toJson', () {

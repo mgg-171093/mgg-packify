@@ -1,8 +1,8 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mgg_packgen/models/component_config.dart';
-import 'package:mgg_packgen/models/package_config.dart';
-import 'package:mgg_packgen/providers/package_form_provider.dart';
+import 'package:mgg_packify/models/component_config.dart';
+import 'package:mgg_packify/models/package_config.dart';
+import 'package:mgg_packify/providers/package_form_provider.dart';
 
 void main() {
   late ProviderContainer container;
