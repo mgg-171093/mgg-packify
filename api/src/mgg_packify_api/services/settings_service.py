@@ -2,7 +2,7 @@
 Persistencia de configuración del usuario.
 
 Guarda y carga la configuración de servidores y last_used en
-%APPDATA%\\mgg_packgen_api\\config.json (Windows) usando platformdirs.
+%APPDATA%\\mgg_packify_api\\config.json (Windows) usando platformdirs.
 
 Si el archivo no existe o está corrupto, devuelve defaults vacíos
 silenciosamente.
@@ -16,7 +16,7 @@ from pathlib import Path
 
 from platformdirs import user_data_dir
 
-from mgg_packgen_api.services.package import ServerConfig
+from mgg_packify_api.services.package import ServerConfig
 
 logger = logging.getLogger(__name__)
 
@@ -38,7 +38,7 @@ logger = logging.getLogger(__name__)
 #   }
 # }
 
-_APP_NAME = "mgg_packgen_api"
+_APP_NAME = "mgg_packify_api"
 _CONFIG_FILE = "config.json"
 _SCHEMA_VERSION = 1
 

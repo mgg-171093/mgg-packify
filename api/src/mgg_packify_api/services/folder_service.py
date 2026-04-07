@@ -20,8 +20,8 @@ import logging
 from dataclasses import asdict
 from pathlib import Path
 
-from mgg_packgen_api.services.component import FOLDER_MAP, ComponentType
-from mgg_packgen_api.services.package import PackageConfig
+from mgg_packify_api.services.component import FOLDER_MAP, ComponentType
+from mgg_packify_api.services.package import PackageConfig
 
 logger = logging.getLogger(__name__)
 

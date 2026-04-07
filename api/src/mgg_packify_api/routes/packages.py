@@ -14,7 +14,7 @@ from pathlib import Path
 
 from fastapi import APIRouter, HTTPException
 
-from mgg_packgen_api.schemas.package import (
+from mgg_packify_api.schemas.package import (
     CloneRequest,
     CloneResponse,
     ComponentIn,
@@ -25,16 +25,16 @@ from mgg_packgen_api.schemas.package import (
     PackageListResponse,
     StepResult,
 )
-from mgg_packgen_api.services import publish_service
-from mgg_packgen_api.services.component import ComponentConfig, ComponentType
-from mgg_packgen_api.services.doc_generator import generate_document
-from mgg_packgen_api.services.folder_service import (
+from mgg_packify_api.services import publish_service
+from mgg_packify_api.services.component import ComponentConfig, ComponentType
+from mgg_packify_api.services.doc_generator import generate_document
+from mgg_packify_api.services.folder_service import (
     create_package_folders,
     load_package_meta,
     save_package_meta,
 )
-from mgg_packgen_api.services.options_service import OptionsManager
-from mgg_packgen_api.services.package import PackageConfig
+from mgg_packify_api.services.options_service import OptionsManager
+from mgg_packify_api.services.package import PackageConfig
 
 router = APIRouter()
 

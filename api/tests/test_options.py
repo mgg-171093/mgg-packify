@@ -25,8 +25,8 @@ def tmp_options(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
     Monkeypatcha el singleton _options_manager en routes.settings para que
     los tests de options no escriban al %APPDATA% real.
     """
-    from mgg_packgen_api.services.options_service import OptionsManager
-    from mgg_packgen_api import routes
+    from mgg_packify_api.services.options_service import OptionsManager
+    from mgg_packify_api import routes
 
     options_file = tmp_path / "options.json"
     tmp_manager = OptionsManager(options_path=options_file)

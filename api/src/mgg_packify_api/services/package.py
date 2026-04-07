@@ -10,7 +10,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 
-from mgg_packgen_api.services.component import ComponentConfig
+from mgg_packify_api.services.component import ComponentConfig
 
 # ─────────────────────────────────────────────────────────────────────────────
 # SERVIDORES POR AMBIENTE

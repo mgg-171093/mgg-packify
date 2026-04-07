@@ -26,8 +26,8 @@ from docx.oxml import OxmlElement
 from docx.oxml.ns import qn
 from docx.shared import Cm, Pt, RGBColor
 
-from mgg_packgen_api.services.component import ETIQUETA_GRUPO, ComponentType
-from mgg_packgen_api.services.package import PackageConfig
+from mgg_packify_api.services.component import ETIQUETA_GRUPO, ComponentType
+from mgg_packify_api.services.package import PackageConfig
 
 # ─────────────────────────────────────────────────────────────────────────────
 # CONSTANTES DE ESTILO (extraídas del XML real de los manuales existentes)

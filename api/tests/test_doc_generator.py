@@ -17,9 +17,9 @@ from unittest.mock import MagicMock, call, patch
 import pytest
 from docx import Document
 
-from mgg_packgen_api.routes.packages import _derive_component_config
-from mgg_packgen_api.schemas.package import ComponentIn, InstanceIn
-from mgg_packgen_api.services.doc_generator import (
+from mgg_packify_api.routes.packages import _derive_component_config
+from mgg_packify_api.schemas.package import ComponentIn, InstanceIn
+from mgg_packify_api.services.doc_generator import (
     _ubicacion,
     gen_seccion_api_docker,
     gen_seccion_api_iis,
