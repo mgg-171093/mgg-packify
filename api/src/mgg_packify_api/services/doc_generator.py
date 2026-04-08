@@ -29,6 +29,88 @@ from docx.shared import Cm, Pt, RGBColor
 from mgg_packify_api.services.component import ETIQUETA_GRUPO, ComponentType
 from mgg_packify_api.services.package import PackageConfig
 
+# ---------------------------------------------------------------------------
+# Document text defaults — Level B editable strings
+# ---------------------------------------------------------------------------
+DOC_TEXT_DEFAULTS: dict[str, dict[str, str]] = {
+    "doc": {
+        "title":          "Manual de instalación",
+        "section1_title": "1.- Componentes afectados:",
+        "note_text":      "Los componentes relacionados en este listado deberán ser respaldados y actualizados en caso de que existan, y en caso de no existir deberán ser agregados en la ruta especificada.",
+        "section2_title": "2.- Proceso",
+    },
+    "sql": {
+        "h2_title":    "{seccion_num}.- SQL",
+        "h3_subtitle": '{seccion_num}.1.- En la base de datos "{base_datos}" en el servidor de {ambiente}:',
+        "step_execute": 'Ejecutar el script "{script}"',
+    },
+    "api_iis": {
+        "h2_title":           "{seccion_num}.- API",
+        "h3_subtitle":        "{seccion_num}.1.-  En el servidor de servicios en {ambiente}:",
+        "step_update_service": 'Actualizar el servicio "{api}" con el contenido del zip "{zip_name}"',
+        "step_update_configs": "Actualizar las siguientes configuraciones en el archivo de configuración del servicio:",
+        "step_deploy_jenkins": "Hacer el despliegue CI/CD en Jenkins",
+        "step_update_apim":    "Actualizar el schema del Api Management de AZURE",
+    },
+    "api_docker": {
+        "h2_title":           "{seccion_num}.- API",
+        "h3_subtitle":        "{seccion_num}.1.-  En el servidor de servicios en {ambiente}:",
+        "step_update_service": 'Actualizar el servicio "{nombre}"',
+        "step_deploy_jenkins": "Hacer el despliegue CI/CD en Jenkins",
+        "step_update_apim":    "Actualizar el schema del Api Management de AZURE",
+        "step_update_env":     "Actualizar las siguientes variables de entorno/configuración:",
+    },
+    "blob": {
+        "h2_title":           "{seccion_num}.- Blob Storage",
+        "h3_subtitle":        "{seccion_num}.1.-  En el servidor de Azure Blob Storage de {ambiente}:",
+        "step_validate_folder": 'Validar si existe la carpeta "{carpeta}" (si no existe, crearla)',
+        "step_upload_files":    'Dentro de la carpeta "{carpeta}" subir los siguientes archivos:',
+        "step_generate_sas":    "Generar URL SAS",
+    },
+    "liferay_build": {
+        "h2_title":    "{seccion_num}.- Liferay",
+        "h3_subtitle": "{seccion_num}.1.-  Hacer deploy de Liferay en ambiente {ambiente_display} la build # {build_id}",
+    },
+    "liferay": {
+        "h2_title":              "{seccion_num}.- Liferay",
+        "h3_subtitle":           "{seccion_num}.1.-  En el servidor de Liferay de {ambiente}:",
+        "step_create_remote_app": 'Crear (o actualizar) la Remote App "{nombre_app}" con los siguientes campos:',
+        "step_go_site":           "Dirigirse al Sitio RETAIL → Páginas Privadas",
+        "step_create_page":       'Crear la página "{pagina}"',
+        "step_edit_page":         "Editar la página → pestaña Widgets / Remote Apps",
+        "step_drag_widget":       'Arrastrar la Remote App "{widget}"',
+        "step_publish":           "Dar clic en Publish",
+    },
+    "assets": {
+        "h2_title":    "{seccion_num}.- Assets (Liferay Documents and Media)",
+        "h3_subtitle": "{seccion_num}.1.-  En el servidor de Liferay de {ambiente}:",
+        "step_navigate": "Dirigirse a Content & Data → Documents and Media",
+        "step_upload":   'Subir el archivo "{asset}"',
+    },
+    "apim": {
+        "h2_title":           "{seccion_num}.- Azure API Management",
+        "h3_subtitle":        "{seccion_num}.1.-  En Azure API Management de {ambiente}:",
+        "step_update_service": 'Actualizar el servicio "{svc}"',
+    },
+}
+
+
+def _resolve_text(section: str, key: str, overrides: dict | None, **kwargs) -> str:
+    """Return override text if present, else DOC_TEXT_DEFAULTS, with .format(**kwargs).
+
+    Falls back silently to the default if the override contains invalid placeholders.
+    Uses default=None sentinel to avoid mutable-default-argument bug.
+    """
+    overrides = overrides or {}
+    section_overrides = overrides.get(section, {})
+    template = section_overrides.get(key) or DOC_TEXT_DEFAULTS[section][key]
+    try:
+        return template.format(**kwargs)
+    except (KeyError, IndexError):
+        # Override has broken placeholders — fall back to default silently
+        return DOC_TEXT_DEFAULTS[section][key].format(**kwargs)
+
+
 # ─────────────────────────────────────────────────────────────────────────────
 # CONSTANTES DE ESTILO (extraídas del XML real de los manuales existentes)
 # ─────────────────────────────────────────────────────────────────────────────
@@ -47,13 +129,15 @@ AUTOR_FOOTER = "Manuel García González"
 # ─────────────────────────────────────────────────────────────────────────────
 
 
-def generate_document(config: PackageConfig, output_path: Path) -> None:
+def generate_document(config: PackageConfig, output_path: Path,
+                      overrides: dict | None = None) -> None:
     """
     Genera el .docx del manual de instalación.
 
     Args:
         config: Configuración completa del package.
         output_path: Ruta completa donde guardar el archivo .docx.
+        overrides: dict anidado de overrides de texto para _resolve_text().
     """
     # Construir el dict `data` en el formato exacto que usa v1
     servidores = {
@@ -83,6 +167,8 @@ def generate_document(config: PackageConfig, output_path: Path) -> None:
             "crear_pagina":   comp.crear_pagina,
             "pagina":         comp.pagina,
             "widgets":        comp.widgets,
+            "jenkins":        comp.jenkins,
+            "actualizar_apim": comp.actualizar_apim,
         }
         componentes_v1.append(d)
 
@@ -95,7 +181,7 @@ def generate_document(config: PackageConfig, output_path: Path) -> None:
         "servidores":  servidores,
     }
 
-    generar_manual(data, str(output_path))
+    generar_manual(data, str(output_path), overrides=overrides)
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -420,37 +506,54 @@ def build_components_table(doc, componentes: list, ambiente: str):
 
 
 def gen_seccion_sql(doc, seccion_num: str, scripts: list, base_datos: str,
-                    ambiente: str, servidor_bd: str):
+                    ambiente: str, servidor_bd: str, overrides: dict | None = None):
     """Genera la sección de proceso para scripts SQL."""
-    add_h2(doc, f"{seccion_num}.- SQL")
+    add_h2(doc, _resolve_text("sql", "h2_title", overrides, seccion_num=seccion_num))
 
     # REQ-SQL-01: incluir nombre de base_datos en el subtítulo
-    add_h3(doc, f'{seccion_num}.1.- En la base de datos "{base_datos}" en el servidor de {ambiente}:')
+    add_h3(doc, _resolve_text("sql", "h3_subtitle", overrides,
+                              seccion_num=seccion_num, base_datos=base_datos, ambiente=ambiente))
 
     for script in scripts:
         add_child(doc,
-                  f'Ejecutar el script "{script}"',
+                  _resolve_text("sql", "step_execute", overrides, script=script),
                   bold_keywords=[f'"{script}"'])
 
 
-def gen_seccion_api_iis(doc, seccion_num: str, apis: list, ambiente: str,
-                         servidor_api: str, configs: list | None = None):
-    """Genera la sección de proceso para APIs en IIS (.zip)."""
-    add_h2(doc, f"{seccion_num}.- API")
+def gen_seccion_api_iis(doc, seccion_num: str, apis: list[dict], ambiente: str,
+                         servidor_api: str, configs: list | None = None,
+                         overrides: dict | None = None):
+    """Genera la sección de proceso para APIs en IIS (.zip).
 
-    add_h3(doc, f"{seccion_num}.1.-  En el servidor de servicios en {ambiente}:")
+    Args:
+        apis: lista de dicts con keys: nombre (str), jenkins (bool), actualizar_apim (bool).
+              Default True para ambos booleanos si la key está ausente (retrocompatibilidad).
+    """
+    add_h2(doc, _resolve_text("api_iis", "h2_title", overrides, seccion_num=seccion_num))
+
+    add_h3(doc, _resolve_text("api_iis", "h3_subtitle", overrides,
+                              seccion_num=seccion_num, ambiente=ambiente))
 
     for api in apis:
-        zip_name = api if api.endswith(".zip") else f"{api}.zip"
+        nombre = api["nombre"] if isinstance(api, dict) else api
+        zip_name = nombre if nombre.endswith(".zip") else f"{nombre}.zip"
         add_child(doc,
-                  f'Actualizar el servicio "{api}" con el contenido del zip "{zip_name}"',
-                  bold_keywords=[f'"{api}"', f'"{zip_name}"'])
+                  _resolve_text("api_iis", "step_update_service", overrides,
+                                api=nombre, zip_name=zip_name),
+                  bold_keywords=[f'"{nombre}"', f'"{zip_name}"'])
+        if api.get("jenkins", True) if isinstance(api, dict) else True:
+            add_child(doc,
+                      _resolve_text("api_iis", "step_deploy_jenkins", overrides),
+                      bold_keywords=["Jenkins"])
+        if api.get("actualizar_apim", True) if isinstance(api, dict) else True:
+            add_child(doc,
+                      _resolve_text("api_iis", "step_update_apim", overrides),
+                      bold_keywords=["Api Management de AZURE"])
 
     if configs:
         add_child(
             doc,
-            "Actualizar las siguientes configuraciones en el archivo"
-            " de configuración del servicio:",
+            _resolve_text("api_iis", "step_update_configs", overrides),
         )
         for cfg in configs:
             p = doc.add_paragraph()
@@ -468,21 +571,36 @@ def gen_seccion_api_iis(doc, seccion_num: str, apis: list, ambiente: str,
                     logging.warning(f"Imagen no encontrada: {cfg['imagen_path']} — {e}")
 
 
-def gen_seccion_api_docker(doc, seccion_num: str, apis: list, ambiente: str,
-                            servidor_api: str, configs: list | None = None):
-    """Genera la sección de proceso para APIs con pipeline Docker / Jenkins CI-CD."""
-    add_h2(doc, f"{seccion_num}.- API")
+def gen_seccion_api_docker(doc, seccion_num: str, apis: list[dict], ambiente: str,
+                            servidor_api: str, configs: list | None = None,
+                            overrides: dict | None = None):
+    """Genera la sección de proceso para APIs con pipeline Docker / Jenkins CI-CD.
 
-    add_h3(doc, f"{seccion_num}.1.-  En el servidor de servicios en {ambiente}:")
+    Args:
+        apis: lista de dicts con keys: nombre (str), jenkins (bool), actualizar_apim (bool).
+              Default True para ambos booleanos si la key está ausente (retrocompatibilidad).
+    """
+    add_h2(doc, _resolve_text("api_docker", "h2_title", overrides, seccion_num=seccion_num))
+
+    add_h3(doc, _resolve_text("api_docker", "h3_subtitle", overrides,
+                              seccion_num=seccion_num, ambiente=ambiente))
 
     for api in apis:
-        add_child(doc, f'Actualizar el servicio "{api}"', bold_keywords=[f'"{api}"'])
-        add_child(doc, "Hacer el despliegue CI/CD en Jenkins", bold_keywords=["Jenkins"])
-        add_child(doc, "Actualizar el schema del Api Management de AZURE",
-                  bold_keywords=["Api Management de AZURE"])
+        nombre = api["nombre"] if isinstance(api, dict) else api
+        add_child(doc,
+                  _resolve_text("api_docker", "step_update_service", overrides, nombre=nombre),
+                  bold_keywords=[f'"{nombre}"'])
+        if api.get("jenkins", True) if isinstance(api, dict) else True:
+            add_child(doc,
+                      _resolve_text("api_docker", "step_deploy_jenkins", overrides),
+                      bold_keywords=["Jenkins"])
+        if api.get("actualizar_apim", True) if isinstance(api, dict) else True:
+            add_child(doc,
+                      _resolve_text("api_docker", "step_update_apim", overrides),
+                      bold_keywords=["Api Management de AZURE"])
 
     if configs:
-        add_child(doc, "Actualizar las siguientes variables de entorno/configuración:")
+        add_child(doc, _resolve_text("api_docker", "step_update_env", overrides))
         for cfg in configs:
             p = doc.add_paragraph()
             p.paragraph_format.left_indent = Cm(2.5)
@@ -500,12 +618,12 @@ def gen_seccion_api_docker(doc, seccion_num: str, apis: list, ambiente: str,
 
 
 def gen_seccion_blob_storage(doc, seccion_num: str, blobs: list, ambiente: str,
-                              servidor_blob: str):
+                              servidor_blob: str, overrides: dict | None = None):
     """Genera la sección de proceso para Azure Blob Storage."""
-    add_h2(doc, f"{seccion_num}.- Blob Storage")
+    add_h2(doc, _resolve_text("blob", "h2_title", overrides, seccion_num=seccion_num))
 
-    add_h3(doc, f"{seccion_num}.1.-  En el servidor de Azure Blob Storage "
-                f"de {ambiente}:")
+    add_h3(doc, _resolve_text("blob", "h3_subtitle", overrides,
+                              seccion_num=seccion_num, ambiente=ambiente))
 
     # Agrupar por carpeta de blob
     carpetas: dict = {}
@@ -517,10 +635,10 @@ def gen_seccion_blob_storage(doc, seccion_num: str, blobs: list, ambiente: str,
 
     for carpeta, archivos in carpetas.items():
         add_child(doc,
-                  f'Validar si existe la carpeta "{carpeta}" (si no existe, crearla)',
+                  _resolve_text("blob", "step_validate_folder", overrides, carpeta=carpeta),
                   bold_keywords=[f'"{carpeta}"'])
         add_child(doc,
-                  f'Dentro de la carpeta "{carpeta}" subir los siguientes archivos:',
+                  _resolve_text("blob", "step_upload_files", overrides, carpeta=carpeta),
                   bold_keywords=[f'"{carpeta}"'])
 
         for archivo in archivos:
@@ -538,32 +656,34 @@ def gen_seccion_blob_storage(doc, seccion_num: str, blobs: list, ambiente: str,
             p2 = doc.add_paragraph()
             p2.paragraph_format.left_indent = Cm(3.5)
             p2.paragraph_format.space_after = Pt(2)
-            run2 = p2.add_run("Generar URL SAS")
+            run2 = p2.add_run(_resolve_text("blob", "step_generate_sas", overrides))
             run2.font.name = FUENTE_DEFAULT
             run2.font.size = Pt(11)
             run2.italic = True
             run2.font.color.rgb = RGBColor.from_string(COLOR_NEGRO)
 
 
-def gen_seccion_liferay_build(doc, seccion_num: str, build_id: str, ambiente: str):
+def gen_seccion_liferay_build(doc, seccion_num: str, build_id: str, ambiente: str,
+                               overrides: dict | None = None):
     """Genera la sección de proceso para deploy de build de Liferay.
 
     CRÍTICO: QA → UAT en ambiente_display.
     """
-    add_h2(doc, f"{seccion_num}.- Liferay")
+    add_h2(doc, _resolve_text("liferay_build", "h2_title", overrides, seccion_num=seccion_num))
 
     ambiente_display = "UAT" if ambiente == "QA" else ambiente
-    add_h3(doc, f"{seccion_num}.1.-  Hacer deploy de Liferay en ambiente "
-                f"{ambiente_display} la build # {build_id}")
+    add_h3(doc, _resolve_text("liferay_build", "h3_subtitle", overrides,
+                              seccion_num=seccion_num, ambiente_display=ambiente_display,
+                              build_id=build_id))
 
 
 def gen_seccion_liferay(doc, seccion_num: str, remote_apps: list, ambiente: str,
-                         servidor_liferay: str):
+                         servidor_liferay: str, overrides: dict | None = None):
     """Genera la sección de proceso para Liferay."""
-    add_h2(doc, f"{seccion_num}.- Liferay")
+    add_h2(doc, _resolve_text("liferay", "h2_title", overrides, seccion_num=seccion_num))
 
-    add_h3(doc, f"{seccion_num}.1.-  En el servidor de Liferay de "
-                f"{ambiente}:")
+    add_h3(doc, _resolve_text("liferay", "h3_subtitle", overrides,
+                              seccion_num=seccion_num, ambiente=ambiente))
 
     for app in remote_apps:
         nombre_app = app["nombre"]
@@ -573,8 +693,8 @@ def gen_seccion_liferay(doc, seccion_num: str, remote_apps: list, ambiente: str,
         if app.get("tipo") == "remote_app":
             add_child(
                 doc,
-                f'Crear (o actualizar) la Remote App "{nombre_app}"'
-                " con los siguientes campos:",
+                _resolve_text("liferay", "step_create_remote_app", overrides,
+                              nombre_app=nombre_app),
                 bold_keywords=[f'"{nombre_app}"'])
             for linea in [f"URL: {js_url_var}", f"CSS: {css_url_var}"]:
                 p = doc.add_paragraph()
@@ -587,39 +707,52 @@ def gen_seccion_liferay(doc, seccion_num: str, remote_apps: list, ambiente: str,
 
         if app.get("crear_pagina"):
             pagina = app.get("pagina", nombre_app)
-            add_child(doc, "Dirigirse al Sitio RETAIL → Páginas Privadas",
+            add_child(doc,
+                      _resolve_text("liferay", "step_go_site", overrides),
                       bold_keywords=["RETAIL", "Páginas Privadas"])
-            add_child(doc, f'Crear la página "{pagina}"', bold_keywords=[f'"{pagina}"'])
-            add_child(doc, "Editar la página → pestaña Widgets / Remote Apps")
+            add_child(doc,
+                      _resolve_text("liferay", "step_create_page", overrides, pagina=pagina),
+                      bold_keywords=[f'"{pagina}"'])
+            add_child(doc, _resolve_text("liferay", "step_edit_page", overrides))
             for widget in app.get("widgets", [nombre_app]):
-                add_child(doc, f'Arrastrar la Remote App "{widget}"',
+                add_child(doc,
+                          _resolve_text("liferay", "step_drag_widget", overrides, widget=widget),
                           bold_keywords=[f'"{widget}"'])
-            add_child(doc, "Dar clic en Publish", bold_keywords=["Publish"])
+            add_child(doc,
+                      _resolve_text("liferay", "step_publish", overrides),
+                      bold_keywords=["Publish"])
 
 
 def gen_seccion_assets(doc, seccion_num: str, assets: list, ambiente: str,
-                        servidor_liferay: str):
+                        servidor_liferay: str, overrides: dict | None = None):
     """Genera la sección para subir assets a Liferay Documents and Media."""
-    add_h2(doc, f"{seccion_num}.- Assets (Liferay Documents and Media)")
+    add_h2(doc, _resolve_text("assets", "h2_title", overrides, seccion_num=seccion_num))
 
-    add_h3(doc, f"{seccion_num}.1.-  En el servidor de Liferay de "
-                f"{ambiente}:")
+    add_h3(doc, _resolve_text("assets", "h3_subtitle", overrides,
+                              seccion_num=seccion_num, ambiente=ambiente))
 
-    add_child(doc, "Dirigirse a Content & Data → Documents and Media",
+    add_child(doc,
+              _resolve_text("assets", "step_navigate", overrides),
               bold_keywords=["Content & Data", "Documents and Media"])
 
     for asset in assets:
-        add_child(doc, f'Subir el archivo "{asset}"', bold_keywords=[f'"{asset}"'])
+        add_child(doc,
+                  _resolve_text("assets", "step_upload", overrides, asset=asset),
+                  bold_keywords=[f'"{asset}"'])
 
 
-def gen_seccion_azure_apim(doc, seccion_num: str, servicios: list, ambiente: str):
+def gen_seccion_azure_apim(doc, seccion_num: str, servicios: list, ambiente: str,
+                            overrides: dict | None = None):
     """Genera la sección para Azure API Management."""
-    add_h2(doc, f"{seccion_num}.- Azure API Management")
+    add_h2(doc, _resolve_text("apim", "h2_title", overrides, seccion_num=seccion_num))
 
-    add_h3(doc, f"{seccion_num}.1.-  En Azure API Management de {ambiente}:")
+    add_h3(doc, _resolve_text("apim", "h3_subtitle", overrides,
+                              seccion_num=seccion_num, ambiente=ambiente))
 
     for svc in servicios:
-        add_child(doc, f'Actualizar el servicio "{svc}"', bold_keywords=[f'"{svc}"'])
+        add_child(doc,
+                  _resolve_text("apim", "step_update_service", overrides, svc=svc),
+                  bold_keywords=[f'"{svc}"'])
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -760,12 +893,13 @@ def _ubicacion(comp: dict, ambiente: str, data: dict) -> str:
 # ─────────────────────────────────────────────────────────────────────────────
 
 
-def generar_manual(data: dict, output_path: str):
+def generar_manual(data: dict, output_path: str, overrides: dict | None = None):
     """
     Genera el .docx del manual de instalación.
 
     data: dict con toda la información recopilada (formato v1).
     output_path: ruta completa donde guardar el archivo.
+    overrides: dict anidado de overrides de texto para _resolve_text().
 
     Esta función es un port 1:1 de v1. NO modificar el comportamiento.
     """
@@ -783,13 +917,15 @@ def generar_manual(data: dict, output_path: str):
     hu_nombre = data["hu_nombre"]
 
     # ── Título ────────────────────────────────────────────────────────────────
-    add_paragraph(doc, "Manual de instalación", bold=True, size=16, space_after=4,
+    add_paragraph(doc,
+                  _resolve_text("doc", "title", overrides),
+                  bold=True, size=16, space_after=4,
                   alignment=WD_ALIGN_PARAGRAPH.CENTER)
     add_heading_green(doc, f"{ticket} - Portal Retail - {hu_nombre}")
     doc.add_paragraph()  # espacio
 
     # ── Sección 1: Componentes afectados (H1) ────────────────────────────────
-    add_h1(doc, "1.- Componentes afectados:")
+    add_h1(doc, _resolve_text("doc", "section1_title", overrides))
 
     # Construir filas de la tabla desde los componentes
     tabla_rows = []
@@ -807,14 +943,11 @@ def generar_manual(data: dict, output_path: str):
     doc.add_paragraph()
 
     # Nota estándar
-    add_note(doc,
-        "Los componentes relacionados en este listado deberán ser respaldados y actualizados "
-        "en caso de que existan, y en caso de no existir deberán ser agregados "
-        "en la ruta especificada.")
+    add_note(doc, _resolve_text("doc", "note_text", overrides))
     doc.add_paragraph()
 
     # ── Sección 2: Proceso (H1) ──────────────────────────────────────────────
-    add_h1(doc, "2.- Proceso")
+    add_h1(doc, _resolve_text("doc", "section2_title", overrides))
 
     # seccion arranca en 1 → genera "2.1.- X", "2.2.- Y", etc.
     seccion = 1
@@ -832,7 +965,8 @@ def generar_manual(data: dict, output_path: str):
 
         if tipo_clave == "liferay_build":
             for c in grupo:
-                gen_seccion_liferay_build(doc, prefix, c["build_id"], ambiente)
+                gen_seccion_liferay_build(doc, prefix, c["build_id"], ambiente,
+                                          overrides=overrides)
                 seccion += 1
                 prefix = f"{seccion_padre}.{seccion}"
 
@@ -846,31 +980,48 @@ def generar_manual(data: dict, output_path: str):
                 por_bd[bd].extend(c["scripts"])
             for bd, scripts in por_bd.items():
                 gen_seccion_sql(doc, prefix, scripts, bd, ambiente,
-                                data["servidores"].get("bd", f"Servidor BD {ambiente}"))
+                                data["servidores"].get("bd", f"Servidor BD {ambiente}"),
+                                overrides=overrides)
                 seccion += 1
                 prefix = f"{seccion_padre}.{seccion}"
 
         elif tipo_clave == "api_iis":
-            nombres = [c["nombre_servicio"] for c in grupo]
+            apis_dicts = [
+                {
+                    "nombre": c["nombre_servicio"],
+                    "jenkins": c.get("jenkins", True),
+                    "actualizar_apim": c.get("actualizar_apim", True),
+                }
+                for c in grupo
+            ]
             configs: list = []
             for c in grupo:
                 configs.extend(c.get("configs", []))
-            gen_seccion_api_iis(doc, prefix, nombres, ambiente,
+            gen_seccion_api_iis(doc, prefix, apis_dicts, ambiente,
                                 data["servidores"].get("api", f"Servidor de servicios {ambiente}"),
-                                configs if configs else None)
+                                configs if configs else None,
+                                overrides=overrides)
             seccion += 1
 
         elif tipo_clave == "api_docker":
-            nombres = [c["nombre_servicio"] for c in grupo]
+            apis_data = [
+                {
+                    "nombre": c["nombre_servicio"],
+                    "jenkins": c.get("jenkins", True),
+                    "actualizar_apim": c.get("actualizar_apim", True),
+                }
+                for c in grupo
+            ]
             configs = []
             for c in grupo:
                 configs.extend(c.get("configs", []))
             servidor_api = data["servidores"].get(
                 "api", f"Servidor de servicios {ambiente}"
             )
-            gen_seccion_api_docker(doc, prefix, nombres, ambiente,
+            gen_seccion_api_docker(doc, prefix, apis_data, ambiente,
                                    servidor_api,
-                                   configs if configs else None)
+                                   configs if configs else None,
+                                   overrides=overrides)
             seccion += 1
 
         elif tipo_clave == "blob":
@@ -878,12 +1029,14 @@ def generar_manual(data: dict, output_path: str):
             for c in grupo:
                 archivos.extend(c["archivos"])
             gen_seccion_blob_storage(doc, prefix, archivos, ambiente,
-                                     data["servidores"].get("blob", f"Servidor Azure {ambiente}"))
+                                     data["servidores"].get("blob", f"Servidor Azure {ambiente}"),
+                                     overrides=overrides)
             seccion += 1
 
         elif tipo_clave == "liferay":
             gen_seccion_liferay(doc, prefix, grupo, ambiente,
-                                data["servidores"].get("liferay", f"Servidor Liferay {ambiente}"))
+                                data["servidores"].get("liferay", f"Servidor Liferay {ambiente}"),
+                                overrides=overrides)
             seccion += 1
 
         elif tipo_clave == "assets":
@@ -891,12 +1044,13 @@ def generar_manual(data: dict, output_path: str):
             for c in grupo:
                 archivos.extend(c["archivos"])
             gen_seccion_assets(doc, prefix, archivos, ambiente,
-                               data["servidores"].get("liferay", f"Servidor Liferay {ambiente}"))
+                               data["servidores"].get("liferay", f"Servidor Liferay {ambiente}"),
+                               overrides=overrides)
             seccion += 1
 
         elif tipo_clave == "apim":
             servicios = [c["nombre_servicio"] for c in grupo]
-            gen_seccion_azure_apim(doc, prefix, servicios, ambiente)
+            gen_seccion_azure_apim(doc, prefix, servicios, ambiente, overrides=overrides)
             seccion += 1
 
     add_footer(doc, AUTOR_FOOTER)

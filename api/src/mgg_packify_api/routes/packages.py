@@ -139,6 +139,8 @@ def _derive_component_config(comp: ComponentIn, inst: InstanceIn) -> list[Compon
                 pagina=inst.pagina,
                 widgets=inst.widgets,
                 publicar=inst.publicar,
+                jenkins=inst.jenkins,
+                actualizar_apim=inst.actualizar_apim,
             )]
 
         case ComponentType.API_DOCKER:
@@ -159,6 +161,8 @@ def _derive_component_config(comp: ComponentIn, inst: InstanceIn) -> list[Compon
                 crear_pagina=inst.crear_pagina,
                 pagina=inst.pagina,
                 widgets=inst.widgets,
+                jenkins=inst.jenkins,
+                actualizar_apim=inst.actualizar_apim,
             )]
 
         case ComponentType.BLOB:
@@ -386,7 +390,8 @@ def generate_package(req: GenerateRequest) -> GenerateResponse:
 
         # Generar .docx
         doc_path = package_dir / "Manual" / f"{config.package_name}.docx"
-        generate_document(config, doc_path)
+        overrides = opts.doc_templates.to_overrides_dict()
+        generate_document(config, doc_path, overrides=overrides)
 
         # Guardar meta
         save_package_meta(config, package_dir)

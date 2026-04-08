@@ -54,7 +54,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
         _timer?.cancel();
         if (mounted) {
           ref.read(serverStatusProvider.notifier).state = ServerStatus.ready;
-          context.go('/home');
+          context.go('/dashboard');
         }
       } catch (_) {
         // Not ready yet — keep polling
@@ -82,7 +82,8 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
               // Logo / icon
               Builder(
                 builder: (context) {
-                  final isDark = Theme.of(context).brightness == Brightness.dark;
+                  final isDark =
+                      Theme.of(context).brightness == Brightness.dark;
                   Widget img = Image.asset(
                     'assets/logo-mgg.png',
                     width: 96,

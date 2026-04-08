@@ -5,10 +5,10 @@ import 'package:flutter/foundation.dart';
 // ─────────────────────────────────────────────
 
 enum ComponentType {
-  liferayBuild('liferay_build', 'Liferay (Deploy de build)', false),
+  liferayBuild('liferay_build', 'Liferay build', false),
   sql('sql', 'SQL', true),
-  apiIis('api_iis', 'API IIS (.zip)', true),
-  apiDocker('api_docker', 'API Docker / Pipeline CI-CD', true),
+  apiIis('api_iis', 'API IIS', true),
+  apiDocker('api_docker', 'API Docker', true),
   blob('blob', 'Blob Storage (JS/CSS)', true),
   liferay('liferay', 'Liferay (Remote App / Página)', true),
   assets('assets', 'Assets (imágenes Liferay)', true),
@@ -33,7 +33,6 @@ const kCanonicalComponentOrder = [
   ComponentType.blob,
   ComponentType.liferay,
   ComponentType.assets,
-  ComponentType.apim,
 ];
 
 // ─────────────────────────────────────────────
@@ -129,6 +128,8 @@ class ComponentInstanceState {
     this.estatus = 'modificado',
     this.tipo = '',
     this.publicar = false,
+    this.jenkins = true,
+    this.actualizarApim = true,
   });
 
   // liferay_build
@@ -155,6 +156,9 @@ class ComponentInstanceState {
   final String tipo;
   // api_iis — publish flag
   final bool publicar;
+  // api_docker — CI/CD pipeline flags
+  final bool jenkins;
+  final bool actualizarApim;
 
   ComponentInstanceState copyWith({
     String? buildId,
@@ -172,6 +176,8 @@ class ComponentInstanceState {
     String? estatus,
     String? tipo,
     bool? publicar,
+    bool? jenkins,
+    bool? actualizarApim,
   }) {
     return ComponentInstanceState(
       buildId: buildId ?? this.buildId,
@@ -189,6 +195,8 @@ class ComponentInstanceState {
       estatus: estatus ?? this.estatus,
       tipo: tipo ?? this.tipo,
       publicar: publicar ?? this.publicar,
+      jenkins: jenkins ?? this.jenkins,
+      actualizarApim: actualizarApim ?? this.actualizarApim,
     );
   }
 
@@ -215,12 +223,16 @@ class ComponentInstanceState {
         'estatus': estatus,
         'tipo': tipo,
         'publicar': publicar,
+        'jenkins': jenkins,
+        'actualizar_apim': actualizarApim,
       },
       ComponentType.apiDocker => {
         'nombre_servicio': nombreServicio,
         'configs': configs.map((c) => c.toJson()).toList(),
         'estatus': estatus,
         'tipo': tipo,
+        'jenkins': jenkins,
+        'actualizar_apim': actualizarApim,
       },
       ComponentType.blob => {
         'archivos': archivos.map((f) => f.toJson()).toList(),
@@ -289,6 +301,8 @@ class ComponentInstanceState {
       estatus: (json['estatus'] as String?) ?? 'modificado',
       tipo: (json['tipo'] as String?) ?? '',
       publicar: (json['publicar'] as bool?) ?? false,
+      jenkins: (json['jenkins'] as bool?) ?? true,
+      actualizarApim: (json['actualizar_apim'] as bool?) ?? true,
     );
   }
 }

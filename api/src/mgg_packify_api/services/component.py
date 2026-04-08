@@ -79,10 +79,10 @@ TIPO_DISPLAY: dict[ComponentType, str] = {
 
 # Labels de display para el selector de componentes en la UI
 COMPONENT_LABELS: dict[ComponentType, str] = {
-    ComponentType.LIFERAY_BUILD: "Liferay (Deploy de build)",
+    ComponentType.LIFERAY_BUILD: "Liferay build",
     ComponentType.SQL: "SQL",
-    ComponentType.API_IIS: "API IIS (.zip)",
-    ComponentType.API_DOCKER: "API Docker / Pipeline CI-CD",
+    ComponentType.API_IIS: "API IIS",
+    ComponentType.API_DOCKER: "API Docker",
     ComponentType.BLOB: "Blob Storage (JS/CSS)",
     ComponentType.LIFERAY: "Liferay (Remote App / Página)",
     ComponentType.ASSETS: "Assets (imágenes Liferay)",
@@ -149,3 +149,9 @@ class ComponentConfig:
     """Si se debe publicar el servicio IIS vía MSBuild/dotnet publish."""
     ruta: str = ""
     """Ruta al proyecto .csproj en el repositorio (sólo para api_iis)."""
+
+    # ── API Docker / API IIS — optional docx steps ───────────────────────────
+    jenkins: bool = True
+    """Si se debe incluir el paso 'Hacer el despliegue CI/CD en Jenkins' en el docx."""
+    actualizar_apim: bool = True
+    """Si se debe incluir el paso 'Actualizar el schema del Api Management de AZURE' en el docx."""

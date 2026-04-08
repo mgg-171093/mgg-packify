@@ -62,6 +62,7 @@ class OptionsModel {
     this.apiIisServices = const [],
     this.apiDockerServices = const [],
     this.sqlDatabases = const [],
+    this.docTemplates = const {},
   });
 
   final List<String> estatusList;
@@ -71,6 +72,10 @@ class OptionsModel {
   final List<ApiDockerServiceEntry> apiDockerServices;
   final List<String> sqlDatabases;
 
+  /// User overrides for doc template text, keyed by section then field name.
+  /// Null values mean "use default Python text"; non-null = user override.
+  final Map<String, Map<String, String?>> docTemplates;
+
   OptionsModel copyWith({
     List<String>? estatusList,
     List<String>? tipoSqlList,
@@ -78,6 +83,7 @@ class OptionsModel {
     List<ApiIisServiceEntry>? apiIisServices,
     List<ApiDockerServiceEntry>? apiDockerServices,
     List<String>? sqlDatabases,
+    Map<String, Map<String, String?>>? docTemplates,
   }) {
     return OptionsModel(
       estatusList: estatusList ?? this.estatusList,
@@ -86,12 +92,28 @@ class OptionsModel {
       apiIisServices: apiIisServices ?? this.apiIisServices,
       apiDockerServices: apiDockerServices ?? this.apiDockerServices,
       sqlDatabases: sqlDatabases ?? this.sqlDatabases,
+      docTemplates: docTemplates ?? this.docTemplates,
     );
   }
 
   static OptionsModel empty() => const OptionsModel();
 
   factory OptionsModel.fromJson(Map<String, dynamic> json) {
+    // Parse doc_templates: Map<String, Map<String, String?>>
+    // Null values from JSON are preserved as null in the inner map.
+    final rawTemplates = json['doc_templates'] as Map<String, dynamic>?;
+    final docTemplates = <String, Map<String, String?>>{};
+    if (rawTemplates != null) {
+      for (final entry in rawTemplates.entries) {
+        final inner = entry.value as Map<String, dynamic>?;
+        if (inner != null) {
+          docTemplates[entry.key] = inner.map(
+            (k, v) => MapEntry(k, v as String?),
+          );
+        }
+      }
+    }
+
     return OptionsModel(
       estatusList:
           (json['estatus_options'] as List?)
@@ -126,6 +148,7 @@ class OptionsModel {
       sqlDatabases: (json['sql_databases'] as List<dynamic>? ?? [])
           .map((e) => e as String)
           .toList(),
+      docTemplates: docTemplates,
     );
   }
 
@@ -136,5 +159,6 @@ class OptionsModel {
     'api_iis_services': apiIisServices.map((e) => e.toJson()).toList(),
     'api_docker_services': apiDockerServices.map((e) => e.toJson()).toList(),
     'sql_databases': sqlDatabases,
+    'doc_templates': docTemplates,
   };
 }

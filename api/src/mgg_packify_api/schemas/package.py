@@ -41,6 +41,9 @@ class InstanceIn(BaseModel):
     tipo: str = ""
     # api_iis — publish flag
     publicar: bool = False
+    # api_docker / api_iis — optional steps in docx
+    jenkins: bool = True
+    actualizar_apim: bool = True
     # sql — per-script copy flags (parallel to scripts[])
     scripts_copiar: list[bool] = []
 

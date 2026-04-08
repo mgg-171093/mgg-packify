@@ -253,3 +253,72 @@ def test_options_v2_to_v3_migration(
     # Los campos existentes deben seguir funcionando
     assert body["estatus_options"] == ["modificado", "nuevo"]
     assert body["api_iis_services"] == []
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# doc_templates round-trip + v3→v4 migration (C.6)
+# ─────────────────────────────────────────────────────────────────────────────
+
+
+def test_doc_templates_round_trip(
+    client: TestClient, tmp_options: Path
+) -> None:
+    """
+    PUT /settings/options con doc_templates contiene un override; GET devuelve el override.
+    """
+    payload = {
+        "estatus_options": ["modificado", "nuevo"],
+        "tipo_sql_options": ["sp", "trigger", "script", "job"],
+        "tipo_blob_options": ["css", "scss", "js"],
+        "api_iis_services": [],
+        "api_docker_services": [],
+        "sql_databases": [],
+        "doc_templates": {
+            "sql": {
+                "h2_title": "{seccion_num}.- Scripts SQL Personalizados"
+            }
+        },
+    }
+
+    put_resp = client.put("/settings/options", json=payload)
+    assert put_resp.status_code == 200
+
+    get_resp = client.get("/settings/options")
+    assert get_resp.status_code == 200
+    body = get_resp.json()
+
+    assert "doc_templates" in body
+    assert body["doc_templates"]["sql"]["h2_title"] == "{seccion_num}.- Scripts SQL Personalizados"
+
+
+def test_doc_templates_v3_migration(tmp_path: Path) -> None:
+    """
+    Un options.json en formato v3 (sin doc_templates) se lee sin crash
+    y doc_templates defaultea a la estructura vacía (D9).
+    """
+    from mgg_packify_api.services.options_service import OptionsManager
+
+    options_file = tmp_path / "options.json"
+    v3_data = {
+        "version": 3,
+        "estatus_options": ["modificado", "nuevo"],
+        "tipo_sql_options": ["sp", "trigger", "script", "job"],
+        "tipo_blob_options": ["css", "scss", "js"],
+        "api_iis_services": [],
+        "api_docker_services": [],
+        "sql_databases": [],
+        # no "doc_templates" key — simulates v3 format
+    }
+    options_file.parent.mkdir(parents=True, exist_ok=True)
+    options_file.write_text(__import__("json").dumps(v3_data), encoding="utf-8")
+
+    manager = OptionsManager(options_path=options_file)
+    result = manager.load()
+
+    # doc_templates must be present and be an empty/default DocTemplatesSchema
+    assert result.doc_templates is not None
+    # All section fields should be None (no overrides)
+    overrides = result.doc_templates.to_overrides_dict()
+    assert overrides == {}
+    # Existing fields must still work
+    assert result.estatus_options == ["modificado", "nuevo"]

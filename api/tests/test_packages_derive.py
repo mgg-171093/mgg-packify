@@ -278,3 +278,99 @@ def test_blob_each_row_nombre_from_archivo() -> None:
 
     assert "app.css" in nombres
     assert "vendor.js" in nombres
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# REQ-DOC-01 / REQ-DOC-02: jenkins y actualizar_apim en api_docker y api_iis
+# ─────────────────────────────────────────────────────────────────────────────
+
+
+def test_api_docker_jenkins_default_true() -> None:
+    """api_docker: jenkins default=True cuando no se pasa (REQ-DOC-01)."""
+    comp = _make_comp("api_docker")
+    inst = _make_inst(nombre_servicio="WorkerSvc")
+
+    results = _derive_component_config(comp, inst)
+
+    assert len(results) == 1
+    assert results[0].jenkins is True
+
+
+def test_api_docker_actualizar_apim_default_true() -> None:
+    """api_docker: actualizar_apim default=True cuando no se pasa (REQ-DOC-01)."""
+    comp = _make_comp("api_docker")
+    inst = _make_inst(nombre_servicio="WorkerSvc")
+
+    results = _derive_component_config(comp, inst)
+
+    assert len(results) == 1
+    assert results[0].actualizar_apim is True
+
+
+def test_api_docker_jenkins_false_propagates() -> None:
+    """api_docker: jenkins=False se propaga al ComponentConfig (REQ-DOC-01)."""
+    comp = _make_comp("api_docker")
+    inst = _make_inst(nombre_servicio="WorkerSvc", jenkins=False)
+
+    results = _derive_component_config(comp, inst)
+
+    assert len(results) == 1
+    assert results[0].jenkins is False
+
+
+def test_api_docker_actualizar_apim_false_propagates() -> None:
+    """api_docker: actualizar_apim=False se propaga al ComponentConfig (REQ-DOC-01)."""
+    comp = _make_comp("api_docker")
+    inst = _make_inst(nombre_servicio="WorkerSvc", actualizar_apim=False)
+
+    results = _derive_component_config(comp, inst)
+
+    assert len(results) == 1
+    assert results[0].actualizar_apim is False
+
+
+def test_api_iis_jenkins_default_true() -> None:
+    """api_iis: jenkins default=True cuando no se pasa (REQ-DOC-02)."""
+    comp = _make_comp("api_iis")
+    inst = _make_inst(nombre_servicio="WebRetailAPI")
+
+    results = _derive_component_config(comp, inst)
+
+    assert len(results) == 1
+    assert results[0].jenkins is True
+
+
+def test_api_iis_actualizar_apim_default_true() -> None:
+    """api_iis: actualizar_apim default=True cuando no se pasa (REQ-DOC-02)."""
+    comp = _make_comp("api_iis")
+    inst = _make_inst(nombre_servicio="WebRetailAPI")
+
+    results = _derive_component_config(comp, inst)
+
+    assert len(results) == 1
+    assert results[0].actualizar_apim is True
+
+
+def test_api_iis_jenkins_false_propagates() -> None:
+    """api_iis: jenkins=False se propaga al ComponentConfig (REQ-DOC-02)."""
+    comp = _make_comp("api_iis")
+    inst = _make_inst(nombre_servicio="WebRetailAPI", jenkins=False)
+
+    results = _derive_component_config(comp, inst)
+
+    assert len(results) == 1
+    assert results[0].jenkins is False
+
+
+def test_api_iis_accepts_payload_without_jenkins_error() -> None:
+    """api_iis sin jenkins en el payload → no error de validación (REQ-DOC-02)."""
+    comp = _make_comp("api_iis")
+    # InstanceIn por defecto tiene jenkins=True — sin pasar el campo
+    inst = InstanceIn(nombre_servicio="WebRetailAPI")
+
+    results = _derive_component_config(comp, inst)
+
+    assert len(results) == 1
+    # Los campos deben existir con default True
+    assert results[0].jenkins is True
+    assert results[0].actualizar_apim is True

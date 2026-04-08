@@ -3,13 +3,21 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'models/generate_result.dart';
 import 'providers/theme_mode_provider.dart';
+import 'screens/appearance_screen.dart';
+import 'screens/catalogos/bases_datos_screen.dart';
+import 'screens/catalogos/doc_templates_screen.dart';
+import 'screens/catalogos/estatus_screen.dart';
+import 'screens/catalogos/servidores_screen.dart';
+import 'screens/catalogos/servicios_screen.dart';
+import 'screens/catalogos/tipos_screen.dart';
 import 'screens/clone_screen.dart';
+import 'screens/dashboard_screen.dart';
 import 'screens/history_screen.dart';
-import 'screens/home_screen.dart';
 import 'screens/new_package_screen.dart';
-import 'screens/settings_screen.dart';
 import 'screens/splash_screen.dart';
 import 'screens/success_screen.dart';
+import 'screens/templates_screen.dart';
+import 'widgets/app_shell.dart';
 
 // ─────────────────────────────────────────────
 // Router
@@ -18,6 +26,7 @@ import 'screens/success_screen.dart';
 final router = GoRouter(
   initialLocation: '/splash',
   routes: [
+    // ── Outside the shell — no sidebar ────────────────────────────────
     GoRoute(
       path: '/splash',
       pageBuilder: (ctx, state) => CustomTransitionPage(
@@ -28,30 +37,12 @@ final router = GoRouter(
             FadeTransition(opacity: anim, child: child),
       ),
     ),
+    // /home → redirect to /dashboard (backwards compatibility)
+    GoRoute(path: '/home', redirect: (ctx, state) => '/dashboard'),
+    // /settings → redirect to /settings/appearance (backwards compatibility)
     GoRoute(
-      path: '/home',
-      pageBuilder: (ctx, state) => CustomTransitionPage(
-        key: state.pageKey,
-        child: const HomeScreen(),
-        transitionDuration: const Duration(milliseconds: 250),
-        transitionsBuilder: (ctx, anim, _, child) =>
-            FadeTransition(opacity: anim, child: child),
-      ),
-    ),
-    GoRoute(
-      path: '/new-package',
-      pageBuilder: (ctx, state) => CustomTransitionPage(
-        key: state.pageKey,
-        child: const NewPackageScreen(),
-        transitionDuration: const Duration(milliseconds: 300),
-        transitionsBuilder: (ctx, anim, _, child) {
-          final tween = Tween(
-            begin: const Offset(1.0, 0.0),
-            end: Offset.zero,
-          ).chain(CurveTween(curve: Curves.easeOut));
-          return SlideTransition(position: anim.drive(tween), child: child);
-        },
-      ),
+      path: '/settings',
+      redirect: (ctx, state) => '/settings/appearance',
     ),
     GoRoute(
       path: '/success',
@@ -71,50 +62,85 @@ final router = GoRouter(
         );
       },
     ),
-    GoRoute(
-      path: '/clone',
-      pageBuilder: (ctx, state) => CustomTransitionPage(
-        key: state.pageKey,
-        child: const CloneScreen(),
-        transitionDuration: const Duration(milliseconds: 300),
-        transitionsBuilder: (ctx, anim, _, child) {
-          final tween = Tween(
-            begin: const Offset(1.0, 0.0),
-            end: Offset.zero,
-          ).chain(CurveTween(curve: Curves.easeOut));
-          return SlideTransition(position: anim.drive(tween), child: child);
-        },
-      ),
-    ),
-    GoRoute(
-      path: '/settings',
-      pageBuilder: (ctx, state) => CustomTransitionPage(
-        key: state.pageKey,
-        child: const SettingsScreen(),
-        transitionDuration: const Duration(milliseconds: 300),
-        transitionsBuilder: (ctx, anim, _, child) {
-          final tween = Tween(
-            begin: const Offset(1.0, 0.0),
-            end: Offset.zero,
-          ).chain(CurveTween(curve: Curves.easeOut));
-          return SlideTransition(position: anim.drive(tween), child: child);
-        },
-      ),
-    ),
-    GoRoute(
-      path: '/history',
-      pageBuilder: (ctx, state) => CustomTransitionPage(
-        key: state.pageKey,
-        child: const HistoryScreen(),
-        transitionDuration: const Duration(milliseconds: 300),
-        transitionsBuilder: (ctx, anim, _, child) {
-          final tween = Tween(
-            begin: const Offset(1.0, 0.0),
-            end: Offset.zero,
-          ).chain(CurveTween(curve: Curves.easeOut));
-          return SlideTransition(position: anim.drive(tween), child: child);
-        },
-      ),
+    // ── Inside the shell — with sidebar ───────────────────────────────
+    ShellRoute(
+      builder: (ctx, state, child) => AppShell(child: child),
+      routes: [
+        GoRoute(
+          path: '/dashboard',
+          pageBuilder: (ctx, state) =>
+              const NoTransitionPage(child: DashboardScreen()),
+        ),
+        GoRoute(
+          path: '/new-package',
+          pageBuilder: (ctx, state) =>
+              const NoTransitionPage(child: NewPackageScreen()),
+        ),
+        GoRoute(
+          path: '/clone',
+          pageBuilder: (ctx, state) =>
+              const NoTransitionPage(child: CloneScreen()),
+        ),
+        GoRoute(
+          path: '/history',
+          pageBuilder: (ctx, state) =>
+              const NoTransitionPage(child: HistoryScreen()),
+        ),
+        GoRoute(
+          path: '/templates',
+          pageBuilder: (ctx, state) =>
+              const NoTransitionPage(child: TemplatesScreen()),
+        ),
+        GoRoute(
+          path: '/settings/appearance',
+          pageBuilder: (ctx, state) =>
+              const NoTransitionPage(child: AppearanceScreen()),
+        ),
+        GoRoute(
+          path: '/catalogos/servidores',
+          pageBuilder: (ctx, state) {
+            final returnTo = state.extra as String?;
+            return NoTransitionPage(
+              child: ServidoresScreen(returnTo: returnTo),
+            );
+          },
+        ),
+        GoRoute(
+          path: '/catalogos/servicios',
+          pageBuilder: (ctx, state) {
+            final returnTo = state.extra as String?;
+            return NoTransitionPage(child: ServiciosScreen(returnTo: returnTo));
+          },
+        ),
+        GoRoute(
+          path: '/catalogos/estatus',
+          pageBuilder: (ctx, state) {
+            final returnTo = state.extra as String?;
+            return NoTransitionPage(child: EstatusScreen(returnTo: returnTo));
+          },
+        ),
+        GoRoute(
+          path: '/catalogos/bases-datos',
+          pageBuilder: (ctx, state) {
+            final returnTo = state.extra as String?;
+            return NoTransitionPage(
+              child: BasesDatosScreen(returnTo: returnTo),
+            );
+          },
+        ),
+        GoRoute(
+          path: '/catalogos/tipos',
+          pageBuilder: (ctx, state) {
+            final returnTo = state.extra as String?;
+            return NoTransitionPage(child: TiposScreen(returnTo: returnTo));
+          },
+        ),
+        GoRoute(
+          path: '/catalogos/doc-templates',
+          pageBuilder: (ctx, state) =>
+              const NoTransitionPage(child: DocTemplatesScreen()),
+        ),
+      ],
     ),
   ],
 );

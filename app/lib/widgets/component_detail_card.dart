@@ -1,6 +1,7 @@
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import '../models/component_config.dart';
 import '../models/options_model.dart';
 import '../providers/options_provider.dart';
@@ -17,6 +18,7 @@ class ComponentDetailCard extends StatefulWidget {
     required this.onAdd,
     required this.onRemove,
     required this.onUpdate,
+    this.returnTo,
   });
 
   final ComponentType type;
@@ -24,6 +26,9 @@ class ComponentDetailCard extends StatefulWidget {
   final VoidCallback onAdd;
   final void Function(int index) onRemove;
   final void Function(int index, ComponentInstanceState updated) onUpdate;
+
+  /// Route to return to when navigating to a catalog. Passed to catalog screens.
+  final String? returnTo;
 
   @override
   State<ComponentDetailCard> createState() => _ComponentDetailCardState();
@@ -134,6 +139,7 @@ class _ComponentDetailCardState extends State<ComponentDetailCard>
                       type: widget.type,
                       instance: widget.instances[i],
                       onUpdate: (updated) => widget.onUpdate(i, updated),
+                      returnTo: widget.returnTo,
                     ),
                   ],
                   // Add instance button (multi-instance types only)
@@ -224,6 +230,61 @@ class _AddInstanceButton extends StatelessWidget {
 }
 
 // ─────────────────────────────────────────────
+// _EmptyServicePrompt
+// ─────────────────────────────────────────────
+
+class _EmptyServicePrompt extends StatelessWidget {
+  const _EmptyServicePrompt({required this.label, required this.onGoToCatalog});
+
+  final String label;
+  final VoidCallback onGoToCatalog;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      decoration: BoxDecoration(
+        color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.4),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(
+          color: theme.colorScheme.outline.withValues(alpha: 0.3),
+        ),
+      ),
+      child: Row(
+        children: [
+          Icon(
+            Icons.info_outline,
+            size: 18,
+            color: theme.colorScheme.onSurfaceVariant,
+          ),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              label,
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
+            ),
+          ),
+          const SizedBox(width: 8),
+          TextButton.icon(
+            onPressed: onGoToCatalog,
+            icon: const Icon(Icons.open_in_new, size: 14),
+            label: const Text('Ir al catálogo'),
+            style: TextButton.styleFrom(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              minimumSize: Size.zero,
+              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ─────────────────────────────────────────────
 // _InstanceFields — dispatches by ComponentType
 // ─────────────────────────────────────────────
 
@@ -232,11 +293,15 @@ class _InstanceFields extends ConsumerStatefulWidget {
     required this.type,
     required this.instance,
     required this.onUpdate,
+    this.returnTo,
   });
 
   final ComponentType type;
   final ComponentInstanceState instance;
   final void Function(ComponentInstanceState) onUpdate;
+
+  /// Route to return to when navigating to a catalog.
+  final String? returnTo;
 
   @override
   ConsumerState<_InstanceFields> createState() => _InstanceFieldsState();
@@ -602,6 +667,34 @@ class _InstanceFieldsState extends ConsumerState<_InstanceFields> {
             isDense: true,
           ),
         ),
+        if (sqlDatabases.isEmpty) ...[
+          const SizedBox(height: 6),
+          _EmptyServicePrompt(
+            label: 'No hay bases de datos configuradas.',
+            onGoToCatalog: () => context.go(
+              '/catalogos/bases-datos',
+              extra: widget.returnTo ?? '/new-package',
+            ),
+          ),
+        ] else ...[
+          const SizedBox(height: 4),
+          Align(
+            alignment: Alignment.centerRight,
+            child: TextButton.icon(
+              onPressed: () => context.go(
+                '/catalogos/bases-datos',
+                extra: widget.returnTo ?? '/new-package',
+              ),
+              icon: const Icon(Icons.edit_outlined, size: 14),
+              label: const Text('Gestionar catálogo'),
+              style: TextButton.styleFrom(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                minimumSize: Size.zero,
+                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+              ),
+            ),
+          ),
+        ],
         const SizedBox(height: 12),
         _buildEstatusDropdown(estatusOptions),
         const SizedBox(height: 12),
@@ -721,7 +814,35 @@ class _InstanceFieldsState extends ConsumerState<_InstanceFields> {
           ),
           hint: const Text('Seleccionar servicio...'),
         ),
-        const SizedBox(height: 12),
+        if (iisServices.isEmpty) ...[
+          const SizedBox(height: 6),
+          _EmptyServicePrompt(
+            label: 'No hay servicios IIS configurados.',
+            onGoToCatalog: () => context.go(
+              '/catalogos/servicios',
+              extra: widget.returnTo ?? '/new-package',
+            ),
+          ),
+        ] else ...[
+          const SizedBox(height: 4),
+          Align(
+            alignment: Alignment.centerRight,
+            child: TextButton.icon(
+              onPressed: () => context.go(
+                '/catalogos/servicios',
+                extra: widget.returnTo ?? '/new-package',
+              ),
+              icon: const Icon(Icons.edit_outlined, size: 14),
+              label: const Text('Gestionar catálogo'),
+              style: TextButton.styleFrom(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                minimumSize: Size.zero,
+                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+              ),
+            ),
+          ),
+        ],
+        const SizedBox(height: 8),
         _buildEstatusDropdown(estatusOptions),
         const SizedBox(height: 4),
         SwitchListTile(
@@ -729,6 +850,30 @@ class _InstanceFieldsState extends ConsumerState<_InstanceFields> {
           value: widget.instance.publicar,
           onChanged: (v) =>
               widget.onUpdate(widget.instance.copyWith(publicar: v)),
+          contentPadding: EdgeInsets.zero,
+          dense: true,
+        ),
+        SwitchListTile(
+          title: const Text('Jenkins CI/CD', style: TextStyle(fontSize: 14)),
+          subtitle: const Text(
+            'Incluir pipeline de Jenkins',
+            style: TextStyle(fontSize: 12),
+          ),
+          value: widget.instance.jenkins,
+          onChanged: (v) =>
+              widget.onUpdate(widget.instance.copyWith(jenkins: v)),
+          contentPadding: EdgeInsets.zero,
+          dense: true,
+        ),
+        SwitchListTile(
+          title: const Text('Actualizar APIM', style: TextStyle(fontSize: 14)),
+          subtitle: const Text(
+            'Actualizar Azure API Management',
+            style: TextStyle(fontSize: 12),
+          ),
+          value: widget.instance.actualizarApim,
+          onChanged: (v) =>
+              widget.onUpdate(widget.instance.copyWith(actualizarApim: v)),
           contentPadding: EdgeInsets.zero,
           dense: true,
         ),
@@ -862,9 +1007,62 @@ class _InstanceFieldsState extends ConsumerState<_InstanceFields> {
           ),
           hint: const Text('Seleccionar servicio...'),
         ),
-        const SizedBox(height: 12),
+        if (dockerServices.isEmpty) ...[
+          const SizedBox(height: 6),
+          _EmptyServicePrompt(
+            label: 'No hay servicios Docker configurados.',
+            onGoToCatalog: () => context.go(
+              '/catalogos/servicios',
+              extra: widget.returnTo ?? '/new-package',
+            ),
+          ),
+        ] else ...[
+          const SizedBox(height: 4),
+          Align(
+            alignment: Alignment.centerRight,
+            child: TextButton.icon(
+              onPressed: () => context.go(
+                '/catalogos/servicios',
+                extra: widget.returnTo ?? '/new-package',
+              ),
+              icon: const Icon(Icons.edit_outlined, size: 14),
+              label: const Text('Gestionar catálogo'),
+              style: TextButton.styleFrom(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                minimumSize: Size.zero,
+                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+              ),
+            ),
+          ),
+        ],
+        const SizedBox(height: 8),
         _buildEstatusDropdown(estatusOptions),
-        const SizedBox(height: 12),
+        const SizedBox(height: 4),
+        SwitchListTile(
+          title: const Text('Jenkins CI/CD', style: TextStyle(fontSize: 14)),
+          subtitle: const Text(
+            'Incluir pipeline de Jenkins',
+            style: TextStyle(fontSize: 12),
+          ),
+          value: widget.instance.jenkins,
+          onChanged: (v) =>
+              widget.onUpdate(widget.instance.copyWith(jenkins: v)),
+          contentPadding: EdgeInsets.zero,
+          dense: true,
+        ),
+        SwitchListTile(
+          title: const Text('Actualizar APIM', style: TextStyle(fontSize: 14)),
+          subtitle: const Text(
+            'Actualizar Azure API Management',
+            style: TextStyle(fontSize: 12),
+          ),
+          value: widget.instance.actualizarApim,
+          onChanged: (v) =>
+              widget.onUpdate(widget.instance.copyWith(actualizarApim: v)),
+          contentPadding: EdgeInsets.zero,
+          dense: true,
+        ),
+        const SizedBox(height: 8),
         const Text(
           'Configuraciones:',
           style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
