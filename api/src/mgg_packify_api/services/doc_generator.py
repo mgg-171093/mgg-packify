@@ -83,6 +83,8 @@ def generate_document(config: PackageConfig, output_path: Path) -> None:
             "crear_pagina":   comp.crear_pagina,
             "pagina":         comp.pagina,
             "widgets":        comp.widgets,
+            "jenkins":        comp.jenkins,
+            "actualizar_apim": comp.actualizar_apim,
         }
         componentes_v1.append(d)
 
@@ -468,18 +470,26 @@ def gen_seccion_api_iis(doc, seccion_num: str, apis: list, ambiente: str,
                     logging.warning(f"Imagen no encontrada: {cfg['imagen_path']} — {e}")
 
 
-def gen_seccion_api_docker(doc, seccion_num: str, apis: list, ambiente: str,
+def gen_seccion_api_docker(doc, seccion_num: str, apis: list[dict], ambiente: str,
                             servidor_api: str, configs: list | None = None):
-    """Genera la sección de proceso para APIs con pipeline Docker / Jenkins CI-CD."""
+    """Genera la sección de proceso para APIs con pipeline Docker / Jenkins CI-CD.
+
+    Args:
+        apis: lista de dicts con keys: nombre (str), jenkins (bool), actualizar_apim (bool).
+              Default True para ambos booleanos si la key está ausente (retrocompatibilidad).
+    """
     add_h2(doc, f"{seccion_num}.- API")
 
     add_h3(doc, f"{seccion_num}.1.-  En el servidor de servicios en {ambiente}:")
 
     for api in apis:
-        add_child(doc, f'Actualizar el servicio "{api}"', bold_keywords=[f'"{api}"'])
-        add_child(doc, "Hacer el despliegue CI/CD en Jenkins", bold_keywords=["Jenkins"])
-        add_child(doc, "Actualizar el schema del Api Management de AZURE",
-                  bold_keywords=["Api Management de AZURE"])
+        nombre = api["nombre"] if isinstance(api, dict) else api
+        add_child(doc, f'Actualizar el servicio "{nombre}"', bold_keywords=[f'"{nombre}"'])
+        if api.get("jenkins", True) if isinstance(api, dict) else True:
+            add_child(doc, "Hacer el despliegue CI/CD en Jenkins", bold_keywords=["Jenkins"])
+        if api.get("actualizar_apim", True) if isinstance(api, dict) else True:
+            add_child(doc, "Actualizar el schema del Api Management de AZURE",
+                      bold_keywords=["Api Management de AZURE"])
 
     if configs:
         add_child(doc, "Actualizar las siguientes variables de entorno/configuración:")
@@ -861,14 +871,21 @@ def generar_manual(data: dict, output_path: str):
             seccion += 1
 
         elif tipo_clave == "api_docker":
-            nombres = [c["nombre_servicio"] for c in grupo]
+            apis_data = [
+                {
+                    "nombre": c["nombre_servicio"],
+                    "jenkins": c.get("jenkins", True),
+                    "actualizar_apim": c.get("actualizar_apim", True),
+                }
+                for c in grupo
+            ]
             configs = []
             for c in grupo:
                 configs.extend(c.get("configs", []))
             servidor_api = data["servidores"].get(
                 "api", f"Servidor de servicios {ambiente}"
             )
-            gen_seccion_api_docker(doc, prefix, nombres, ambiente,
+            gen_seccion_api_docker(doc, prefix, apis_data, ambiente,
                                    servidor_api,
                                    configs if configs else None)
             seccion += 1

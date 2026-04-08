@@ -139,6 +139,8 @@ def _derive_component_config(comp: ComponentIn, inst: InstanceIn) -> list[Compon
                 pagina=inst.pagina,
                 widgets=inst.widgets,
                 publicar=inst.publicar,
+                jenkins=inst.jenkins,
+                actualizar_apim=inst.actualizar_apim,
             )]
 
         case ComponentType.API_DOCKER:
@@ -159,6 +161,8 @@ def _derive_component_config(comp: ComponentIn, inst: InstanceIn) -> list[Compon
                 crear_pagina=inst.crear_pagina,
                 pagina=inst.pagina,
                 widgets=inst.widgets,
+                jenkins=inst.jenkins,
+                actualizar_apim=inst.actualizar_apim,
             )]
 
         case ComponentType.BLOB:

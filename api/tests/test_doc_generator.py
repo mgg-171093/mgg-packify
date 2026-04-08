@@ -282,7 +282,10 @@ class TestGenSeccionApiPicture:
         configs = [{"clave": "env", "valor": "prod", "imagen_path": str(img)}]
 
         with patch.object(doc, "add_picture") as mock_pic:
-            gen_seccion_api_docker(doc, "3", ["DockerSvc"], "PRD", "srv", configs)
+            gen_seccion_api_docker(
+                doc, "3", [{"nombre": "DockerSvc", "jenkins": True, "actualizar_apim": True}],
+                "PRD", "srv", configs,
+            )
 
         mock_pic.assert_called_once()
 
@@ -292,7 +295,10 @@ class TestGenSeccionApiPicture:
         configs = [{"clave": "env", "valor": "prod", "imagen_path": None}]
 
         with patch.object(doc, "add_picture") as mock_pic:
-            gen_seccion_api_docker(doc, "3", ["DockerSvc"], "PRD", "srv", configs)
+            gen_seccion_api_docker(
+                doc, "3", [{"nombre": "DockerSvc", "jenkins": True, "actualizar_apim": True}],
+                "PRD", "srv", configs,
+            )
 
         mock_pic.assert_not_called()
 
@@ -302,6 +308,101 @@ class TestGenSeccionApiPicture:
         configs = [{"clave": "env", "valor": "prod", "imagen_path": "/does/not/exist.png"}]
 
         with caplog.at_level(logging.WARNING):
-            gen_seccion_api_docker(doc, "3", ["DockerSvc"], "PRD", "srv", configs)
+            gen_seccion_api_docker(
+                doc, "3", [{"nombre": "DockerSvc", "jenkins": True, "actualizar_apim": True}],
+                "PRD", "srv", configs,
+            )
 
         assert any("Imagen no encontrada" in r.message for r in caplog.records)
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# REQ-DOC-01: Booleanos jenkins y actualizar_apim en gen_seccion_api_docker
+# ─────────────────────────────────────────────────────────────────────────────
+
+
+class TestGenSeccionApiDockerBooleanos:
+    """Verifica que los booleanos jenkins y actualizar_apim controlan la presencia de pasos en el docx."""
+
+    def test_jenkins_false_omits_jenkins_step(self) -> None:
+        """jenkins=False → 'Hacer el despliegue CI/CD en Jenkins' NO aparece en el docx (REQ-DOC-01)."""
+        doc = Document()
+        apis = [{"nombre": "MiServicio", "jenkins": False, "actualizar_apim": True}]
+
+        gen_seccion_api_docker(doc, "2", apis, "QA", "srv")
+
+        texts = _paragraphs_text(doc)
+        combined = " ".join(texts)
+        assert "Jenkins" not in combined
+        assert "Actualizar el schema del Api Management de AZURE" in combined
+
+    def test_actualizar_apim_false_omits_apim_step(self) -> None:
+        """actualizar_apim=False → 'Actualizar el schema del Api Management de AZURE' NO aparece (REQ-DOC-01)."""
+        doc = Document()
+        apis = [{"nombre": "MiServicio", "jenkins": True, "actualizar_apim": False}]
+
+        gen_seccion_api_docker(doc, "2", apis, "QA", "srv")
+
+        texts = _paragraphs_text(doc)
+        combined = " ".join(texts)
+        assert "Jenkins" in combined
+        assert "Api Management de AZURE" not in combined
+
+    def test_both_true_includes_both_steps(self) -> None:
+        """jenkins=True y actualizar_apim=True → ambos pasos aparecen (retrocompatibilidad)."""
+        doc = Document()
+        apis = [{"nombre": "MiServicio", "jenkins": True, "actualizar_apim": True}]
+
+        gen_seccion_api_docker(doc, "2", apis, "QA", "srv")
+
+        texts = _paragraphs_text(doc)
+        combined = " ".join(texts)
+        assert "Jenkins" in combined
+        assert "Api Management de AZURE" in combined
+
+    def test_both_false_omits_both_steps(self) -> None:
+        """jenkins=False y actualizar_apim=False → ningún paso opcional aparece."""
+        doc = Document()
+        apis = [{"nombre": "MiServicio", "jenkins": False, "actualizar_apim": False}]
+
+        gen_seccion_api_docker(doc, "2", apis, "QA", "srv")
+
+        texts = _paragraphs_text(doc)
+        combined = " ".join(texts)
+        assert "Jenkins" not in combined
+        assert "Api Management de AZURE" not in combined
+        # Pero el nombre del servicio sí debe aparecer
+        assert "MiServicio" in combined
+
+    def test_default_true_when_key_absent(self) -> None:
+        """Cuando la key jenkins/actualizar_apim está ausente, default=True (retrocompatibilidad)."""
+        doc = Document()
+        # Dict sin las keys de booleanos — simula paquete generado antes del cambio
+        apis = [{"nombre": "ServicioViejo"}]
+
+        gen_seccion_api_docker(doc, "2", apis, "QA", "srv")
+
+        texts = _paragraphs_text(doc)
+        combined = " ".join(texts)
+        assert "Jenkins" in combined
+        assert "Api Management de AZURE" in combined
+
+    def test_multiple_instances_independent_flags(self) -> None:
+        """Múltiples instancias con flags distintos → cada una aplica sus propios flags."""
+        doc = Document()
+        apis = [
+            {"nombre": "SvcA", "jenkins": True, "actualizar_apim": False},
+            {"nombre": "SvcB", "jenkins": False, "actualizar_apim": True},
+        ]
+
+        gen_seccion_api_docker(doc, "2", apis, "QA", "srv")
+
+        texts = _paragraphs_text(doc)
+        combined = " ".join(texts)
+        # Jenkins debe aparecer (por SvcA)
+        assert "Jenkins" in combined
+        # APIM debe aparecer (por SvcB)
+        assert "Api Management de AZURE" in combined
+        # Ambos servicios referenciados
+        assert "SvcA" in combined
+        assert "SvcB" in combined

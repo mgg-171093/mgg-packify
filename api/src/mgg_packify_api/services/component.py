@@ -149,3 +149,9 @@ class ComponentConfig:
     """Si se debe publicar el servicio IIS vía MSBuild/dotnet publish."""
     ruta: str = ""
     """Ruta al proyecto .csproj en el repositorio (sólo para api_iis)."""
+
+    # ── API Docker / API IIS — optional docx steps ───────────────────────────
+    jenkins: bool = True
+    """Si se debe incluir el paso 'Hacer el despliegue CI/CD en Jenkins' en el docx."""
+    actualizar_apim: bool = True
+    """Si se debe incluir el paso 'Actualizar el schema del Api Management de AZURE' en el docx."""
