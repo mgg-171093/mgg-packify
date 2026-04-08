@@ -39,7 +39,13 @@ const _destinations = [
   ),
   // Index 9 — Tipos
   (icon: Icons.category_outlined, label: 'Tipos', path: '/catalogos/tipos'),
-  // Index 10 — Apariencia
+  // Index 10 — Texto Docs
+  (
+    icon: Icons.edit_note_outlined,
+    label: 'Texto Docs',
+    path: '/catalogos/doc-templates',
+  ),
+  // Index 11 — Apariencia
   (
     icon: Icons.palette_outlined,
     label: 'Apariencia',
@@ -60,7 +66,8 @@ int _indexFromPath(String path) {
   if (path.startsWith('/catalogos/estatus')) return 7;
   if (path.startsWith('/catalogos/bases-datos')) return 8;
   if (path.startsWith('/catalogos/tipos')) return 9;
-  if (path == '/settings/appearance') return 10;
+  if (path.startsWith('/catalogos/doc-templates')) return 10;
+  if (path == '/settings/appearance') return 11;
   return -1;
 }
 
@@ -208,13 +215,19 @@ class _AppSidebar extends StatelessWidget {
               selected: selectedIndex == 9,
               onTap: () => onDestinationSelected(9),
             ),
-            const Divider(height: 1),
-            // ── Sistema ──────────────────────
             _SidebarItem(
               icon: _destinations[10].icon,
               label: _destinations[10].label,
               selected: selectedIndex == 10,
               onTap: () => onDestinationSelected(10),
+            ),
+            const Divider(height: 1),
+            // ── Sistema ──────────────────────
+            _SidebarItem(
+              icon: _destinations[11].icon,
+              label: _destinations[11].label,
+              selected: selectedIndex == 11,
+              onTap: () => onDestinationSelected(11),
             ),
           ],
         ),

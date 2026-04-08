@@ -18,6 +18,7 @@ from platformdirs import user_data_dir
 from mgg_packify_api.schemas.options import (
     ApiDockerServiceEntry,
     ApiIisServiceEntry,
+    DocTemplatesSchema,
     OptionsSchema,
 )
 
@@ -38,7 +39,7 @@ logger = logging.getLogger(__name__)
 
 _APP_NAME = "mgg_packify_api"
 _OPTIONS_FILE = "options.json"
-_SCHEMA_VERSION = 3
+_SCHEMA_VERSION = 4
 
 
 def _default_options() -> dict:
@@ -52,6 +53,7 @@ def _default_options() -> dict:
         "api_iis_services": [],
         "api_docker_services": [],
         "sql_databases": [],
+        "doc_templates": {},
     }
 
 
@@ -105,6 +107,8 @@ class OptionsManager:
             with self._path.open("r", encoding="utf-8") as f:
                 data = json.load(f)
             _defaults = OptionsSchema()
+            # D9: v3→v4 migration — silent fallback for doc_templates
+            doc_templates_data = data.get("doc_templates", {})
             return OptionsSchema(
                 estatus_options=data.get(
                     "estatus_options", _defaults.estatus_options
@@ -124,6 +128,7 @@ class OptionsManager:
                     for entry in data.get("api_docker_services", [])
                 ],
                 sql_databases=data.get("sql_databases", []),
+                doc_templates=DocTemplatesSchema(**doc_templates_data) if doc_templates_data else DocTemplatesSchema(),
             )
         except (json.JSONDecodeError, OSError, TypeError, ValueError) as exc:
             logger.warning(
@@ -154,6 +159,7 @@ class OptionsManager:
                 for entry in options.api_docker_services
             ],
             "sql_databases": options.sql_databases,
+            "doc_templates": options.doc_templates.model_dump(exclude_none=True),
         }
         self._write(data)
 

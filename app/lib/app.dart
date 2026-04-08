@@ -5,6 +5,7 @@ import 'models/generate_result.dart';
 import 'providers/theme_mode_provider.dart';
 import 'screens/appearance_screen.dart';
 import 'screens/catalogos/bases_datos_screen.dart';
+import 'screens/catalogos/doc_templates_screen.dart';
 import 'screens/catalogos/estatus_screen.dart';
 import 'screens/catalogos/servidores_screen.dart';
 import 'screens/catalogos/servicios_screen.dart';
@@ -133,6 +134,11 @@ final router = GoRouter(
             final returnTo = state.extra as String?;
             return NoTransitionPage(child: TiposScreen(returnTo: returnTo));
           },
+        ),
+        GoRoute(
+          path: '/catalogos/doc-templates',
+          pageBuilder: (ctx, state) =>
+              const NoTransitionPage(child: DocTemplatesScreen()),
         ),
       ],
     ),

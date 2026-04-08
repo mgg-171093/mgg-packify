@@ -390,7 +390,8 @@ def generate_package(req: GenerateRequest) -> GenerateResponse:
 
         # Generar .docx
         doc_path = package_dir / "Manual" / f"{config.package_name}.docx"
-        generate_document(config, doc_path)
+        overrides = opts.doc_templates.to_overrides_dict()
+        generate_document(config, doc_path, overrides=overrides)
 
         # Guardar meta
         save_package_meta(config, package_dir)
