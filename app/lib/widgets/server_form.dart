@@ -56,8 +56,7 @@ class _ServerFormState extends State<ServerForm> {
 
   bool get _showApi =>
       widget.selectedTypes.contains(ComponentType.apiIis) ||
-      widget.selectedTypes.contains(ComponentType.apiDocker) ||
-      widget.selectedTypes.contains(ComponentType.apim);
+      widget.selectedTypes.contains(ComponentType.apiDocker);
 
   bool get _showBd => widget.selectedTypes.contains(ComponentType.sql);
 

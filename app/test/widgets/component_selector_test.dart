@@ -5,7 +5,7 @@ import 'package:mgg_packify/widgets/component_selector.dart';
 
 void main() {
   group('ComponentSelector', () {
-    testWidgets('renders all 8 component types as chips', (tester) async {
+    testWidgets('renders all 7 component types as chips', (tester) async {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(

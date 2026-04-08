@@ -5,10 +5,10 @@ import 'package:flutter/foundation.dart';
 // ─────────────────────────────────────────────
 
 enum ComponentType {
-  liferayBuild('liferay_build', 'Liferay (Deploy de build)', false),
+  liferayBuild('liferay_build', 'Liferay build', false),
   sql('sql', 'SQL', true),
-  apiIis('api_iis', 'API IIS (.zip)', true),
-  apiDocker('api_docker', 'API Docker / Pipeline CI-CD', true),
+  apiIis('api_iis', 'API IIS', true),
+  apiDocker('api_docker', 'API Docker', true),
   blob('blob', 'Blob Storage (JS/CSS)', true),
   liferay('liferay', 'Liferay (Remote App / Página)', true),
   assets('assets', 'Assets (imágenes Liferay)', true),
@@ -33,7 +33,6 @@ const kCanonicalComponentOrder = [
   ComponentType.blob,
   ComponentType.liferay,
   ComponentType.assets,
-  ComponentType.apim,
 ];
 
 // ─────────────────────────────────────────────
