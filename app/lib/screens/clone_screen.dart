@@ -99,11 +99,6 @@ class _CloneScreenState extends ConsumerState<CloneScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => context.go('/home'),
-          tooltip: 'Volver',
-        ),
         title: const Text('Clonar Package'),
         backgroundColor: Colors.white,
         foregroundColor: Theme.of(context).colorScheme.secondary,

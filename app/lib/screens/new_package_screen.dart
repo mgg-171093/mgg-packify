@@ -238,11 +238,6 @@ class _NewPackageScreenState extends ConsumerState<NewPackageScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        leading: IconButton(
-          icon: const Icon(Icons.close),
-          onPressed: () => context.go('/home'),
-          tooltip: 'Cancelar',
-        ),
         title: const Text('Nuevo Package'),
         actions: [
           if (formState.selectedTypes.isNotEmpty)
@@ -437,6 +432,7 @@ class _NewPackageScreenState extends ConsumerState<NewPackageScreen> {
                       onRemove: (idx) => notifier.removeInstance(type, idx),
                       onUpdate: (idx, updated) =>
                           notifier.updateInstance(type, idx, updated),
+                      returnTo: '/new-package',
                     ),
                 const SizedBox(height: 16),
               ],

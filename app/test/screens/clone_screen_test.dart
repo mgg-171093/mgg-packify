@@ -53,14 +53,6 @@ Widget _buildApp() {
 
 void main() {
   group('CloneScreen', () {
-    testWidgets('renders a back arrow icon in the AppBar', (tester) async {
-      await tester.pumpWidget(_buildApp());
-      await tester.pumpAndSettle();
-
-      // Task 4.1: AppBar leading must have Icons.arrow_back
-      expect(find.byIcon(Icons.arrow_back), findsOneWidget);
-    });
-
     testWidgets('AppBar shows "Clonar Package" title', (tester) async {
       await tester.pumpWidget(_buildApp());
       await tester.pumpAndSettle();
@@ -68,15 +60,16 @@ void main() {
       expect(find.text('Clonar Package'), findsOneWidget);
     });
 
-    testWidgets('tapping back arrow navigates to /home', (tester) async {
-      await tester.pumpWidget(_buildApp());
-      await tester.pumpAndSettle();
+    testWidgets(
+      'does NOT render a back arrow in the AppBar (sidebar navigation)',
+      (tester) async {
+        await tester.pumpWidget(_buildApp());
+        await tester.pumpAndSettle();
 
-      await tester.tap(find.byIcon(Icons.arrow_back));
-      await tester.pumpAndSettle();
-
-      // After navigation the Home scaffold text should appear
-      expect(find.text('Home'), findsOneWidget);
-    });
+        // In the new shell layout, AppBar has no leading back button.
+        // Navigation back is handled by the persistent sidebar.
+        expect(find.byIcon(Icons.arrow_back), findsNothing);
+      },
+    );
   });
 }

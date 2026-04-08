@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:go_router/go_router.dart';
 import 'package:mgg_packify/core/api_client.dart';
 import 'package:mgg_packify/models/component_config.dart';
 import 'package:mgg_packify/models/options_model.dart';
@@ -30,6 +31,7 @@ Widget _buildCard({
   required ComponentType type,
   required List<ComponentInstanceState> instances,
   OptionsModel? options,
+  String? returnTo,
 }) {
   final opts =
       options ??
@@ -50,10 +52,64 @@ Widget _buildCard({
             onAdd: () {},
             onRemove: (_) {},
             onUpdate: (_, __) {},
+            returnTo: returnTo,
           ),
         ),
       ),
     ),
+  );
+}
+
+/// Build the card wrapped in a GoRouter for navigation tests.
+Widget _buildCardWithRouter({
+  required ComponentType type,
+  required List<ComponentInstanceState> instances,
+  OptionsModel? options,
+  String? returnTo,
+  List<String> navigatedRoutes = const [],
+}) {
+  final opts =
+      options ??
+      OptionsModel(
+        estatusList: const ['modificado', 'nuevo'],
+        tipoSqlList: const ['sp'],
+        tipoBlobList: const ['css'],
+      );
+
+  final router = GoRouter(
+    initialLocation: '/test',
+    routes: [
+      GoRoute(
+        path: '/test',
+        builder: (ctx, state) => Scaffold(
+          body: SingleChildScrollView(
+            child: ComponentDetailCard(
+              type: type,
+              instances: instances,
+              onAdd: () {},
+              onRemove: (_) {},
+              onUpdate: (_, __) {},
+              returnTo: returnTo,
+            ),
+          ),
+        ),
+      ),
+      GoRoute(
+        path: '/catalogos/servicios',
+        builder: (ctx, state) =>
+            const Scaffold(body: Text('Servicios Catalog')),
+      ),
+      GoRoute(
+        path: '/catalogos/bases-datos',
+        builder: (ctx, state) =>
+            const Scaffold(body: Text('Bases Datos Catalog')),
+      ),
+    ],
+  );
+
+  return ProviderScope(
+    overrides: [apiClientProvider.overrideWithValue(_StubApiClient(opts))],
+    child: MaterialApp.router(routerConfig: router),
   );
 }
 
@@ -326,6 +382,154 @@ void main() {
       expect(find.byIcon(Icons.add_photo_alternate_outlined), findsOneWidget);
       // Row 2 (imagenPath set) → image icon
       expect(find.byIcon(Icons.image), findsOneWidget);
+    });
+
+    // ── E.9: Empty service prompts ────────────────
+
+    testWidgets('api_iis with empty services shows _EmptyServicePrompt', (
+      tester,
+    ) async {
+      final emptyOptions = OptionsModel(
+        estatusList: const ['modificado'],
+        tipoSqlList: const [],
+        tipoBlobList: const [],
+        apiIisServices: const [],
+      );
+
+      await tester.pumpWidget(
+        _buildCard(
+          type: ComponentType.apiIis,
+          instances: [const ComponentInstanceState()],
+          options: emptyOptions,
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('No hay servicios IIS configurados.'), findsOneWidget);
+      expect(find.text('Ir al catálogo'), findsOneWidget);
+    });
+
+    testWidgets('api_iis with services shows "Gestionar catálogo" link', (
+      tester,
+    ) async {
+      final optionsWithServices = OptionsModel(
+        estatusList: const ['modificado'],
+        tipoSqlList: const [],
+        tipoBlobList: const [],
+        apiIisServices: const [
+          ApiIisServiceEntry(nombre: 'Svc1', ruta: '/ruta1'),
+        ],
+      );
+
+      await tester.pumpWidget(
+        _buildCard(
+          type: ComponentType.apiIis,
+          instances: [const ComponentInstanceState()],
+          options: optionsWithServices,
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('Gestionar catálogo'), findsOneWidget);
+      // No empty prompt
+      expect(find.text('No hay servicios IIS configurados.'), findsNothing);
+    });
+
+    testWidgets('api_docker with empty services shows _EmptyServicePrompt', (
+      tester,
+    ) async {
+      final emptyOptions = OptionsModel(
+        estatusList: const ['modificado'],
+        tipoSqlList: const [],
+        tipoBlobList: const [],
+        apiDockerServices: const [],
+      );
+
+      await tester.pumpWidget(
+        _buildCard(
+          type: ComponentType.apiDocker,
+          instances: [const ComponentInstanceState()],
+          options: emptyOptions,
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(
+        find.text('No hay servicios Docker configurados.'),
+        findsOneWidget,
+      );
+      expect(find.text('Ir al catálogo'), findsOneWidget);
+    });
+
+    testWidgets('api_docker shows Jenkins and APIM switches with default ON', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        _buildCard(
+          type: ComponentType.apiDocker,
+          instances: [const ComponentInstanceState()],
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('Jenkins CI/CD'), findsOneWidget);
+      expect(find.text('Actualizar APIM'), findsOneWidget);
+
+      // Both switches should be ON by default
+      final switches = tester.widgetList<Switch>(find.byType(Switch)).toList();
+      // There are 2 switches (jenkins + actualizarApim)
+      expect(switches.length, greaterThanOrEqualTo(2));
+      // Find by label position — check both are true by default
+      final jenkinsSwitch = switches[0];
+      final apimSwitch = switches[1];
+      expect(jenkinsSwitch.value, isTrue);
+      expect(apimSwitch.value, isTrue);
+    });
+
+    testWidgets('sql with empty databases shows _EmptyServicePrompt', (
+      tester,
+    ) async {
+      final emptyOptions = OptionsModel(
+        estatusList: const ['modificado'],
+        tipoSqlList: const ['sp'],
+        tipoBlobList: const [],
+        sqlDatabases: const [],
+      );
+
+      await tester.pumpWidget(
+        _buildCard(
+          type: ComponentType.sql,
+          instances: [const ComponentInstanceState(scripts: [])],
+          options: emptyOptions,
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('No hay bases de datos configuradas.'), findsOneWidget);
+      expect(find.text('Ir al catálogo'), findsOneWidget);
+    });
+
+    testWidgets('sql with databases shows "Gestionar catálogo" link', (
+      tester,
+    ) async {
+      final optionsWithDbs = OptionsModel(
+        estatusList: const ['modificado'],
+        tipoSqlList: const ['sp'],
+        tipoBlobList: const [],
+        sqlDatabases: const ['DB_QA', 'DB_PROD'],
+      );
+
+      await tester.pumpWidget(
+        _buildCard(
+          type: ComponentType.sql,
+          instances: [const ComponentInstanceState(scripts: [])],
+          options: optionsWithDbs,
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('Gestionar catálogo'), findsOneWidget);
+      expect(find.text('No hay bases de datos configuradas.'), findsNothing);
     });
   });
 }

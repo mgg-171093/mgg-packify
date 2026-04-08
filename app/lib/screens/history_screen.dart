@@ -16,11 +16,6 @@ class HistoryScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => context.go('/home'),
-          tooltip: 'Volver',
-        ),
         title: const Text('Historial'),
         actions: [
           historyAsync.whenOrNull(

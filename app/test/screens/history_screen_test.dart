@@ -145,21 +145,22 @@ void main() {
   });
 
   group('HistoryScreen — AppBar', () {
-    testWidgets('shows "Historial" title', (tester) async {
+    testWidgets('shows "Historial" title in AppBar', (tester) async {
       await tester.pumpWidget(_buildApp());
       await tester.pumpAndSettle();
 
       expect(find.text('Historial'), findsOneWidget);
     });
 
-    testWidgets('shows back arrow and navigates to /home', (tester) async {
+    testWidgets('does NOT show back arrow (sidebar navigation replaces it)', (
+      tester,
+    ) async {
       await tester.pumpWidget(_buildApp());
       await tester.pumpAndSettle();
 
-      await tester.tap(find.byIcon(Icons.arrow_back));
-      await tester.pumpAndSettle();
-
-      expect(find.text('Home'), findsOneWidget);
+      // In the new shell layout the leading back arrow was removed.
+      // The persistent sidebar handles back/home navigation.
+      expect(find.byIcon(Icons.arrow_back), findsNothing);
     });
 
     testWidgets('shows clear icon when entries exist', (tester) async {
