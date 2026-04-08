@@ -20,6 +20,8 @@ from docx import Document
 from mgg_packify_api.routes.packages import _derive_component_config
 from mgg_packify_api.schemas.package import ComponentIn, InstanceIn
 from mgg_packify_api.services.doc_generator import (
+    DOC_TEXT_DEFAULTS,
+    _resolve_text,
     _ubicacion,
     gen_seccion_api_docker,
     gen_seccion_api_iis,
@@ -234,7 +236,7 @@ class TestGenSeccionApiPicture:
         configs = [{"clave": "key", "valor": "val", "imagen_path": str(img)}]
 
         with patch.object(doc, "add_picture") as mock_pic:
-            gen_seccion_api_iis(doc, "2", ["MySvc"], "QA", "srv", configs)
+            gen_seccion_api_iis(doc, "2", [{"nombre": "MySvc", "jenkins": True, "actualizar_apim": True}], "QA", "srv", configs)
 
         mock_pic.assert_called_once()
         # Verificar que el primer argumento posicional es la ruta de la imagen
@@ -246,7 +248,7 @@ class TestGenSeccionApiPicture:
         configs = [{"clave": "key", "valor": "val", "imagen_path": None}]
 
         with patch.object(doc, "add_picture") as mock_pic:
-            gen_seccion_api_iis(doc, "2", ["MySvc"], "QA", "srv", configs)
+            gen_seccion_api_iis(doc, "2", [{"nombre": "MySvc", "jenkins": True, "actualizar_apim": True}], "QA", "srv", configs)
 
         mock_pic.assert_not_called()
 
@@ -257,7 +259,7 @@ class TestGenSeccionApiPicture:
 
         with caplog.at_level(logging.WARNING):
             # Must NOT raise
-            gen_seccion_api_iis(doc, "2", ["MySvc"], "QA", "srv", configs)
+            gen_seccion_api_iis(doc, "2", [{"nombre": "MySvc", "jenkins": True, "actualizar_apim": True}], "QA", "srv", configs)
 
         assert any("Imagen no encontrada" in r.message for r in caplog.records)
 
@@ -267,7 +269,7 @@ class TestGenSeccionApiPicture:
         configs = [{"clave": "key", "valor": "val"}]
 
         with patch.object(doc, "add_picture") as mock_pic:
-            gen_seccion_api_iis(doc, "2", ["MySvc"], "QA", "srv", configs)
+            gen_seccion_api_iis(doc, "2", [{"nombre": "MySvc", "jenkins": True, "actualizar_apim": True}], "QA", "srv", configs)
 
         mock_pic.assert_not_called()
 
@@ -406,3 +408,132 @@ class TestGenSeccionApiDockerBooleanos:
         # Ambos servicios referenciados
         assert "SvcA" in combined
         assert "SvcB" in combined
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# REQ-DOC-02: Booleanos jenkins y actualizar_apim en gen_seccion_api_iis
+# ─────────────────────────────────────────────────────────────────────────────
+
+
+class TestGenSeccionApiIisBooleanos:
+    """Verifica que los booleanos jenkins y actualizar_apim controlan la presencia de pasos en el docx para IIS."""
+
+    def test_jenkins_true_includes_jenkins_step(self) -> None:
+        """jenkins=True → 'Hacer el despliegue CI/CD en Jenkins' aparece en el docx (REQ-DOC-02)."""
+        doc = Document()
+        apis = [{"nombre": "MiServicio", "jenkins": True, "actualizar_apim": False}]
+
+        gen_seccion_api_iis(doc, "2", apis, "QA", "srv")
+
+        texts = _paragraphs_text(doc)
+        combined = " ".join(texts)
+        assert "Jenkins" in combined
+
+    def test_jenkins_false_omits_jenkins_step(self) -> None:
+        """jenkins=False → 'Hacer el despliegue CI/CD en Jenkins' NO aparece en el docx (REQ-DOC-02)."""
+        doc = Document()
+        apis = [{"nombre": "MiServicio", "jenkins": False, "actualizar_apim": True}]
+
+        gen_seccion_api_iis(doc, "2", apis, "QA", "srv")
+
+        texts = _paragraphs_text(doc)
+        combined = " ".join(texts)
+        assert "Jenkins" not in combined
+        assert "Actualizar el schema del Api Management de AZURE" in combined
+
+    def test_actualizar_apim_true_includes_apim_step(self) -> None:
+        """actualizar_apim=True → 'Actualizar el schema del Api Management de AZURE' aparece (REQ-DOC-02)."""
+        doc = Document()
+        apis = [{"nombre": "MiServicio", "jenkins": False, "actualizar_apim": True}]
+
+        gen_seccion_api_iis(doc, "2", apis, "QA", "srv")
+
+        texts = _paragraphs_text(doc)
+        combined = " ".join(texts)
+        assert "Api Management de AZURE" in combined
+
+    def test_actualizar_apim_false_omits_apim_step(self) -> None:
+        """actualizar_apim=False → 'Actualizar el schema del Api Management de AZURE' NO aparece (REQ-DOC-02)."""
+        doc = Document()
+        apis = [{"nombre": "MiServicio", "jenkins": True, "actualizar_apim": False}]
+
+        gen_seccion_api_iis(doc, "2", apis, "QA", "srv")
+
+        texts = _paragraphs_text(doc)
+        combined = " ".join(texts)
+        assert "Jenkins" in combined
+        assert "Api Management de AZURE" not in combined
+
+    def test_default_true_when_jenkins_key_absent(self) -> None:
+        """Cuando la key jenkins está ausente, default=True (retrocompatibilidad)."""
+        doc = Document()
+        # Dict sin la key jenkins — simula paquete generado antes del cambio
+        apis = [{"nombre": "ServicioViejo", "actualizar_apim": True}]
+
+        gen_seccion_api_iis(doc, "2", apis, "QA", "srv")
+
+        texts = _paragraphs_text(doc)
+        combined = " ".join(texts)
+        assert "Jenkins" in combined
+        assert "Api Management de AZURE" in combined
+
+    def test_multiple_instances_independent_flags(self) -> None:
+        """Múltiples instancias IIS con flags distintos → cada una aplica sus propios flags."""
+        doc = Document()
+        apis = [
+            {"nombre": "SvcA", "jenkins": True, "actualizar_apim": False},
+            {"nombre": "SvcB", "jenkins": False, "actualizar_apim": True},
+        ]
+
+        gen_seccion_api_iis(doc, "2", apis, "QA", "srv")
+
+        texts = _paragraphs_text(doc)
+        combined = " ".join(texts)
+        # Jenkins debe aparecer (por SvcA)
+        assert "Jenkins" in combined
+        # APIM debe aparecer (por SvcB)
+        assert "Api Management de AZURE" in combined
+        # Ambos servicios referenciados
+        assert "SvcA" in combined
+        assert "SvcB" in combined
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# C.7 — _resolve_text smoke tests
+# ─────────────────────────────────────────────────────────────────────────────
+
+
+class TestResolveText:
+    """Smoke tests for _resolve_text()."""
+
+    def test_override_present_returns_override_with_format(self) -> None:
+        """Override present → override text returned with format applied."""
+        overrides = {"sql": {"h2_title": "{seccion_num}.- SQL Personalizado"}}
+        result = _resolve_text("sql", "h2_title", overrides, seccion_num="3")
+        assert result == "3.- SQL Personalizado"
+
+    def test_no_override_returns_default(self) -> None:
+        """No override → DOC_TEXT_DEFAULTS returned with format applied."""
+        result = _resolve_text("sql", "h2_title", None, seccion_num="2")
+        expected = DOC_TEXT_DEFAULTS["sql"]["h2_title"].format(seccion_num="2")
+        assert result == expected
+        assert "2" in result
+
+    def test_broken_placeholder_in_override_falls_back_to_default(self) -> None:
+        """Override with broken placeholder → falls back to default silently, no exception."""
+        overrides = {"sql": {"h2_title": "{seccion_num}.- SQL {nonexistent_key}"}}
+        # Should NOT raise, should fall back to default
+        result = _resolve_text("sql", "h2_title", overrides, seccion_num="5")
+        expected = DOC_TEXT_DEFAULTS["sql"]["h2_title"].format(seccion_num="5")
+        assert result == expected
+
+    def test_empty_overrides_dict_returns_default(self) -> None:
+        """Empty overrides dict → default returned."""
+        result = _resolve_text("sql", "h3_subtitle", {},
+                               seccion_num="1", base_datos="MYDB", ambiente="QA")
+        expected = DOC_TEXT_DEFAULTS["sql"]["h3_subtitle"].format(
+            seccion_num="1", base_datos="MYDB", ambiente="QA"
+        )
+        assert result == expected
+        assert '"MYDB"' in result
+        assert "QA" in result

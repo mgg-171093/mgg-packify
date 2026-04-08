@@ -853,6 +853,30 @@ class _InstanceFieldsState extends ConsumerState<_InstanceFields> {
           contentPadding: EdgeInsets.zero,
           dense: true,
         ),
+        SwitchListTile(
+          title: const Text('Jenkins CI/CD', style: TextStyle(fontSize: 14)),
+          subtitle: const Text(
+            'Incluir pipeline de Jenkins',
+            style: TextStyle(fontSize: 12),
+          ),
+          value: widget.instance.jenkins,
+          onChanged: (v) =>
+              widget.onUpdate(widget.instance.copyWith(jenkins: v)),
+          contentPadding: EdgeInsets.zero,
+          dense: true,
+        ),
+        SwitchListTile(
+          title: const Text('Actualizar APIM', style: TextStyle(fontSize: 14)),
+          subtitle: const Text(
+            'Actualizar Azure API Management',
+            style: TextStyle(fontSize: 12),
+          ),
+          value: widget.instance.actualizarApim,
+          onChanged: (v) =>
+              widget.onUpdate(widget.instance.copyWith(actualizarApim: v)),
+          contentPadding: EdgeInsets.zero,
+          dense: true,
+        ),
         const SizedBox(height: 8),
         const Text(
           'Configuraciones:',
