@@ -5,9 +5,11 @@ import 'package:go_router/go_router.dart';
 import 'package:mgg_packify/models/options_model.dart';
 import 'package:mgg_packify/models/package_history_entry.dart';
 import 'package:mgg_packify/models/settings_model.dart';
+import 'package:mgg_packify/providers/health_polling_provider.dart';
 import 'package:mgg_packify/providers/history_provider.dart';
 import 'package:mgg_packify/providers/options_provider.dart';
 import 'package:mgg_packify/providers/settings_provider.dart';
+import 'package:mgg_packify/providers/update_check_provider.dart';
 import 'package:mgg_packify/screens/dashboard_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -48,7 +50,11 @@ GoRouter _makeRouter() => GoRouter(
 
 Widget _buildApp({List<Override> overrides = const []}) {
   return ProviderScope(
-    overrides: overrides,
+    overrides: [
+      updateCheckProvider.overrideWith(_FakeUpdateCheckNotifier.new),
+      healthPollingProvider.overrideWith(_FakeHealthPollingNotifier.new),
+      ...overrides,
+    ],
     child: MaterialApp.router(routerConfig: _makeRouter()),
   );
 }
@@ -100,6 +106,25 @@ class _FakeOptionsNotifier extends AsyncNotifier<OptionsModel>
 
   @override
   Future<void> save(OptionsModel options) async {}
+}
+
+class _FakeUpdateCheckNotifier extends UpdateCheckNotifier {
+  @override
+  Future<UpdateCheckState> build() async => UpdateCheckState.none();
+
+  @override
+  Future<void> checkForUpdates() async {}
+}
+
+class _FakeHealthPollingNotifier extends HealthPollingNotifier {
+  @override
+  void build() {}
+
+  @override
+  void startPolling() {}
+
+  @override
+  void stopPolling() {}
 }
 
 // ─────────────────────────────────────────────
