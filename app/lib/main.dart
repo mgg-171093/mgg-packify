@@ -2,10 +2,19 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:local_notifier/local_notifier.dart';
 import 'app.dart';
+import 'core/app_logger.dart';
 import 'core/server_manager.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await AppLogger.initialize();
+  FlutterError.onError = (details) {
+    AppLogger.e(
+      'Flutter error: ${details.exceptionAsString()}',
+      error: details.exception,
+      stackTrace: details.stack,
+    );
+  };
 
   await localNotifier.setup(appName: 'MGG-Packify');
 

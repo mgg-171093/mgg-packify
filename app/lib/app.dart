@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'models/generate_result.dart';
 import 'providers/theme_mode_provider.dart';
+import 'screens/about_screen.dart';
 import 'screens/appearance_screen.dart';
 import 'screens/catalogos/bases_datos_screen.dart';
 import 'screens/catalogos/doc_templates_screen.dart';
@@ -13,6 +14,7 @@ import 'screens/catalogos/tipos_screen.dart';
 import 'screens/clone_screen.dart';
 import 'screens/dashboard_screen.dart';
 import 'screens/history_screen.dart';
+import 'screens/log_viewer_screen.dart';
 import 'screens/new_package_screen.dart';
 import 'screens/splash_screen.dart';
 import 'screens/success_screen.dart';
@@ -139,6 +141,16 @@ final router = GoRouter(
           path: '/catalogos/doc-templates',
           pageBuilder: (ctx, state) =>
               const NoTransitionPage(child: DocTemplatesScreen()),
+        ),
+        GoRoute(
+          path: '/logs',
+          pageBuilder: (ctx, state) =>
+              const NoTransitionPage(child: LogViewerScreen()),
+        ),
+        GoRoute(
+          path: '/about',
+          pageBuilder: (ctx, state) =>
+              const NoTransitionPage(child: AboutScreen()),
         ),
       ],
     ),

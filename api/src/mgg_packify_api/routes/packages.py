@@ -7,8 +7,10 @@ Rutas de packages:
 
 from __future__ import annotations
 
+import logging
 import os
 import shutil
+import time
 from datetime import datetime
 from pathlib import Path
 
@@ -37,6 +39,8 @@ from mgg_packify_api.services.options_service import OptionsManager
 from mgg_packify_api.services.package import PackageConfig
 
 router = APIRouter()
+
+logger = logging.getLogger(__name__)
 
 # Orden canónico de componentes
 _CANONICAL_ORDER = [
@@ -282,6 +286,12 @@ def generate_package(req: GenerateRequest) -> GenerateResponse:
     - Guarda package_meta.json en la raíz del package
     """
     try:
+        _start_time = time.time()
+        logger.info(
+            "Package generation started: ticket=%s, ambiente=%s",
+            req.ticket,
+            req.ambiente,
+        )
         ruta = Path(req.ruta_packages)
         if not ruta.exists():
             return GenerateResponse(
@@ -407,6 +417,12 @@ def generate_package(req: GenerateRequest) -> GenerateResponse:
             if p.is_dir():
                 folders.append(str(p.relative_to(package_dir)))
 
+        _elapsed = time.time() - _start_time
+        logger.info(
+            "Package generation completed in %.2fs: %s",
+            _elapsed,
+            config.package_name,
+        )
         return GenerateResponse(
             ok=True,
             package_name=config.package_name,
@@ -419,6 +435,7 @@ def generate_package(req: GenerateRequest) -> GenerateResponse:
         )
 
     except Exception as exc:
+        logger.exception("Package generation failed: %s", exc)
         raise HTTPException(status_code=500, detail=str(exc)) from exc
 
 

@@ -82,8 +82,8 @@ mgg-packify/
         ├── main.dart, app.dart
         ├── core/         api_client.dart, constants.dart, server_manager.dart
         ├── models/       (8 files — see Models section)
-        ├── providers/    (8 files — see Providers section)
-        ├── screens/      (7 files — see Screens section)
+        ├── providers/    (10 files — see Providers section)
+        ├── screens/      (9 files — see Screens section)
         └── widgets/      (5 files — see Widgets section)
 ```
 
@@ -100,10 +100,12 @@ mgg-packify/
 | `/clone` | `CloneScreen` | — | `/home` | Slide right 300ms |
 | `/settings` | `SettingsScreen` | — | `/home` | Slide right 300ms |
 | `/history` | `HistoryScreen` | — | `/home` | Slide right 300ms |
+| `/logs` | `LogViewerScreen` | — | `/home` | Slide right 300ms |
+| `/about` | `AboutScreen` | — | `/home` | Slide right 300ms |
 
 ---
 
-## Screens (7 total)
+## Screens (9 total)
 
 | Screen | File | Description |
 |--------|------|-------------|
@@ -114,6 +116,8 @@ mgg-packify/
 | `CloneScreen` | `clone_screen.dart` | Clone an existing package with a new iteration number |
 | `SettingsScreen` | `settings_screen.dart` | 5-tab configuration (see Settings Tabs) |
 | `HistoryScreen` | `history_screen.dart` | Last 50 generated packages — swipe to delete, tap to re-generate |
+| `LogViewerScreen` | `log_viewer_screen.dart` | Two-tab log viewer (App / API logs) — reads `GET /logs` |
+| `AboutScreen` | `about_screen.dart` | App info: versions, GitHub link, update check button |
 
 ### Settings Tabs (5)
 
@@ -127,7 +131,7 @@ mgg-packify/
 
 ---
 
-## Providers (8 total)
+## Providers (10 total)
 
 | Provider | File | Riverpod type | Persistence | Key methods |
 |----------|------|---------------|-------------|-------------|
@@ -139,6 +143,8 @@ mgg-packify/
 | `themeModeProvider` | `theme_mode_provider.dart` | `AsyncNotifierProvider<ThemeModeNotifier, ThemeMode>` | SharedPreferences key: `theme_mode` | `setMode(mode)`, `toggle()` |
 | `serverStatusProvider` | `server_status_provider.dart` | `StateProvider<ServerStatus>` | In-memory only | Set via `.notifier.state = ...` |
 | `cloneListProvider` | `clone_list_provider.dart` | `FutureProvider.family<List<PackageListItem>, String>` | No persistence (API call) | Parameterized by `baseDir` string |
+| `healthPollingProvider` | `health_polling_provider.dart` | `NotifierProvider<HealthPollingNotifier, void>` | In-memory only | `startPolling()`, `stopPolling()` |
+| `updateCheckProvider` | `update_check_provider.dart` | `AsyncNotifierProvider<UpdateCheckNotifier, UpdateCheckState>` | In-memory only | `checkForUpdates()` |
 
 ### Critical Provider Gotchas
 
@@ -256,6 +262,9 @@ These features exist in the codebase but were **NOT** in the original `PROMPT_V3
 | **Toast notifications** | `local_notifier` package | Windows native toast shown after successful package generation |
 | **Clone & re-generate** | `CloneScreen` + `/packages/clone` | Pick an existing package folder, auto-increment iteration, prefill form |
 | **Server-form widget** | `ServerForm` widget | Contextual server URL fields per component type in SettingsScreen + NewPackageScreen |
+| **Logging** | `AppLogger` + `GET /logs` | Rotating log files for app and API; log viewer screen accessible from sidebar |
+| **Auto-updater** | `updateCheckProvider` + `latest.json` | Passive update check on startup; dismissable banner in dashboard |
+| **Health indicator** | `healthPollingProvider` + `AppShell` sidebar | Green/red dot; crash detection after 2 failures; restart button |
 
 ---
 
@@ -270,18 +279,18 @@ colorScheme: ColorScheme.fromSeed(
 )
 ```
 
-> **Note**: Brand colors (`kGreenPrimary`, etc.) referenced in older docs/notes are **not present** in the codebase. `constants.dart` only defines `kApiPort` and `kBaseUrl`.
+> **Note**: Brand colors (`kGreenPrimary`, etc.) referenced in older docs/notes are **not present** in the codebase. `constants.dart` defines `kApiPort`, `kBaseUrl`, `kAppVersion`, and `kUpdateCheckUrl`.
 
 ---
 
 ## Test Commands
 
 ```bash
-# API tests (87 tests)
+# API tests (120 tests)
 cd api
 python -m pytest
 
-# Flutter tests (161 tests)
+# Flutter tests (211 tests)
 cd app
 flutter test
 
@@ -310,6 +319,14 @@ dart run build_runner build --delete-conflicting-outputs
 | `app/lib/core/api_client.dart` | HTTP client + all API methods + `apiClientProvider` |
 | `app/lib/core/server_manager.dart` | Python process spawn/kill logic |
 | `app/lib/core/constants.dart` | `kApiPort = 8787`, `kBaseUrl` |
+| `app/lib/core/app_logger.dart` | Singleton logger with rotating file output to `%LOCALAPPDATA%\MGG Packify\logs\app.log` |
+| `app/lib/providers/health_polling_provider.dart` | 30s health poll, crash detection, `ServerStatus.crashed` |
+| `app/lib/providers/update_check_provider.dart` | Fetches `latest.json`, semver compare, passive failure |
+| `app/lib/screens/log_viewer_screen.dart` | Two-tab log viewer (App / API) |
+| `app/lib/screens/about_screen.dart` | Version info + update check button |
+| `latest.json` | Auto-updater manifest — `version`, `url`, `release_notes` |
+| `build.ps1` | Flutter → PyInstaller → Inno Setup pipeline (flags: `-SkipFlutter`, `-SkipApi`, `-SkipInstaller`) |
+| `installer/mgg-packify.iss` | Inno Setup script — installs to `%LOCALAPPDATA%\MGG Packify` |
 
 ---
 

@@ -7,6 +7,7 @@ import '../models/options_model.dart';
 import '../models/package_config.dart';
 import '../models/package_list_item.dart';
 import '../models/settings_model.dart';
+import 'app_logger.dart';
 
 // ─────────────────────────────────────────────
 // ApiException
@@ -62,12 +63,17 @@ class ApiClient {
     }
   }
 
+  void _logDebug(String message) {
+    AppLogger.d(message);
+  }
+
   // ── Health ────────────────────────────────────
 
   /// GET /health — throws ApiException on non-200 or timeout
   Future<void> getHealth() async {
     try {
       final response = await _client.get(_uri('/health')).timeout(_timeout);
+      _logDebug('GET /health → ${response.statusCode}');
       _checkStatus(response);
     } on ApiException {
       rethrow;
@@ -84,6 +90,7 @@ class ApiClient {
       final response = await _client
           .get(_uri('/settings'), headers: _jsonHeaders)
           .timeout(_timeout);
+      _logDebug('GET /settings → ${response.statusCode}');
       _checkStatus(response);
       final json = jsonDecode(response.body) as Map<String, dynamic>;
       return SettingsModel.fromJson(json);
@@ -104,6 +111,7 @@ class ApiClient {
             body: jsonEncode(settings.toJson()),
           )
           .timeout(_timeout);
+      _logDebug('PUT /settings → ${response.statusCode}');
       _checkStatus(response);
     } on ApiException {
       rethrow;
@@ -120,6 +128,7 @@ class ApiClient {
       final response = await _client
           .get(_uri('/settings/options'), headers: _jsonHeaders)
           .timeout(_timeout);
+      _logDebug('GET /settings/options → ${response.statusCode}');
       _checkStatus(response);
       final json = jsonDecode(response.body) as Map<String, dynamic>;
       return OptionsModel.fromJson(json);
@@ -140,6 +149,7 @@ class ApiClient {
             body: jsonEncode(opts.toJson()),
           )
           .timeout(_timeout);
+      _logDebug('PUT /settings/options → ${response.statusCode}');
       _checkStatus(response);
       final json = jsonDecode(response.body) as Map<String, dynamic>;
       return OptionsModel.fromJson(json);
@@ -162,6 +172,7 @@ class ApiClient {
             body: jsonEncode(config.toJson()),
           )
           .timeout(const Duration(minutes: 5));
+      _logDebug('POST /packages/generate → ${response.statusCode}');
       _checkStatus(response);
       final json = jsonDecode(response.body) as Map<String, dynamic>;
       return GenerateResult.fromJson(json);
@@ -188,6 +199,7 @@ class ApiClient {
             }),
           )
           .timeout(_timeout);
+      _logDebug('POST /packages/clone → ${response.statusCode}');
       _checkStatus(response);
       return jsonDecode(response.body) as Map<String, dynamic>;
     } on ApiException {
@@ -206,6 +218,7 @@ class ApiClient {
             headers: _jsonHeaders,
           )
           .timeout(_timeout);
+      _logDebug('GET /packages/list → ${response.statusCode}');
       _checkStatus(response);
       final list = jsonDecode(response.body) as List;
       return list
@@ -215,6 +228,30 @@ class ApiClient {
       rethrow;
     } catch (e) {
       throw ApiException('Error al listar packages: $e');
+    }
+  }
+
+  /// GET /logs?source={source}&lines={lines} → Map with lines list
+  Future<Map<String, dynamic>> getLogs({
+    required String source,
+    int lines = 200,
+  }) async {
+    try {
+      final response = await _client
+          .get(
+            _uri('/logs', {'source': source, 'lines': '$lines'}),
+            headers: _jsonHeaders,
+          )
+          .timeout(_timeout);
+      _logDebug(
+        'GET /logs?source=$source&lines=$lines → ${response.statusCode}',
+      );
+      _checkStatus(response);
+      return jsonDecode(response.body) as Map<String, dynamic>;
+    } on ApiException {
+      rethrow;
+    } catch (e) {
+      throw ApiException('Error al obtener logs: $e');
     }
   }
 
@@ -232,8 +269,3 @@ final apiClientProvider = Provider<ApiClient>((ref) {
   ref.onDispose(client.dispose);
   return client;
 });
-
-// ignore: unused_element
-void _logDebug(String msg) {
-  debugPrint('[ApiClient] $msg');
-}

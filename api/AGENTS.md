@@ -13,7 +13,7 @@ Context for AI agents working on the Python backend of MGG-Packify.
 |------|--------|
 | **No virtualenv** | Packages installed globally. If `import mgg_packify_api` fails: `pip install -e api/` |
 | **Port 8787 is hardcoded** | Never change it. Flutter and API both reference it |
-| **All 87 tests must pass** | Run `python -m pytest` after every change |
+| **All 120 tests must pass** | Run `python -m pytest` after every change |
 | **liferay_build has NO folder** | Guarded in `folder_service.py` — do not remove that guard |
 | **UBICACIÓN = ambiente only** | Never concatenate `base_datos` into UBICACIÓN |
 | **QA → UAT only in docx** | Only in `gen_seccion_liferay_build()` — nowhere else |
@@ -37,7 +37,7 @@ mgg-packify-api
 
 ```bash
 cd api
-python -m pytest              # all 87 tests
+python -m pytest              # all 120 tests
 python -m pytest -v           # verbose
 python -m pytest tests/test_packages_derive.py  # single file
 ```
@@ -49,10 +49,12 @@ python -m pytest tests/test_packages_derive.py  # single file
 ```
 api/
 ├── pyproject.toml
+├── mgg-packify-api.spec      ← PyInstaller spec (onefile build)
 └── src/mgg_packify_api/
-    ├── main.py               ← FastAPI app + uvicorn entry point
+    ├── main.py               ← FastAPI app + uvicorn entry point + RotatingFileHandler setup
     ├── routes/
-    │   ├── health.py         ← GET /health
+    │   ├── health.py         ← GET /health (version via importlib.metadata)
+    │   ├── logs.py           ← GET /logs
     │   ├── packages.py       ← POST /packages/generate, /clone, GET /list
     │   └── settings.py       ← GET/PUT /settings, /settings/options
     ├── schemas/
@@ -83,12 +85,13 @@ api/
 | `POST` | `/packages/generate` | `packages.py` | None | Full package generation pipeline |
 | `POST` | `/packages/clone` | `packages.py` | None | Read `package_meta.json` for pre-fill (clone flow) |
 | `GET` | `/packages/list` | `packages.py` | None | List package subdirectories in a given path |
+| `GET` | `/logs` | `logs.py` | None | Read last N lines from `api.log` or `app.log` — `?source=api&lines=200` |
 
 ### GET /health
 
 ```json
 // Response 200
-{ "status": "ok", "version": "3.0.0" }
+{ "status": "ok", "version": "3.5.0" }
 ```
 
 ### GET /settings
@@ -337,6 +340,33 @@ GET /packages/list?base_dir=C%3A%5CPackages%5CPortalRetail
 { "packages": [] }
 ```
 
+### GET /logs
+
+```
+// Query params: source (api|app, default: api), lines (int, default: 200)
+GET /logs?source=api&lines=200
+GET /logs?source=app&lines=100
+```
+
+```json
+// Response 200
+{
+  "source": "api",
+  "lines": [
+    "2026-04-08 10:00:00,123 INFO     POST /packages/generate completed in 1.23s",
+    "2026-04-08 10:00:01,456 WARNING  options.json not found — using defaults"
+  ],
+  "log_path": "C:\\Users\\user\\AppData\\Local\\MGG Packify\\logs\\api.log"
+}
+
+// Response 200 — log file does not exist yet
+{
+  "source": "api",
+  "lines": [],
+  "log_path": "C:\\Users\\user\\AppData\\Local\\MGG Packify\\logs\\api.log"
+}
+```
+
 ---
 
 ## Data Flow — Generate Pipeline
@@ -518,6 +548,7 @@ class ComponentType(StrEnum):
 api/tests/
 ├── conftest.py               ← TestClient fixtures
 ├── test_health.py            ← /health endpoint
+├── test_logs.py              ← /logs endpoint (monkeypatches _log_dir)
 ├── test_settings.py          ← /settings CRUD
 ├── test_options.py           ← /settings/options CRUD
 ├── test_packages_generate.py ← POST /packages/generate (integration)

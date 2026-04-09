@@ -2,7 +2,7 @@ name: mgg_packify
 description: "MGG-Packify – Portal Retail Skandia México"
 publish_to: 'none'
 
-version: 1.0.0+1
+version: 3.5.0+1
 
 environment:
   sdk: ^3.11.0
@@ -19,6 +19,7 @@ dependencies:
   shared_preferences: ^2.3.0
   local_notifier: ^0.1.4
   path: ^1.9.0
+  logger: ^2.4.0
 
 dev_dependencies:
   flutter_test:

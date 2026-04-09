@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../core/constants.dart';
+import '../core/server_manager.dart';
+import '../providers/server_status_provider.dart';
 
 /// Sidebar destinations definition
 const _destinations = [
@@ -51,6 +55,10 @@ const _destinations = [
     label: 'Apariencia',
     path: '/settings/appearance',
   ),
+  // Index 12 — Logs
+  (icon: Icons.article_outlined, label: 'Logs', path: '/logs'),
+  // Index 13 — Acerca de
+  (icon: Icons.info_outline, label: 'Acerca de', path: '/about'),
 ];
 
 /// Maps the current path to a sidebar index for highlight.
@@ -68,6 +76,8 @@ int _indexFromPath(String path) {
   if (path.startsWith('/catalogos/tipos')) return 9;
   if (path.startsWith('/catalogos/doc-templates')) return 10;
   if (path == '/settings/appearance') return 11;
+  if (path == '/logs') return 12;
+  if (path == '/about') return 13;
   return -1;
 }
 
@@ -104,7 +114,7 @@ class AppShell extends StatelessWidget {
 }
 
 /// The permanent sidebar navigation.
-class _AppSidebar extends StatelessWidget {
+class _AppSidebar extends ConsumerWidget {
   const _AppSidebar({
     required this.selectedIndex,
     required this.onDestinationSelected,
@@ -114,9 +124,11 @@ class _AppSidebar extends StatelessWidget {
   final void Function(int index) onDestinationSelected;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final serverStatus = ref.watch(serverStatusProvider);
+    final isHealthy = serverStatus == ServerStatus.ready;
 
     return SizedBox(
       width: 220,
@@ -131,16 +143,40 @@ class _AppSidebar extends StatelessWidget {
                 children: [
                   Icon(Icons.inventory_2, color: colorScheme.primary, size: 24),
                   const SizedBox(width: 10),
-                  Text(
-                    'MGG Packify',
-                    style: theme.textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.w700,
-                      color: colorScheme.primary,
+                  Expanded(
+                    child: Text(
+                      'MGG Packify',
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.w700,
+                        color: colorScheme.primary,
+                      ),
+                    ),
+                  ),
+                  // ── Health indicator dot ──────
+                  Container(
+                    width: 10,
+                    height: 10,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: isHealthy ? Colors.green : Colors.red,
                     ),
                   ),
                 ],
               ),
             ),
+            // ── Restart button when crashed ───
+            if (serverStatus == ServerStatus.crashed) ...[
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 12),
+                child: TextButton.icon(
+                  icon: const Icon(Icons.refresh, size: 16),
+                  label: const Text('Reiniciar API'),
+                  onPressed: () {
+                    ref.read(serverManagerProvider).restart(ref);
+                  },
+                ),
+              ),
+            ],
             const Divider(height: 1),
             // ── Main group ────────────────────
             _SidebarItem(
@@ -228,6 +264,31 @@ class _AppSidebar extends StatelessWidget {
               label: _destinations[11].label,
               selected: selectedIndex == 11,
               onTap: () => onDestinationSelected(11),
+            ),
+            const Divider(height: 1),
+            // ── Sistema / herramientas ────────
+            _SidebarItem(
+              icon: _destinations[12].icon,
+              label: _destinations[12].label,
+              selected: selectedIndex == 12,
+              onTap: () => onDestinationSelected(12),
+            ),
+            _SidebarItem(
+              icon: _destinations[13].icon,
+              label: _destinations[13].label,
+              selected: selectedIndex == 13,
+              onTap: () => onDestinationSelected(13),
+            ),
+            // ── Spacer + version footer ───────
+            const Spacer(),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Text(
+                'v$kAppVersion',
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: theme.colorScheme.onSurface.withOpacity(0.5),
+                ),
+              ),
             ),
           ],
         ),
