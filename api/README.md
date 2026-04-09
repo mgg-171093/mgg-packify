@@ -53,7 +53,7 @@ The API starts on `http://localhost:8787`. The Flutter app also accepts an
 
 ```bash
 cd api
-python -m pytest          # run all 87 tests
+python -m pytest          # run all 120 tests
 python -m pytest -v       # verbose output
 python -m pytest tests/test_packages_derive.py  # single file
 ```
@@ -79,7 +79,7 @@ Line length: 100 chars (configured in `pyproject.toml`).
 
 | Method | Path | Description |
 |--------|------|-------------|
-| `GET` | `/health` | Liveness check — returns `{"status": "ok", "version": "3.0.0"}` |
+| `GET` | `/health` | Liveness check — returns `{"status": "ok", "version": "3.5.0"}` |
 | `GET` | `/settings` | Get server config (QA/PROD hosts) + last-used form values |
 | `PUT` | `/settings` | Save server config and last-used values |
 | `GET` | `/settings/options` | Get configurable option lists (estatus, SQL tipo, Blob tipo, etc.) |
@@ -87,6 +87,7 @@ Line length: 100 chars (configured in `pyproject.toml`).
 | `POST` | `/packages/generate` | Generate full package: folders + `.docx` + optional publish |
 | `POST` | `/packages/clone` | Load `package_meta.json` for pre-fill on clone |
 | `GET` | `/packages/list` | List all packages in a directory, sorted by creation date desc |
+| `GET` | `/logs` | Read last N lines from `api.log` or `app.log` (query: `?source=api&lines=200`) |
 
 Full endpoint documentation with JSON request/response examples: see [api/AGENTS.md](./AGENTS.md).
 
@@ -102,6 +103,10 @@ The API persists configuration to Windows AppData:
 | `options.json` | `%APPDATA%\mgg_packify_api\options.json` | Configurable lists: estatus, SQL tipo, Blob tipo, API services, SQL databases |
 
 These files are created automatically with defaults on first run if they don't exist.
+
+| File | Path | Contents |
+|------|------|----------|
+| `api.log` | `%LOCALAPPDATA%\MGG Packify\logs\api.log` | Rotating API log (5 MB × 3 backups) — request timing, errors, warnings |
 
 ---
 
@@ -143,10 +148,12 @@ Do not change this value.
 ```text
 api/
 ├── pyproject.toml                        ← project metadata, dependencies, ruff config
+├── mgg-packify-api.spec                  ← PyInstaller spec (onefile build)
 └── src/mgg_packify_api/
-    ├── main.py                           ← FastAPI app + uvicorn entry point
+    ├── main.py                           ← FastAPI app + uvicorn entry point + RotatingFileHandler setup
     ├── routes/
-    │   ├── health.py                     ← GET /health
+    │   ├── health.py                     ← GET /health (version via importlib.metadata)
+    │   ├── logs.py                       ← GET /logs
     │   ├── packages.py                   ← POST /packages/generate, /clone, GET /list
     │   └── settings.py                   ← GET/PUT /settings, /settings/options
     ├── schemas/

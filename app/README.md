@@ -17,6 +17,8 @@ Communicates with a local Python FastAPI backend via HTTP REST on `localhost:878
 | OS | Windows 11 |
 | Python | ≥ 3.12 (for the API backend) |
 
+Key Flutter dependencies: `flutter_riverpod`, `go_router`, `http`, `logger`, `local_notifier`, `shared_preferences`, `url_launcher`.
+
 ---
 
 ## Run
@@ -29,13 +31,15 @@ flutter build windows          # production build
 
 The app auto-spawns the Python API on startup (dev mode: skips spawn if port 8787 already active).
 
+Key screens: `SplashScreen`, `HomeScreen`, `NewPackageScreen`, `SuccessScreen`, `CloneScreen`, `SettingsScreen`, `HistoryScreen`, `LogViewerScreen`, `AboutScreen`.
+
 ---
 
 ## Test
 
 ```bash
 cd app
-flutter test                   # run all 161 tests
+flutter test                   # run all 211 tests
 flutter test test/path/file.dart  # run a single test file
 ```
 
@@ -73,7 +77,7 @@ These rules apply to **every** change in this codebase. Violating any of them br
 | **Navigation** | `context.go('/home')` | `Navigator.pop(context)` or `context.pop()` |
 | **State mutations** | Custom `save()` method on notifier | `await update((s) => ...)` — reserved Riverpod method |
 | **Python side** | Packages installed globally | Do NOT introduce a virtualenv |
-| **Tests** | All 161 tests green before merging | Never leave a failing test |
+| **Tests** | All 211 tests green before merging | Never leave a failing test |
 
 ### Why no `Navigator.pop()`?
 

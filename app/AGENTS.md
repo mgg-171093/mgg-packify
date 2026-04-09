@@ -25,7 +25,7 @@ See also: [Root AGENTS.md](../AGENTS.md) for domain rules, component types, and 
 cd app
 flutter run -d windows              # run in debug mode
 flutter build windows               # production build
-flutter test                        # run all 161 tests
+flutter test                        # run all 211 tests
 flutter test test/path/file.dart    # single test file
 dart run build_runner build --delete-conflicting-outputs  # regenerate mocks
 ```
@@ -36,15 +36,16 @@ dart run build_runner build --delete-conflicting-outputs  # regenerate mocks
 
 ```
 app/lib/
-├── main.dart            ← Entry point: WidgetsFlutterBinding, ProviderScope, lifecycle
+├── main.dart            ← Entry point: WidgetsFlutterBinding, AppLogger.initialize(), ProviderScope, lifecycle
 ├── app.dart             ← go_router config + ThemeData (Material3, seed Colors.blue)
 ├── core/
-│   ├── api_client.dart      ← ApiClient class + apiClientProvider
-│   ├── constants.dart       ← kApiPort (8787), kBaseUrl
-│   └── server_manager.dart  ← Process spawn/kill, dev-mode port check
+│   ├── api_client.dart      ← ApiClient class + apiClientProvider + getLogs()
+│   ├── app_logger.dart      ← AppLogger singleton (RotatingFileOutput → %LOCALAPPDATA%\MGG Packify\logs\app.log)
+│   ├── constants.dart       ← kApiPort (8787), kBaseUrl, kAppVersion, kUpdateCheckUrl
+│   └── server_manager.dart  ← Process spawn/kill, dev-mode port check, restart()
 ├── models/              (8 files — see Models section)
-├── providers/           (8 files — see Providers section)
-├── screens/             (7 files — see Screens section)
+├── providers/           (10 files — see Providers section)
+├── screens/             (9 files — see Screens section)
 └── widgets/             (5 files — see Widgets section)
 ```
 
@@ -61,6 +62,8 @@ app/lib/
 | `/clone` | `CloneScreen` | — | `/home` | Slide right 300ms |
 | `/settings` | `SettingsScreen` | — | `/home` | Slide right 300ms |
 | `/history` | `HistoryScreen` | — | `/home` | Slide right 300ms |
+| `/logs` | `LogViewerScreen` | — | `/home` | Slide right 300ms |
+| `/about` | `AboutScreen` | — | `/home` | Slide right 300ms |
 
 ---
 
@@ -167,6 +170,33 @@ app/lib/
 - "Limpiar historial" action button (trash icon) in AppBar — clears all entries after confirmation
 - Empty state: shows history icon + descriptive message
 - **`prefillFromHistory` only fills ticket, HU nombre, ambiente, iteracion, and ruta** — does NOT restore component types/instances
+
+---
+
+### LogViewerScreen (`/logs`)
+
+**Description**: Log viewer with two tabs — App logs and API logs.  
+**Route**: `/logs`  
+**Provider deps**: `apiClientProvider`  
+**Key interactions**:
+- Two tabs: "App" (reads `app.log` via `GET /logs?source=app`) and "API" (reads `GET /logs?source=api`)
+- Each tab shows last N log lines in a monospace scrollable list
+- Refresh button reloads both tabs
+- Back button → `context.go('/home')`
+
+---
+
+### AboutScreen (`/about`)
+
+**Description**: App info screen — versions, GitHub link, update check.  
+**Route**: `/about`  
+**Provider deps**: `apiClientProvider`, `updateCheckProvider`  
+**Key interactions**:
+- Shows Flutter app version (`kAppVersion`) and API version (from `GET /health`)
+- GitHub repo link via `url_launcher`
+- "Buscar actualizaciones" button triggers `updateCheckProvider.notifier.checkForUpdates()`
+- Displays update banner if new version available
+- Back button → `context.go('/home')`
 
 ---
 
@@ -282,6 +312,8 @@ showDialog(
 | `themeModeProvider` | `theme_mode_provider.dart` | `AsyncNotifierProvider<ThemeModeNotifier, ThemeMode>` | SharedPreferences key: `theme_mode` | `setMode(mode)`, `toggle()` |
 | `serverStatusProvider` | `server_status_provider.dart` | `StateProvider<ServerStatus>` | In-memory only | Set via `.notifier.state = ...` |
 | `cloneListProvider` | `clone_list_provider.dart` | `FutureProvider.family<List<PackageListItem>, String>` | No persistence (API call) | Parameterized by `baseDir` string |
+| `healthPollingProvider` | `health_polling_provider.dart` | `NotifierProvider<HealthPollingNotifier, void>` | In-memory only | `startPolling()`, `stopPolling()` — `Timer.periodic(30s)`, 2 consecutive failures → `ServerStatus.crashed` |
+| `updateCheckProvider` | `update_check_provider.dart` | `AsyncNotifierProvider<UpdateCheckNotifier, UpdateCheckState>` | In-memory only | `checkForUpdates()` — fetches `latest.json`, semver compare, 5s timeout, silent failure |
 
 ### Critical Provider Gotchas
 
@@ -291,6 +323,8 @@ showDialog(
 - **`AsyncNotifier.update()` is FORBIDDEN** — use custom `save()` methods in all `AsyncNotifier` subclasses
 - **`historyProvider.add()`** prepends entries and caps at 50; older entries beyond 50 are dropped
 - **`templatesProvider.save()`** appends; no cap — user manages manually
+- **`healthPollingProvider` uses `ref.read` in Timer callback** — NOT `ref.watch`; timer callback is outside widget tree
+- **`updateCheckProvider` never throws** — all network errors are caught silently; `state.hasError` is always false
 
 ---
 
@@ -340,6 +374,8 @@ Dev mode behavior:
 3. If no → launches `python -m mgg_packify_api.main` from `api/` working directory
 4. Env var `MGG_API_PATH` overrides path resolution
 
+`restart()` calls `start()` internally (not `_startRelease()` directly) to respect the `kReleaseMode` guard.
+
 ---
 
 ## Theme
@@ -368,6 +404,8 @@ app/test/
 │   └── ...
 ├── providers/
 │   ├── settings_provider_test.dart
+│   ├── health_polling_provider_test.dart   ← 11 tests
+│   ├── update_check_provider_test.dart     ← 9 tests
 │   └── ...
 ├── screens/
 │   ├── home_screen_test.dart
@@ -391,6 +429,9 @@ After adding/changing mocks: `dart run build_runner build --delete-conflicting-o
 - **`cloneListProvider` requires `baseDir` param** — calling without param will not compile
 - **`ServerManager` has no default impl** — overridden in `main.dart`; DO NOT add a fallback constructor that spawns a process
 - **`PackageTemplate.instancesJson` is always `[]`** — templates save selected component types but NOT instance data (known limitation)
-- **`constants.dart` only has `kApiPort` and `kBaseUrl`** — brand colors (`kGreenPrimary`, etc.) referenced in older docs are not present; theme uses `Colors.blue` seed
+- **No brand color constants** — `kGreenPrimary` etc. referenced in older docs are not present; theme uses `Colors.blue` seed
 - **`prefillFromHistory` restores partial state only** — fills ticket/HU/ambiente/iteracion/ruta but not component types or instances
 - **Settings tabs 0–1 require manual save; tabs 2–4 auto-save** — if you add a new settings field, match the appropriate save pattern
+- **`AppLogger.initialize()` must be called in tests** — use `setUpAll(() => AppLogger.initialize())` in any test that touches code calling `AppLogger.i/w/d/e()`; otherwise throws `LateInitializationError`
+- **`serverStatusProvider` has two new states**: `crashed` (2 consecutive health poll failures) and `restarting` (during `ServerManager.restart()`)
+- **`constants.dart` now has 4 constants**: `kApiPort`, `kBaseUrl`, `kAppVersion`, `kUpdateCheckUrl`
