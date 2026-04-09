@@ -14,8 +14,8 @@ def test_health_returns_200(client: TestClient) -> None:
 
 
 def test_health_body(client: TestClient) -> None:
-    """GET /health debe retornar {status: ok, version: 3.0.0}."""
+    """GET /health debe retornar {status: ok, version: 3.5.0}."""
     response = client.get("/health")
     body = response.json()
     assert body["status"] == "ok"
-    assert body["version"] == "3.0.0"
+    assert body["version"] == "3.5.0"
