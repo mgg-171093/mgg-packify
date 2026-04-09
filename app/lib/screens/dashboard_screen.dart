@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../models/package_history_entry.dart';
+import '../providers/health_polling_provider.dart';
 import '../providers/history_provider.dart';
 import '../providers/options_provider.dart';
 import '../providers/settings_provider.dart';
+import '../providers/update_check_provider.dart';
 
 // ─────────────────────────────────────────────
 // DashboardMetrics — pure data helper
@@ -68,141 +70,189 @@ class DashboardMetrics {
 // DashboardScreen
 // ─────────────────────────────────────────────
 
-class DashboardScreen extends ConsumerWidget {
+class DashboardScreen extends ConsumerStatefulWidget {
   const DashboardScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<DashboardScreen> createState() => _DashboardScreenState();
+}
+
+class _DashboardScreenState extends ConsumerState<DashboardScreen> {
+  bool _updateDismissed = false;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(updateCheckProvider.notifier).checkForUpdates();
+      ref.read(healthPollingProvider.notifier).startPolling();
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final historyAsync = ref.watch(historyProvider);
     final settingsAsync = ref.watch(settingsProvider);
     final optionsAsync = ref.watch(optionsProvider);
+    final updateState = ref.watch(updateCheckProvider);
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 
     return Scaffold(
       appBar: AppBar(title: const Text('Dashboard')),
-      body: historyAsync.when(
-        loading: () => const Center(child: CircularProgressIndicator()),
-        error: (e, _) => Center(child: Text('Error al cargar: $e')),
-        data: (entries) {
-          final metrics = DashboardMetrics(entries);
-          return SingleChildScrollView(
-            padding: const EdgeInsets.all(24),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                // ── Metrics row ──────────────────────
-                _SectionTitle(label: 'Resumen'),
-                const SizedBox(height: 12),
-                _MetricsRow(metrics: metrics),
-                const SizedBox(height: 24),
-
-                // ── Por ambiente ─────────────────────
-                if (metrics.total() > 0) ...[
-                  _SectionTitle(label: 'Por ambiente'),
-                  const SizedBox(height: 12),
-                  _AmbienteBreakdown(byAmbiente: metrics.byAmbiente()),
-                  const SizedBox(height: 24),
-                ],
-
-                // ── Config status ────────────────────
-                _SectionTitle(label: 'Estado de configuración'),
-                const SizedBox(height: 12),
-                settingsAsync.when(
-                  loading: () => const _ConfigStatusCard(
-                    qaConfigured: false,
-                    prodConfigured: false,
-                    loading: true,
-                  ),
-                  error: (_, __) => const _ConfigStatusCard(
-                    qaConfigured: false,
-                    prodConfigured: false,
-                    loading: false,
-                  ),
-                  data: (settings) => _ConfigStatusCard(
-                    qaConfigured: settings.qa.api.isNotEmpty,
-                    prodConfigured: settings.prod.api.isNotEmpty,
-                  ),
-                ),
-                const SizedBox(height: 24),
-
-                // ── Catalog counters ─────────────────
-                _SectionTitle(label: 'Catálogos'),
-                const SizedBox(height: 12),
-                optionsAsync.when(
-                  loading: () => const _CatalogCountsCard(
-                    estatus: 0,
-                    tiposSql: 0,
-                    tiposBlob: 0,
-                    serviciosIis: 0,
-                    serviciosDocker: 0,
-                    basesDatos: 0,
-                    loading: true,
-                  ),
-                  error: (_, __) => const _CatalogCountsCard(
-                    estatus: 0,
-                    tiposSql: 0,
-                    tiposBlob: 0,
-                    serviciosIis: 0,
-                    serviciosDocker: 0,
-                    basesDatos: 0,
-                  ),
-                  data: (options) => _CatalogCountsCard(
-                    estatus: options.estatusList.length,
-                    tiposSql: options.tipoSqlList.length,
-                    tiposBlob: options.tipoBlobList.length,
-                    serviciosIis: options.apiIisServices.length,
-                    serviciosDocker: options.apiDockerServices.length,
-                    basesDatos: options.sqlDatabases.length,
-                  ),
-                ),
-                const SizedBox(height: 24),
-
-                // ── Recent packages ──────────────────
-                if (metrics.total() > 0) ...[
-                  _SectionTitle(label: 'Últimos generados'),
-                  const SizedBox(height: 12),
-                  ...metrics
-                      .recent(5)
-                      .map(
-                        (e) => _RecentPackageCard(
-                          entry: e,
-                          onTap: () => context.go('/history'),
-                        ),
-                      ),
-                ] else ...[
-                  Center(
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 32),
-                      child: Column(
-                        children: [
-                          Icon(
-                            Icons.inventory_2_outlined,
-                            size: 48,
-                            color: colorScheme.outlineVariant,
-                          ),
-                          const SizedBox(height: 12),
-                          Text(
-                            'Todavía no generaste ningún package',
-                            style: theme.textTheme.bodyMedium?.copyWith(
-                              color: colorScheme.onSurfaceVariant,
-                            ),
-                          ),
-                          const SizedBox(height: 16),
-                          FilledButton.icon(
-                            onPressed: () => context.go('/new-package'),
-                            icon: const Icon(Icons.add_box_outlined),
-                            label: const Text('Nuevo Package'),
-                          ),
-                        ],
-                      ),
+      body: Column(
+        children: [
+          // ── Update banner ────────────────────
+          if (updateState.valueOrNull?.hasUpdate == true && !_updateDismissed)
+            Container(
+              color: Theme.of(context).colorScheme.primaryContainer,
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              child: Row(
+                children: [
+                  const Icon(Icons.system_update_alt, size: 16),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      'Nueva versión disponible: ${updateState.value!.latestVersion}',
+                      style: Theme.of(context).textTheme.bodySmall,
                     ),
                   ),
+                  IconButton(
+                    icon: const Icon(Icons.close, size: 16),
+                    onPressed: () => setState(() => _updateDismissed = true),
+                    constraints: const BoxConstraints(),
+                    padding: EdgeInsets.zero,
+                  ),
                 ],
-              ],
+              ),
             ),
-          );
-        },
+          // ── Main content ─────────────────────
+          Expanded(
+            child: historyAsync.when(
+              loading: () => const Center(child: CircularProgressIndicator()),
+              error: (e, _) => Center(child: Text('Error al cargar: $e')),
+              data: (entries) {
+                final metrics = DashboardMetrics(entries);
+                return SingleChildScrollView(
+                  padding: const EdgeInsets.all(24),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      // ── Metrics row ──────────────────────
+                      _SectionTitle(label: 'Resumen'),
+                      const SizedBox(height: 12),
+                      _MetricsRow(metrics: metrics),
+                      const SizedBox(height: 24),
+
+                      // ── Por ambiente ─────────────────────
+                      if (metrics.total() > 0) ...[
+                        _SectionTitle(label: 'Por ambiente'),
+                        const SizedBox(height: 12),
+                        _AmbienteBreakdown(byAmbiente: metrics.byAmbiente()),
+                        const SizedBox(height: 24),
+                      ],
+
+                      // ── Config status ────────────────────
+                      _SectionTitle(label: 'Estado de configuración'),
+                      const SizedBox(height: 12),
+                      settingsAsync.when(
+                        loading: () => const _ConfigStatusCard(
+                          qaConfigured: false,
+                          prodConfigured: false,
+                          loading: true,
+                        ),
+                        error: (_, __) => const _ConfigStatusCard(
+                          qaConfigured: false,
+                          prodConfigured: false,
+                          loading: false,
+                        ),
+                        data: (settings) => _ConfigStatusCard(
+                          qaConfigured: settings.qa.api.isNotEmpty,
+                          prodConfigured: settings.prod.api.isNotEmpty,
+                        ),
+                      ),
+                      const SizedBox(height: 24),
+
+                      // ── Catalog counters ─────────────────
+                      _SectionTitle(label: 'Catálogos'),
+                      const SizedBox(height: 12),
+                      optionsAsync.when(
+                        loading: () => const _CatalogCountsCard(
+                          estatus: 0,
+                          tiposSql: 0,
+                          tiposBlob: 0,
+                          serviciosIis: 0,
+                          serviciosDocker: 0,
+                          basesDatos: 0,
+                          loading: true,
+                        ),
+                        error: (_, __) => const _CatalogCountsCard(
+                          estatus: 0,
+                          tiposSql: 0,
+                          tiposBlob: 0,
+                          serviciosIis: 0,
+                          serviciosDocker: 0,
+                          basesDatos: 0,
+                        ),
+                        data: (options) => _CatalogCountsCard(
+                          estatus: options.estatusList.length,
+                          tiposSql: options.tipoSqlList.length,
+                          tiposBlob: options.tipoBlobList.length,
+                          serviciosIis: options.apiIisServices.length,
+                          serviciosDocker: options.apiDockerServices.length,
+                          basesDatos: options.sqlDatabases.length,
+                        ),
+                      ),
+                      const SizedBox(height: 24),
+
+                      // ── Recent packages ──────────────────
+                      if (metrics.total() > 0) ...[
+                        _SectionTitle(label: 'Últimos generados'),
+                        const SizedBox(height: 12),
+                        ...metrics
+                            .recent(5)
+                            .map(
+                              (e) => _RecentPackageCard(
+                                entry: e,
+                                onTap: () => context.go('/history'),
+                              ),
+                            ),
+                      ] else ...[
+                        Center(
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 32),
+                            child: Column(
+                              children: [
+                                Icon(
+                                  Icons.inventory_2_outlined,
+                                  size: 48,
+                                  color: colorScheme.outlineVariant,
+                                ),
+                                const SizedBox(height: 12),
+                                Text(
+                                  'Todavía no generaste ningún package',
+                                  style: theme.textTheme.bodyMedium?.copyWith(
+                                    color: colorScheme.onSurfaceVariant,
+                                  ),
+                                ),
+                                const SizedBox(height: 16),
+                                FilledButton.icon(
+                                  onPressed: () => context.go('/new-package'),
+                                  icon: const Icon(Icons.add_box_outlined),
+                                  label: const Text('Nuevo Package'),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
+                    ],
+                  ),
+                );
+              },
+            ),
+          ),
+        ],
       ),
     );
   }

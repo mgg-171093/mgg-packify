@@ -1,6 +1,9 @@
+import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../providers/server_status_provider.dart';
+import 'app_logger.dart';
 
 class ServerManager {
   Process? _process;
@@ -34,6 +37,16 @@ class ServerManager {
       debugPrint(
         '[ServerManager] Started release server from $exePath (pid: ${_process?.pid})',
       );
+
+      _process!.stdout
+          .transform(const SystemEncoding().decoder)
+          .transform(const LineSplitter())
+          .listen((line) => AppLogger.raw(line));
+
+      _process!.stderr
+          .transform(const SystemEncoding().decoder)
+          .transform(const LineSplitter())
+          .listen((line) => AppLogger.raw('[stderr] $line'));
     } catch (e) {
       debugPrint('[ServerManager] ERROR starting release server: $e');
     }
@@ -122,6 +135,14 @@ class ServerManager {
     } catch (_) {}
 
     return null;
+  }
+
+  Future<void> restart(WidgetRef ref) async {
+    AppLogger.i('ServerManager: restarting API...');
+    ref.read(serverStatusProvider.notifier).state = ServerStatus.restarting;
+    await stop();
+    await Future.delayed(const Duration(milliseconds: 500));
+    await start();
   }
 
   Future<void> stop() async {
