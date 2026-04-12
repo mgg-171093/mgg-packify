@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http/http.dart' as http;
 import '../core/constants.dart';
 import '../core/app_logger.dart';
+import '../core/server_manager.dart';
 
 class UpdateCheckState {
   final bool hasUpdate;
@@ -118,6 +119,12 @@ class UpdateCheckNotifier extends AsyncNotifier<UpdateCheckState> {
         }
       }
       await sink.close();
+
+      // Stop the Python API process before launching the installer.
+      // exit(0) bypasses the Flutter lifecycle — the process would otherwise
+      // remain alive, causing Inno Setup "Access Denied" on mgg-packify-api.exe.
+      AppLogger.i('UpdateCheck: stopping API process before installer launch');
+      await ref.read(serverManagerProvider).stop();
 
       // Launch installer silently and exit the app
       await Process.start(tempPath, ['/SILENT']);
