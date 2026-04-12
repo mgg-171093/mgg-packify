@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
+import 'package:http/http.dart' as http;
 import 'package:mgg_packify/models/options_model.dart';
 import 'package:mgg_packify/models/package_history_entry.dart';
 import 'package:mgg_packify/models/settings_model.dart';
@@ -113,7 +114,7 @@ class _FakeUpdateCheckNotifier extends UpdateCheckNotifier {
   Future<UpdateCheckState> build() async => UpdateCheckState.none();
 
   @override
-  Future<void> checkForUpdates() async {}
+  Future<void> checkForUpdates({http.Client? client}) async {}
 }
 
 class _FakeHealthPollingNotifier extends HealthPollingNotifier {
