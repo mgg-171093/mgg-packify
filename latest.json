@@ -1,5 +1,5 @@
 {
-  "version": "3.7.0",
-  "url": "https://github.com/mgg-171093/mgg-packify/releases/download/v3.7.0-stable/MGGPackify-3.7.0-Setup.exe",
-  "release_notes": "Catálogo de proyectos configurable, branding personalizable, splash screen extendido"
+  "version": "3.8.0",
+  "url": "https://github.com/mgg-171093/mgg-packify/releases/download/v3.8.0-stable/MGGPackify-3.8.0-Setup.exe",
+  "release_notes": "Smart auto-updater: detección automática de nueva versión al abrir la app y polling cada 4 horas. Fixes: logo en sidebar, ícono en taskbar de Windows, errores de instalación al actualizar, versión unificada en pantalla Acerca de."
 }
