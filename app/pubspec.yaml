@@ -2,7 +2,7 @@ name: mgg_packify
 description: "MGG-Packify – generador de paquetes de instalación para múltiples proyectos y ambientes"
 publish_to: 'none'
 
-version: 3.6.0+1
+version: 3.8.0+1
 
 environment:
   sdk: ^3.11.0

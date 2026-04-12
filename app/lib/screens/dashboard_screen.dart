@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../core/constants.dart';
 import '../models/package_history_entry.dart';
 import '../providers/health_polling_provider.dart';
 import '../providers/history_provider.dart';
 import '../providers/options_provider.dart';
 import '../providers/settings_provider.dart';
 import '../providers/update_check_provider.dart';
+import '../widgets/update_dialog.dart';
 
 // ─────────────────────────────────────────────
 // DashboardMetrics — pure data helper
@@ -78,13 +80,12 @@ class DashboardScreen extends ConsumerStatefulWidget {
 }
 
 class _DashboardScreenState extends ConsumerState<DashboardScreen> {
-  bool _updateDismissed = false;
+  bool _dialogShown = false;
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref.read(updateCheckProvider.notifier).checkForUpdates();
       ref.read(healthPollingProvider.notifier).startPolling();
     });
   }
@@ -94,38 +95,35 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
     final historyAsync = ref.watch(historyProvider);
     final settingsAsync = ref.watch(settingsProvider);
     final optionsAsync = ref.watch(optionsProvider);
-    final updateState = ref.watch(updateCheckProvider);
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+
+    // ── Listen for update availability and show modal dialog ──────
+    ref.listen<AsyncValue<UpdateCheckState>>(updateCheckProvider, (_, next) {
+      if (!_dialogShown && next.valueOrNull?.hasUpdate == true) {
+        _dialogShown = true;
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (!mounted) return;
+          showDialog(
+            context: context,
+            barrierDismissible: false,
+            builder: (_) => UpdateDialog(
+              currentVersion: kAppVersion,
+              latestVersion: next.value!.latestVersion,
+              releaseNotes: next.value!.releaseNotes,
+              onDownload: ({required onProgress}) => ref
+                  .read(updateCheckProvider.notifier)
+                  .downloadAndInstall(onProgress: onProgress),
+            ),
+          );
+        });
+      }
+    });
 
     return Scaffold(
       appBar: AppBar(title: const Text('Dashboard')),
       body: Column(
         children: [
-          // ── Update banner ────────────────────
-          if (updateState.valueOrNull?.hasUpdate == true && !_updateDismissed)
-            Container(
-              color: Theme.of(context).colorScheme.primaryContainer,
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              child: Row(
-                children: [
-                  const Icon(Icons.system_update_alt, size: 16),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: Text(
-                      'Nueva versión disponible: ${updateState.value!.latestVersion}',
-                      style: Theme.of(context).textTheme.bodySmall,
-                    ),
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.close, size: 16),
-                    onPressed: () => setState(() => _updateDismissed = true),
-                    constraints: const BoxConstraints(),
-                    padding: EdgeInsets.zero,
-                  ),
-                ],
-              ),
-            ),
           // ── Main content ─────────────────────
           Expanded(
             child: historyAsync.when(

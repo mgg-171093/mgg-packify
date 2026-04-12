@@ -148,17 +148,38 @@ class _AppSidebar extends ConsumerWidget {
               padding: const EdgeInsets.fromLTRB(16, 20, 16, 12),
               child: Row(
                 children: [
-                  Icon(Icons.inventory_2, color: colorScheme.primary, size: 24),
-                  const SizedBox(width: 10),
                   Expanded(
-                    child: Text(
-                      'MGG Packify',
-                      style: theme.textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.w700,
+                    child: Image.asset(
+                      'assets/branding/logo-sidebar.png',
+                      width: 180,
+                      height: 60,
+                      errorBuilder: (_, __, ___) => Icon(
+                        Icons.inventory_2,
                         color: colorScheme.primary,
+                        size: 24,
                       ),
                     ),
                   ),
+                  // Image.asset(
+                  //   'assets/branding/logo-sidebar.png',
+                  //   width: 80,
+                  //   height: 40,
+                  //   errorBuilder: (_, __, ___) => Icon(
+                  //     Icons.inventory_2,
+                  //     color: colorScheme.primary,
+                  //     size: 24,
+                  //   ),
+                  // ),
+                  const SizedBox(width: 10),
+                  // Expanded(
+                  //   child: Text(
+                  //     'MGG Packify',
+                  //     style: theme.textTheme.titleMedium?.copyWith(
+                  //       fontWeight: FontWeight.w700,
+                  //       color: colorScheme.primary,
+                  //     ),
+                  //   ),
+                  // ),
                   // ── Health indicator dot ──────
                   Container(
                     width: 10,

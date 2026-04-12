@@ -3,7 +3,7 @@
 ; Run: ISCC installer\mgg-packify.iss
 
 #define AppName "MGG Packify"
-#define AppVersion "3.5.0"
+#define AppVersion "3.8.0"
 #define AppPublisher "Manuel García González"
 #define AppURL "https://github.com/mgg-171093/mgg-packify"
 #define AppExeName "mgg_packify.exe"
@@ -30,6 +30,9 @@ WizardStyle=modern
 ArchitecturesInstallIn64BitMode=x64compatible
 UninstallDisplayName={#AppName}
 UninstallDisplayIcon={app}\{#AppExeName}
+CloseApplications=yes
+CloseApplicationsFilter=mgg_packify.exe,mgg-packify-api.exe
+RestartIfNeededByRun=no
 
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"
