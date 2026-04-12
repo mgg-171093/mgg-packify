@@ -1,9 +1,3 @@
-<p align="center">
-  <img src="app/assets/logo-mgg.png" width="120" alt="MGG-Packify">
-</p>
-
-# MGG-Packify
-
 ![MGG Packify](docs/branding/banner.png)
 
 [![Version](https://img.shields.io/badge/Version-3.5.0-blue?style=flat-square)](./latest.json)
