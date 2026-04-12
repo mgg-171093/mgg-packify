@@ -3,7 +3,7 @@
 ; Run: ISCC installer\mgg-packify.iss
 
 #define AppName "MGG Packify"
-#define AppVersion "3.9.0"
+#define AppVersion "3.9.1"
 #define AppPublisher "Manuel García González"
 #define AppURL "https://github.com/mgg-171093/mgg-packify"
 #define AppExeName "mgg_packify.exe"
@@ -51,6 +51,10 @@ Name: "{autoprograms}\{#AppName}"; Filename: "{app}\{#AppExeName}"
 Name: "{autodesktop}\{#AppName}"; Filename: "{app}\{#AppExeName}"; Tasks: desktopicon
 
 [Run]
+; Fallback: force-kill the API process in case it wasn't stopped gracefully
+; (e.g. manual install without going through the in-app updater).
+; taskkill exits with code 128 if the process isn't found — Inno Setup ignores [Run] exit codes.
+Filename: "taskkill.exe"; Parameters: "/F /IM {#ApiExeName}"; Flags: runhidden nowait; StatusMsg: "Cerrando servicios..."
 Filename: "{app}\{#AppExeName}"; Description: "{cm:LaunchProgram,{#StringChange(AppName, '&', '&&')}}"; Flags: nowait postinstall skipifsilent
 
 [InstallDelete]
