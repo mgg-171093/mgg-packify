@@ -9,6 +9,7 @@ import 'screens/catalogos/bases_datos_screen.dart';
 import 'screens/catalogos/doc_templates_screen.dart';
 import 'screens/catalogos/estatus_screen.dart';
 import 'screens/catalogos/servidores_screen.dart';
+import 'screens/catalogos/projects_screen.dart';
 import 'screens/catalogos/servicios_screen.dart';
 import 'screens/catalogos/tipos_screen.dart';
 import 'screens/clone_screen.dart';
@@ -97,6 +98,13 @@ final router = GoRouter(
           path: '/settings/appearance',
           pageBuilder: (ctx, state) =>
               const NoTransitionPage(child: AppearanceScreen()),
+        ),
+        GoRoute(
+          path: '/catalogos/proyectos',
+          pageBuilder: (ctx, state) {
+            final returnTo = state.extra as String?;
+            return NoTransitionPage(child: ProjectsScreen(returnTo: returnTo));
+          },
         ),
         GoRoute(
           path: '/catalogos/servidores',

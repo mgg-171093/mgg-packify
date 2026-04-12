@@ -177,6 +177,7 @@ def generate_document(config: PackageConfig, output_path: Path,
         "hu_nombre":  config.hu_nombre,
         "ambiente":   config.ambiente,
         "iteracion":  config.iteracion,
+        "project_name": config.project_name or "GenericProject",
         "componentes": componentes_v1,
         "servidores":  servidores,
     }
@@ -915,13 +916,14 @@ def generar_manual(data: dict, output_path: str, overrides: dict | None = None):
     ambiente  = data["ambiente"]
     ticket    = data["ticket"]
     hu_nombre = data["hu_nombre"]
+    project_name = data.get("project_name", "GenericProject")
 
     # ── Título ────────────────────────────────────────────────────────────────
     add_paragraph(doc,
                   _resolve_text("doc", "title", overrides),
                   bold=True, size=16, space_after=4,
                   alignment=WD_ALIGN_PARAGRAPH.CENTER)
-    add_heading_green(doc, f"{ticket} - Portal Retail - {hu_nombre}")
+    add_heading_green(doc, f"{ticket} - {project_name} - {hu_nombre}")
     doc.add_paragraph()  # espacio
 
     # ── Sección 1: Componentes afectados (H1) ────────────────────────────────

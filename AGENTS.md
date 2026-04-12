@@ -48,8 +48,7 @@ See also: [ARCHITECTURE.md](./ARCHITECTURE.md) · [api/AGENTS.md](./api/AGENTS.m
 
 ## Project Overview
 
-**MGG-Packify** — Portal Retail Skandia México  
-Windows 11 desktop app that generates installation packages (.docx + folder structure).
+**MGG-Packify** — Windows 11 desktop app that generates installation packages (.docx + folder structure) for multiple projects and environments.
 
 **Architecture**: Flutter desktop UI spawns a Python FastAPI process as a child. Flutter communicates via HTTP REST to `localhost:8787`.
 
@@ -214,10 +213,10 @@ liferay_build → sql → api_iis → api_docker → blob → liferay → assets
 ### Package Name Format
 
 ```text
-{ticket}-PortalRetail_{AMBIENTE}-{iteracion.zfill(2)}
+{ticket}-{ProjectName}_{AMBIENTE}-{iteracion.zfill(2)}
 ```
 
-Example: `INC-1234-PortalRetail_QA-03`
+Example: `INC-1234-MiProyecto_QA-03`
 
 ### QA → UAT Display
 

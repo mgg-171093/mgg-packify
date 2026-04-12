@@ -324,6 +324,7 @@ def generate_package(req: GenerateRequest) -> GenerateResponse:
             iteracion=req.iteracion,
             ruta_packages=req.ruta_packages,
             componentes=sorted_comps,
+            project_name=req.project_name,
         )
 
         # Crear estructura de carpetas

@@ -6,6 +6,7 @@ import 'package:mgg_packify/widgets/package_name_preview.dart';
 void main() {
   Widget buildPreview({
     required String ticket,
+    required String projectNombre,
     required String ambiente,
     required String iteracion,
   }) {
@@ -13,6 +14,7 @@ void main() {
       home: Scaffold(
         body: PackageNamePreview(
           ticket: ticket,
+          projectNombre: projectNombre,
           ambiente: ambiente,
           iteracion: iteracion,
         ),
@@ -25,14 +27,24 @@ void main() {
       tester,
     ) async {
       await tester.pumpWidget(
-        buildPreview(ticket: 'MX01-274906', ambiente: 'QA', iteracion: '01'),
+        buildPreview(
+          ticket: 'MX01-274906',
+          projectNombre: 'MiProyecto',
+          ambiente: 'QA',
+          iteracion: '01',
+        ),
       );
-      expect(find.text('MX01-274906-PortalRetail_QA-01'), findsOneWidget);
+      expect(find.text('MX01-274906-MiProyecto_QA-01'), findsOneWidget);
     });
 
     testWidgets('zero-pads single-digit iteracion', (tester) async {
       await tester.pumpWidget(
-        buildPreview(ticket: 'MX01-001', ambiente: 'QA', iteracion: '5'),
+        buildPreview(
+          ticket: 'MX01-001',
+          projectNombre: 'MiProyecto',
+          ambiente: 'QA',
+          iteracion: '5',
+        ),
       );
       expect(find.textContaining('-05'), findsOneWidget);
     });
@@ -41,30 +53,64 @@ void main() {
       tester,
     ) async {
       await tester.pumpWidget(
-        buildPreview(ticket: '', ambiente: 'QA', iteracion: '01'),
+        buildPreview(
+          ticket: '',
+          projectNombre: 'MiProyecto',
+          ambiente: 'QA',
+          iteracion: '01',
+        ),
+      );
+      expect(find.textContaining('---'), findsOneWidget);
+    });
+
+    testWidgets('shows placeholder dashes when projectNombre is empty', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        buildPreview(
+          ticket: 'MX01-999',
+          projectNombre: '',
+          ambiente: 'QA',
+          iteracion: '01',
+        ),
       );
       expect(find.textContaining('---'), findsOneWidget);
     });
 
     testWidgets('shows placeholder when iteracion is empty', (tester) async {
       await tester.pumpWidget(
-        buildPreview(ticket: 'MX01-999', ambiente: 'PROD', iteracion: ''),
+        buildPreview(
+          ticket: 'MX01-999',
+          projectNombre: 'MiProyecto',
+          ambiente: 'PROD',
+          iteracion: '',
+        ),
       );
       expect(find.textContaining('--'), findsOneWidget);
     });
 
     testWidgets('updates on different ambiente values', (tester) async {
       await tester.pumpWidget(
-        buildPreview(ticket: 'T001', ambiente: 'PROD', iteracion: '02'),
+        buildPreview(
+          ticket: 'T001',
+          projectNombre: 'MiProyecto',
+          ambiente: 'PROD',
+          iteracion: '02',
+        ),
       );
-      expect(find.text('T001-PortalRetail_PROD-02'), findsOneWidget);
+      expect(find.text('T001-MiProyecto_PROD-02'), findsOneWidget);
     });
   });
 
   group('PackageNamePreview — AnimatedSwitcher', () {
     testWidgets('AnimatedSwitcher is present in widget tree', (tester) async {
       await tester.pumpWidget(
-        buildPreview(ticket: 'T001', ambiente: 'QA', iteracion: '01'),
+        buildPreview(
+          ticket: 'T001',
+          projectNombre: 'MiProyecto',
+          ambiente: 'QA',
+          iteracion: '01',
+        ),
       );
       expect(find.byType(AnimatedSwitcher), findsOneWidget);
     });
@@ -73,10 +119,15 @@ void main() {
       tester,
     ) async {
       const ticket = 'INC-1234';
-      const expectedName = 'INC-1234-PortalRetail_QA-01';
+      const expectedName = 'INC-1234-MiProyecto_QA-01';
 
       await tester.pumpWidget(
-        buildPreview(ticket: ticket, ambiente: 'QA', iteracion: '01'),
+        buildPreview(
+          ticket: ticket,
+          projectNombre: 'MiProyecto',
+          ambiente: 'QA',
+          iteracion: '01',
+        ),
       );
 
       final textWidget = tester.widget<Text>(find.text(expectedName));
@@ -85,20 +136,30 @@ void main() {
 
     testWidgets('ValueKey changes when ticket changes', (tester) async {
       await tester.pumpWidget(
-        buildPreview(ticket: 'A-001', ambiente: 'QA', iteracion: '01'),
+        buildPreview(
+          ticket: 'A-001',
+          projectNombre: 'MiProyecto',
+          ambiente: 'QA',
+          iteracion: '01',
+        ),
       );
 
       final keyBefore = tester
-          .widget<Text>(find.text('A-001-PortalRetail_QA-01'))
+          .widget<Text>(find.text('A-001-MiProyecto_QA-01'))
           .key;
 
       await tester.pumpWidget(
-        buildPreview(ticket: 'B-999', ambiente: 'QA', iteracion: '01'),
+        buildPreview(
+          ticket: 'B-999',
+          projectNombre: 'MiProyecto',
+          ambiente: 'QA',
+          iteracion: '01',
+        ),
       );
       await tester.pump();
 
       final keyAfter = tester
-          .widget<Text>(find.text('B-999-PortalRetail_QA-01'))
+          .widget<Text>(find.text('B-999-MiProyecto_QA-01'))
           .key;
 
       expect(keyBefore, isNot(equals(keyAfter)));
@@ -108,7 +169,12 @@ void main() {
   group('PackageNamePreview — copy button', () {
     testWidgets('copy IconButton is present in widget tree', (tester) async {
       await tester.pumpWidget(
-        buildPreview(ticket: 'TKT-001', ambiente: 'QA', iteracion: '01'),
+        buildPreview(
+          ticket: 'TKT-001',
+          projectNombre: 'MiProyecto',
+          ambiente: 'QA',
+          iteracion: '01',
+        ),
       );
       expect(find.byType(IconButton), findsOneWidget);
     });
@@ -127,7 +193,12 @@ void main() {
       );
 
       await tester.pumpWidget(
-        buildPreview(ticket: 'TKT-002', ambiente: 'QA', iteracion: '01'),
+        buildPreview(
+          ticket: 'TKT-002',
+          projectNombre: 'MiProyecto',
+          ambiente: 'QA',
+          iteracion: '01',
+        ),
       );
 
       await tester.tap(find.byType(IconButton));

@@ -23,6 +23,8 @@ class PackageFormState {
     this.instances = const {},
     this.servers = const {},
     this.guardarServidores = false,
+    this.projectId,
+    this.projectNombre = '',
   });
 
   final String ticket;
@@ -41,10 +43,16 @@ class PackageFormState {
   /// Whether to persist server values after generating
   final bool guardarServidores;
 
-  /// Computed package name per domain rule REQ-DOMAIN-003
+  /// UUID del proyecto seleccionado (null si no hay selección)
+  final String? projectId;
+
+  /// Nombre del proyecto seleccionado (vacío si no hay selección)
+  final String projectNombre;
+
+  /// Computed package name per domain rule
   String get packageName {
     final iter = iteracion.padLeft(2, '0');
-    return '$ticket-PortalRetail_$ambiente-$iter';
+    return '$ticket-${projectNombre}_$ambiente-$iter';
   }
 
   PackageFormState copyWith({
@@ -57,6 +65,8 @@ class PackageFormState {
     Map<ComponentType, List<ComponentInstanceState>>? instances,
     Map<String, ServerConfig>? servers,
     bool? guardarServidores,
+    String? projectId,
+    String? projectNombre,
   }) {
     return PackageFormState(
       ticket: ticket ?? this.ticket,
@@ -68,6 +78,8 @@ class PackageFormState {
       instances: instances ?? this.instances,
       servers: servers ?? this.servers,
       guardarServidores: guardarServidores ?? this.guardarServidores,
+      projectId: projectId ?? this.projectId,
+      projectNombre: projectNombre ?? this.projectNombre,
     );
   }
 
@@ -95,6 +107,10 @@ class PackageFormNotifier extends Notifier<PackageFormState> {
       state = state.copyWith(rutaPackages: value);
   void updateGuardarServidores(bool value) =>
       state = state.copyWith(guardarServidores: value);
+
+  /// Selecciona el proyecto activo para el formulario.
+  void setProject(String id, String nombre) =>
+      state = state.copyWith(projectId: id, projectNombre: nombre);
 
   // ── Component toggles ─────────────────────────
 

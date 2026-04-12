@@ -5,19 +5,22 @@ class PackageNamePreview extends StatelessWidget {
   const PackageNamePreview({
     super.key,
     required this.ticket,
+    required this.projectNombre,
     required this.ambiente,
     required this.iteracion,
   });
 
   final String ticket;
+  final String projectNombre;
   final String ambiente;
   final String iteracion;
 
   String get _previewName {
     final t = ticket.isEmpty ? '---' : ticket;
+    final p = projectNombre.isEmpty ? '---' : projectNombre;
     final a = ambiente.isEmpty ? '---' : ambiente;
     final i = iteracion.isEmpty ? '--' : iteracion.padLeft(2, '0');
-    return '$t-PortalRetail_$a-$i';
+    return '$t-${p}_$a-$i';
   }
 
   @override

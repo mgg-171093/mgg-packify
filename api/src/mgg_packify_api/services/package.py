@@ -65,17 +65,22 @@ class PackageConfig:
     """Lista de componentes incluidos en el package."""
     servidores: ServerConfig = field(default_factory=ServerConfig)
     """Servidores del ambiente target."""
+    project_name: str = ""
+    """Nombre del proyecto (ej: 'MiProyecto'). Vacío usa 'GenericProject' como fallback."""
 
     @property
     def package_name(self) -> str:
         """
         Nombre canónico del package.
 
-        Formato: ``{ticket}-PortalRetail_{ambiente}-{iteracion.zfill(2)}``
+        Formato: ``{ticket}-{project_name}_{ambiente}-{iteracion.zfill(2)}``
+
+        Si ``project_name`` está vacío, usa ``"GenericProject"`` como fallback.
 
         Nota: el campo hu_nombre NO forma parte del nombre de la carpeta/archivo
         (se usa solo en el título del documento .docx). Esto replica exactamente
         el comportamiento de v1.
         """
+        label = self.project_name or "GenericProject"
         iter_str = self.iteracion.zfill(2)
-        return f"{self.ticket}-PortalRetail_{self.ambiente}-{iter_str}"
+        return f"{self.ticket}-{label}_{self.ambiente}-{iter_str}"

@@ -242,8 +242,8 @@ app/lib/
 
 **Preview formula**:
 ```dart
-'$ticket-PortalRetail_$ambiente-${iteracion.padLeft(2, '0')}'
-// Placeholders: '---' for empty ticket/ambiente, '--' for empty iteracion
+'$ticket-$projectNombre_$ambiente-${iteracion.padLeft(2, '0')}'
+// Placeholders: '---' for empty ticket/projectNombre/ambiente, '--' for empty iteracion
 ```
 
 **Key notes**:

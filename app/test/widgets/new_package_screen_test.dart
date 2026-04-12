@@ -3,11 +3,32 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mgg_packify/core/api_client.dart';
+import 'package:mgg_packify/models/options_model.dart';
+import 'package:mgg_packify/providers/options_provider.dart';
 import 'package:mgg_packify/screens/new_package_screen.dart';
+import 'package:mgg_packify/widgets/package_name_preview.dart';
 
 /// Minimal stub ApiClient that does nothing (never called in validation tests)
 class _StubApiClient extends ApiClient {
   _StubApiClient() : super();
+}
+
+/// A project entry used across tests so the "Generar" button is enabled.
+const _testProject = ProjectEntry(id: 'test-id', name: 'TestProject');
+
+/// OptionsNotifier stub that returns options with one project pre-loaded,
+/// so the generate button is enabled (canGenerate = projectNombre.isNotEmpty).
+class _StubOptionsNotifier extends OptionsNotifier {
+  @override
+  Future<OptionsModel> build() async => OptionsModel(
+    estatusList: const [],
+    tipoSqlList: const [],
+    tipoBlobList: const [],
+    apiIisServices: const [],
+    apiDockerServices: const [],
+    sqlDatabases: const [],
+    projects: const [_testProject],
+  );
 }
 
 GoRouter get _testRouter => GoRouter(
@@ -18,12 +39,19 @@ GoRouter get _testRouter => GoRouter(
       path: '/success',
       builder: (_, __) => const Scaffold(body: Text('Success')),
     ),
+    GoRoute(
+      path: '/catalogos/proyectos',
+      builder: (_, __) => const Scaffold(body: Text('Proyectos')),
+    ),
   ],
 );
 
 Widget buildTestApp() {
   return ProviderScope(
-    overrides: [apiClientProvider.overrideWithValue(_StubApiClient())],
+    overrides: [
+      apiClientProvider.overrideWithValue(_StubApiClient()),
+      optionsProvider.overrideWith(_StubOptionsNotifier.new),
+    ],
     child: MaterialApp.router(routerConfig: _testRouter),
   );
 }
@@ -49,6 +77,18 @@ Future<void> tapGenerateButton(WidgetTester tester) async {
   await tester.pump();
 }
 
+/// Selects the test project from the Proyecto dropdown so the generate
+/// button becomes enabled (canGenerate = projectNombre.isNotEmpty).
+Future<void> selectTestProject(WidgetTester tester) async {
+  final dropdown = find.byType(DropdownButtonFormField<ProjectEntry>);
+  await tester.tap(dropdown);
+  await tester.pumpAndSettle();
+  // Tap the project item in the dropdown menu
+  final projectItem = find.text(_testProject.name).last;
+  await tester.tap(projectItem);
+  await tester.pumpAndSettle();
+}
+
 void main() {
   group('NewPackageScreen validation', () {
     testWidgets('shows validation errors when form is empty on submit', (
@@ -57,6 +97,8 @@ void main() {
       await tester.pumpWidget(buildTestApp());
       await tester.pumpAndSettle();
 
+      // Select a project so the generate button is enabled
+      await selectTestProject(tester);
       await tapGenerateButton(tester);
 
       // Should show validation errors for required fields
@@ -66,6 +108,9 @@ void main() {
     testWidgets('shows iteracion validation error', (tester) async {
       await tester.pumpWidget(buildTestApp());
       await tester.pumpAndSettle();
+
+      // Select a project so the generate button is enabled
+      await selectTestProject(tester);
 
       // Clear the default iteracion value and submit
       final iterField = find.widgetWithText(TextFormField, 'Iteración *');
@@ -82,6 +127,9 @@ void main() {
     testWidgets('shows ruta validation error when empty', (tester) async {
       await tester.pumpWidget(buildTestApp());
       await tester.pumpAndSettle();
+
+      // Select a project so the generate button is enabled
+      await selectTestProject(tester);
 
       // Fill ticket to pass that validation
       await tester.enterText(
@@ -122,8 +170,8 @@ void main() {
       await tester.pumpWidget(buildTestApp());
       await tester.pumpAndSettle();
 
-      // Preview shows even when empty — look for placeholder text
-      expect(find.textContaining('PortalRetail'), findsOneWidget);
+      // Preview shows even when empty — look for placeholder dashes
+      expect(find.byType(PackageNamePreview), findsOneWidget);
     });
   });
 }

@@ -1,8 +1,8 @@
 name: mgg_packify
-description: "MGG-Packify – Portal Retail Skandia México"
+description: "MGG-Packify – generador de paquetes de instalación para múltiples proyectos y ambientes"
 publish_to: 'none'
 
-version: 3.5.0+1
+version: 3.6.0+1
 
 environment:
   sdk: ^3.11.0
@@ -20,6 +20,7 @@ dependencies:
   local_notifier: ^0.1.4
   path: ^1.9.0
   logger: ^2.4.0
+  uuid: ^4.5.3
 
 dev_dependencies:
   flutter_test:
@@ -32,3 +33,4 @@ flutter:
   uses-material-design: true
   assets:
     - assets/
+    - assets/branding/

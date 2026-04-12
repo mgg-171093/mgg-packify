@@ -19,6 +19,7 @@ def _base_payload(ruta: str) -> dict:
         "hu_nombre": "Mejora login",
         "ambiente": "QA",
         "iteracion": "01",
+        "project_name": "PortalRetail",
         "ruta_packages": ruta,
         "componentes": [
             {
@@ -160,6 +161,7 @@ def test_generate_package_name_format(client: TestClient, tmp_path: Path) -> Non
         "hu_nombre": "Fix crítico",
         "ambiente": "PROD",
         "iteracion": "2",   # debe ser zfill(2) → "02"
+        "project_name": "PortalRetail",
         "ruta_packages": str(tmp_path),
         "componentes": [
             {
