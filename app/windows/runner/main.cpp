@@ -25,8 +25,12 @@ int APIENTRY wWinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE prev,
   project.set_dart_entrypoint_arguments(std::move(command_line_arguments));
 
   FlutterWindow window(project);
-  Win32Window::Point origin(10, 10);
   Win32Window::Size size(1280, 720);
+  // Center the window on the primary monitor.
+  int screen_w = GetSystemMetrics(SM_CXSCREEN);
+  int screen_h = GetSystemMetrics(SM_CYSCREEN);
+  Win32Window::Point origin((screen_w - size.width) / 2,
+                            (screen_h - size.height) / 2);
   if (!window.Create(L"MGG-Packify", origin, size)) {
     return EXIT_FAILURE;
   }
