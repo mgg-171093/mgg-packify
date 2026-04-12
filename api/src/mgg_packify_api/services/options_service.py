@@ -20,6 +20,7 @@ from mgg_packify_api.schemas.options import (
     ApiIisServiceEntry,
     DocTemplatesSchema,
     OptionsSchema,
+    ProjectEntry,
 )
 
 logger = logging.getLogger(__name__)
@@ -54,6 +55,7 @@ def _default_options() -> dict:
         "api_docker_services": [],
         "sql_databases": [],
         "doc_templates": {},
+        "projects": [],
     }
 
 
@@ -129,6 +131,10 @@ class OptionsManager:
                 ],
                 sql_databases=data.get("sql_databases", []),
                 doc_templates=DocTemplatesSchema(**doc_templates_data) if doc_templates_data else DocTemplatesSchema(),
+                projects=[
+                    ProjectEntry(**entry)
+                    for entry in data.get("projects", [])
+                ],
             )
         except (json.JSONDecodeError, OSError, TypeError, ValueError) as exc:
             logger.warning(
@@ -160,6 +166,10 @@ class OptionsManager:
             ],
             "sql_databases": options.sql_databases,
             "doc_templates": options.doc_templates.model_dump(exclude_none=True),
+            "projects": [
+                {"id": entry.id, "name": entry.name}
+                for entry in options.projects
+            ],
         }
         self._write(data)
 

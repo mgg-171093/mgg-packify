@@ -129,6 +129,7 @@ void main() {
       notifier.updateTicket('MX01-274906');
       notifier.updateAmbiente('QA');
       notifier.updateIteracion('01');
+      notifier.setProject('uuid-1', 'PortalRetail');
       final state = container.read(packageFormProvider);
       expect(state.packageName, 'MX01-274906-PortalRetail_QA-01');
     });

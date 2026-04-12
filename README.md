@@ -4,6 +4,8 @@
 
 # MGG-Packify
 
+![MGG Packify](docs/branding/banner.png)
+
 [![Version](https://img.shields.io/badge/Version-3.5.0-blue?style=flat-square)](./latest.json)
 [![Python](https://img.shields.io/badge/Python-%E2%89%A53.12-3776AB?style=flat-square&logo=python&logoColor=white)](https://www.python.org/)
 [![Flutter](https://img.shields.io/badge/Flutter-3.41.4-02569B?style=flat-square&logo=flutter&logoColor=white)](https://flutter.dev/)
@@ -13,7 +15,7 @@
 [![API Tests](https://img.shields.io/badge/API%20Tests-120%20passing-brightgreen?style=flat-square)](./api/)
 [![Flutter Tests](https://img.shields.io/badge/Flutter%20Tests-211%20passing-brightgreen?style=flat-square)](./app/)
 
-**Portal Retail Skandia México** — Windows 11 desktop app that generates installation packages (`.docx` document + folder structure) for retail portal deployments. Covers all 8 component types: SQL scripts, API IIS/Docker services, Blob Storage, Liferay builds, Assets, and API Management.
+Windows 11 desktop app that generates installation packages (`.docx` document + folder structure) for multiple projects and environments. Covers all 8 component types: SQL scripts, API IIS/Docker services, Blob Storage, Liferay builds, Assets, and API Management.
 
 ---
 

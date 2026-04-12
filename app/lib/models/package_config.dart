@@ -65,6 +65,7 @@ class PackageConfig {
     required this.iteracion,
     required this.rutaPackages,
     required this.componentes,
+    this.projectName = '',
   });
 
   final String ticket;
@@ -72,6 +73,7 @@ class PackageConfig {
   final String ambiente;
   final String iteracion;
   final String rutaPackages;
+  final String projectName;
 
   /// Components in canonical order, each entry:
   /// { 'tipo': String, 'instancias': List<Map> }
@@ -84,6 +86,7 @@ class PackageConfig {
     'iteracion': iteracion.padLeft(2, '0'),
     'ruta_packages': rutaPackages,
     'componentes': componentes,
+    'project_name': projectName,
   };
 
   factory PackageConfig.fromJson(Map<String, dynamic> json) {
@@ -99,6 +102,7 @@ class PackageConfig {
       iteracion: (json['iteracion'] as String?) ?? '01',
       rutaPackages: (json['ruta_packages'] as String?) ?? '',
       componentes: componentes,
+      projectName: (json['project_name'] as String?) ?? '',
     );
   }
 }

@@ -1,5 +1,5 @@
 {
-  "version": "3.5.0",
-  "url": "https://github.com/mgg-171093/mgg-packify/releases/download/v3.5.0-stable/MGGPackify-3.5.0-Setup.exe",
-  "release_notes": "Logging, auto-updater, health indicator, log viewer, about screen"
+  "version": "3.6.0",
+  "url": "https://github.com/mgg-171093/mgg-packify/releases/download/v3.6.0-stable/MGGPackify-3.6.0-Setup.exe",
+  "release_notes": "Catálogo de proyectos configurable, branding personalizable, splash screen extendido"
 }

@@ -7,7 +7,14 @@ import '../core/server_manager.dart';
 import '../providers/server_status_provider.dart';
 
 class SplashScreen extends ConsumerStatefulWidget {
-  const SplashScreen({super.key});
+  const SplashScreen({
+    super.key,
+    this.minDisplayDuration = const Duration(milliseconds: 1500),
+  });
+
+  /// Minimum time the splash is shown before navigating to /dashboard.
+  /// Inject [Duration.zero] in tests for instant navigation.
+  final Duration minDisplayDuration;
 
   @override
   ConsumerState<SplashScreen> createState() => _SplashScreenState();
@@ -16,7 +23,8 @@ class SplashScreen extends ConsumerStatefulWidget {
 class _SplashScreenState extends ConsumerState<SplashScreen> {
   Timer? _timer;
   int _attempts = 0;
-  static const _maxAttempts = 20; // 20 × 500ms = 10 seconds
+  // 36 × 500ms = 18 seconds maximum wait
+  static const _maxAttempts = 36;
 
   @override
   void initState() {
@@ -39,6 +47,9 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
     _attempts = 0;
     ref.read(serverStatusProvider.notifier).state = ServerStatus.starting;
 
+    // Minimum display delay future — runs in parallel with polling
+    final minDelayFuture = Future<void>.delayed(widget.minDisplayDuration);
+
     _timer?.cancel();
     _timer = Timer.periodic(const Duration(milliseconds: 500), (_) async {
       if (_attempts >= _maxAttempts) {
@@ -52,6 +63,8 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
       try {
         await ref.read(apiClientProvider).getHealth();
         _timer?.cancel();
+        // Wait for minimum display delay before navigating
+        await minDelayFuture;
         if (mounted) {
           ref.read(serverStatusProvider.notifier).state = ServerStatus.ready;
           context.go('/dashboard');
@@ -85,10 +98,15 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
                   final isDark =
                       Theme.of(context).brightness == Brightness.dark;
                   Widget img = Image.asset(
-                    'assets/logo-mgg.png',
+                    'assets/branding/logo-full.png',
                     width: 96,
                     height: 96,
                     fit: BoxFit.contain,
+                    errorBuilder: (_, __, ___) => Icon(
+                      Icons.inventory_2,
+                      size: 96,
+                      color: Theme.of(context).colorScheme.primary,
+                    ),
                   );
                   if (isDark) {
                     img = ColorFiltered(
@@ -108,13 +126,6 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
                 style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                   fontWeight: FontWeight.w800,
                 ),
-              ),
-              const SizedBox(height: 4),
-              Text(
-                'Portal Retail · Skandia México',
-                style: Theme.of(
-                  context,
-                ).textTheme.bodyMedium?.copyWith(color: Colors.grey.shade600),
               ),
               const SizedBox(height: 40),
               if (status == ServerStatus.starting) ...[

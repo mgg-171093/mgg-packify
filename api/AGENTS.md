@@ -108,7 +108,7 @@ api/
     "hu_nombre": "Login Portal",
     "ambiente": "QA",
     "iteracion": "02",
-    "ruta_packages": "C:\\Packages\\PortalRetail"
+    "ruta_packages": "C:\\Packages\\MiProyecto"
   }
 }
 ```
@@ -127,12 +127,9 @@ api/
     "hu_nombre": "Login Portal",
     "ambiente": "QA",
     "iteracion": "02",
-    "ruta_packages": "C:\\Packages\\PortalRetail"
+    "ruta_packages": "C:\\Packages\\MiProyecto"
   }
 }
-
-// Response 200
-{ "ok": true }
 ```
 
 ### GET /settings/options
@@ -189,10 +186,10 @@ api/
 // Request body (GenerateRequest)
 {
   "ticket": "INC-1234",
-  "hu_nombre": "Login Portal Retail",
+  "hu_nombre": "Login",
   "ambiente": "qa",
   "iteracion": "03",
-  "ruta_packages": "C:\\Packages\\PortalRetail",
+  "ruta_packages": "C:\\Packages\\MiProyecto",
   "componentes": [
     {
       "tipo": "api_iis",
@@ -246,9 +243,9 @@ api/
 // Response 200 (GenerateResponse)
 {
   "ok": true,
-  "package_name": "INC-1234-PortalRetail_QA-03",
-  "package_dir": "C:\\Packages\\PortalRetail\\INC-1234-PortalRetail_QA-03",
-  "doc_path": "C:\\Packages\\PortalRetail\\INC-1234-PortalRetail_QA-03\\Manual\\INC-1234-PortalRetail_QA-03.docx",
+  "package_name": "INC-1234-MiProyecto_QA-03",
+  "package_dir": "C:\\Packages\\MiProyecto\\INC-1234-MiProyecto_QA-03",
+  "doc_path": "C:\\Packages\\MiProyecto\\INC-1234-MiProyecto_QA-03\\Manual\\INC-1234-MiProyecto_QA-03.docx",
   "folders_created": [
     "Componentes",
     "Componentes\\API",
@@ -260,7 +257,7 @@ api/
     { "label": "Publicar WebRetailAuth", "ok": true, "error": "" }
   ],
   "publish_outputs": [
-    "C:\\Packages\\PortalRetail\\INC-1234-PortalRetail_QA-03\\Componentes\\API\\WebRetailAuth.zip"
+    "C:\\Packages\\MiProyecto\\INC-1234-MiProyecto_QA-03\\Componentes\\API\\WebRetailAuth.zip"
   ],
   "copy_errors": []
 }
@@ -275,7 +272,7 @@ api/
   "steps": [],
   "publish_outputs": [],
   "copy_errors": [],
-  "error": "La ruta no existe: C:\\Packages\\PortalRetail"
+  "error": "La ruta no existe: C:\\Packages\\MiProyecto"
 }
 ```
 
@@ -284,7 +281,7 @@ api/
 ```json
 // Request body (CloneRequest)
 {
-  "source_path": "C:\\Packages\\PortalRetail\\INC-1234-PortalRetail_QA-02",
+  "source_path": "C:\\Packages\\MiProyecto\\INC-1234-MiProyecto_QA-02",
   "new_iteracion": "03"
 }
 
@@ -293,10 +290,10 @@ api/
   "ok": true,
   "prefill": {
     "ticket": "INC-1234",
-    "hu_nombre": "Login Portal Retail",
+    "hu_nombre": "Login",
     "ambiente": "QA",
     "iteracion": "03",
-    "ruta_packages": "C:\\Packages\\PortalRetail",
+    "ruta_packages": "C:\\Packages\\MiProyecto",
     "componentes": [...]
   },
   "error": ""
@@ -306,7 +303,7 @@ api/
 {
   "ok": false,
   "prefill": {},
-  "error": "package_meta.json no encontrado en: C:\\Packages\\PortalRetail\\INC-1234-PortalRetail_QA-02"
+  "error": "package_meta.json no encontrado en: C:\\Packages\\MiProyecto\\INC-1234-MiProyecto_QA-02"
 }
 ```
 
@@ -314,7 +311,7 @@ api/
 
 ```
 // Query param: base_dir (string, required)
-GET /packages/list?base_dir=C%3A%5CPackages%5CPortalRetail
+GET /packages/list?base_dir=C%3A%5CPackages%5CMiProyecto
 ```
 
 ```json
@@ -322,14 +319,14 @@ GET /packages/list?base_dir=C%3A%5CPackages%5CPortalRetail
 {
   "packages": [
     {
-      "name": "INC-1234-PortalRetail_QA-03",
-      "path": "C:\\Packages\\PortalRetail\\INC-1234-PortalRetail_QA-03",
+      "name": "INC-1234-MiProyecto_QA-03",
+      "path": "C:\\Packages\\MiProyecto\\INC-1234-MiProyecto_QA-03",
       "has_meta": false,
       "created_at": "2026-03-15T10:30:00"
     },
     {
-      "name": "INC-1234-PortalRetail_QA-02",
-      "path": "C:\\Packages\\PortalRetail\\INC-1234-PortalRetail_QA-02",
+      "name": "INC-1234-MiProyecto_QA-02",
+      "path": "C:\\Packages\\MiProyecto\\INC-1234-MiProyecto_QA-02",
       "has_meta": true,
       "created_at": "2026-03-10T09:15:00"
     }
@@ -536,8 +533,8 @@ class ComponentType(StrEnum):
 # liferay_build does NOT create a physical folder (guard in folder_service.py)
 # sql/blob expand to N rows; others expand to 1 row per instance
 # QA → UAT ONLY in gen_seccion_liferay_build()
-# Package name: f"{ticket}-PortalRetail_{ambiente.upper()}-{iteracion.zfill(2)}"
-# Example: "INC-1234-PortalRetail_QA-03"
+# Package name: f"{ticket}-{project_name}_{ambiente.upper()}-{iteracion.zfill(2)}"
+# Example: "INC-1234-MiProyecto_QA-03"
 ```
 
 ---
@@ -568,6 +565,6 @@ api/tests/
 - `liferay_build` NEVER creates a physical folder (checked in `folder_service.py` with a guard).
 - UBICACIÓN column: always `ambiente` only — never concatenate with `base_datos`.
 - `package_meta.json` is written then immediately deleted after generation (cleanup step in `generate_package()`). It only persists during the clone flow.
-- SQL script copy reads from `../changes/` relative to `ruta_packages` (e.g. if packages are at `C:\Packages\PortalRetail`, changes folder is `C:\Packages\changes`).
+- SQL script copy reads from `../changes/` relative to `ruta_packages` (e.g. if packages are at `C:\Packages\MiProyecto`, changes folder is `C:\Packages\changes`).
 - `publish_service.py` requires Visual Studio + MSBuild for `.NET Framework` projects; requires `dotnet` CLI on PATH for `.NET Core/5+` projects.
 - `api_iis_services` catalog in `options.json` must be populated before `publicar: true` is used — otherwise every publish step returns `ok=False`.

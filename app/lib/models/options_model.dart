@@ -1,6 +1,31 @@
 import 'package:flutter/foundation.dart';
 
 // ─────────────────────────────────────────────
+// ProjectEntry — catalog entry for projects
+// ─────────────────────────────────────────────
+
+@immutable
+class ProjectEntry {
+  const ProjectEntry({required this.id, required this.name});
+
+  final String id; // UUID
+  final String name; // display name
+
+  ProjectEntry copyWith({String? id, String? name}) {
+    return ProjectEntry(id: id ?? this.id, name: name ?? this.name);
+  }
+
+  factory ProjectEntry.fromJson(Map<String, dynamic> json) {
+    return ProjectEntry(
+      id: (json['id'] as String?) ?? '',
+      name: (json['name'] as String?) ?? '',
+    );
+  }
+
+  Map<String, dynamic> toJson() => {'id': id, 'name': name};
+}
+
+// ─────────────────────────────────────────────
 // ApiIisServiceEntry — catalog entry for IIS APIs
 // ─────────────────────────────────────────────
 
@@ -63,6 +88,7 @@ class OptionsModel {
     this.apiDockerServices = const [],
     this.sqlDatabases = const [],
     this.docTemplates = const {},
+    this.projects = const [],
   });
 
   final List<String> estatusList;
@@ -76,6 +102,9 @@ class OptionsModel {
   /// Null values mean "use default Python text"; non-null = user override.
   final Map<String, Map<String, String?>> docTemplates;
 
+  /// Project catalog entries.
+  final List<ProjectEntry> projects;
+
   OptionsModel copyWith({
     List<String>? estatusList,
     List<String>? tipoSqlList,
@@ -84,6 +113,7 @@ class OptionsModel {
     List<ApiDockerServiceEntry>? apiDockerServices,
     List<String>? sqlDatabases,
     Map<String, Map<String, String?>>? docTemplates,
+    List<ProjectEntry>? projects,
   }) {
     return OptionsModel(
       estatusList: estatusList ?? this.estatusList,
@@ -93,6 +123,7 @@ class OptionsModel {
       apiDockerServices: apiDockerServices ?? this.apiDockerServices,
       sqlDatabases: sqlDatabases ?? this.sqlDatabases,
       docTemplates: docTemplates ?? this.docTemplates,
+      projects: projects ?? this.projects,
     );
   }
 
@@ -149,6 +180,11 @@ class OptionsModel {
           .map((e) => e as String)
           .toList(),
       docTemplates: docTemplates,
+      projects:
+          (json['projects'] as List?)
+              ?.map((e) => ProjectEntry.fromJson(e as Map<String, dynamic>))
+              .toList() ??
+          const [],
     );
   }
 
@@ -160,5 +196,6 @@ class OptionsModel {
     'api_docker_services': apiDockerServices.map((e) => e.toJson()).toList(),
     'sql_databases': sqlDatabases,
     'doc_templates': docTemplates,
+    'projects': projects.map((e) => e.toJson()).toList(),
   };
 }

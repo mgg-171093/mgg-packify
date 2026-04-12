@@ -104,7 +104,7 @@ class _AboutScreenState extends ConsumerState<AboutScreen> {
                               ),
                             ),
                             Text(
-                              'Portal Retail Skandia México',
+                              'Generador de paquetes de instalación',
                               style: theme.textTheme.bodySmall?.copyWith(
                                 color: colorScheme.onSurfaceVariant,
                               ),

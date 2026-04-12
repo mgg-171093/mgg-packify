@@ -61,6 +61,7 @@ class GenerateRequest(BaseModel):
     iteracion: str
     ruta_packages: str
     componentes: list[ComponentIn]
+    project_name: str = ""              # nombre del proyecto (backward-compatible)
 
 
 class StepResult(BaseModel):

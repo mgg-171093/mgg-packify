@@ -21,43 +21,49 @@ const _destinations = [
   (icon: Icons.history_outlined, label: 'Historial', path: '/history'),
   // Index 4 — Templates
   (icon: Icons.bookmark_outlined, label: 'Templates', path: '/templates'),
-  // Index 5 — Servidores
+  // Index 5 — Proyectos
+  (
+    icon: Icons.folder_special_outlined,
+    label: 'Proyectos',
+    path: '/catalogos/proyectos',
+  ),
+  // Index 6 — Servidores
   (
     icon: Icons.dns_outlined,
     label: 'Servidores',
     path: '/catalogos/servidores',
   ),
-  // Index 6 — Servicios API
+  // Index 7 — Servicios API
   (
     icon: Icons.miscellaneous_services_outlined,
     label: 'Servicios API',
     path: '/catalogos/servicios',
   ),
-  // Index 7 — Estatus
+  // Index 8 — Estatus
   (icon: Icons.list_alt_outlined, label: 'Estatus', path: '/catalogos/estatus'),
-  // Index 8 — Bases de Datos
+  // Index 9 — Bases de Datos
   (
     icon: Icons.storage_outlined,
     label: 'Bases de Datos',
     path: '/catalogos/bases-datos',
   ),
-  // Index 9 — Tipos
+  // Index 10 — Tipos
   (icon: Icons.category_outlined, label: 'Tipos', path: '/catalogos/tipos'),
-  // Index 10 — Texto Docs
+  // Index 11 — Texto Docs
   (
     icon: Icons.edit_note_outlined,
     label: 'Texto Docs',
     path: '/catalogos/doc-templates',
   ),
-  // Index 11 — Apariencia
+  // Index 12 — Apariencia
   (
     icon: Icons.palette_outlined,
     label: 'Apariencia',
     path: '/settings/appearance',
   ),
-  // Index 12 — Logs
+  // Index 13 — Logs
   (icon: Icons.article_outlined, label: 'Logs', path: '/logs'),
-  // Index 13 — Acerca de
+  // Index 14 — Acerca de
   (icon: Icons.info_outline, label: 'Acerca de', path: '/about'),
 ];
 
@@ -69,15 +75,16 @@ int _indexFromPath(String path) {
   if (path == '/clone') return 2;
   if (path == '/history') return 3;
   if (path == '/templates') return 4;
-  if (path.startsWith('/catalogos/servidores')) return 5;
-  if (path.startsWith('/catalogos/servicios')) return 6;
-  if (path.startsWith('/catalogos/estatus')) return 7;
-  if (path.startsWith('/catalogos/bases-datos')) return 8;
-  if (path.startsWith('/catalogos/tipos')) return 9;
-  if (path.startsWith('/catalogos/doc-templates')) return 10;
-  if (path == '/settings/appearance') return 11;
-  if (path == '/logs') return 12;
-  if (path == '/about') return 13;
+  if (path.startsWith('/catalogos/proyectos')) return 5;
+  if (path.startsWith('/catalogos/servidores')) return 6;
+  if (path.startsWith('/catalogos/servicios')) return 7;
+  if (path.startsWith('/catalogos/estatus')) return 8;
+  if (path.startsWith('/catalogos/bases-datos')) return 9;
+  if (path.startsWith('/catalogos/tipos')) return 10;
+  if (path.startsWith('/catalogos/doc-templates')) return 11;
+  if (path == '/settings/appearance') return 12;
+  if (path == '/logs') return 13;
+  if (path == '/about') return 14;
   return -1;
 }
 
@@ -257,8 +264,6 @@ class _AppSidebar extends ConsumerWidget {
               selected: selectedIndex == 10,
               onTap: () => onDestinationSelected(10),
             ),
-            const Divider(height: 1),
-            // ── Sistema ──────────────────────
             _SidebarItem(
               icon: _destinations[11].icon,
               label: _destinations[11].label,
@@ -266,18 +271,26 @@ class _AppSidebar extends ConsumerWidget {
               onTap: () => onDestinationSelected(11),
             ),
             const Divider(height: 1),
-            // ── Sistema / herramientas ────────
+            // ── Sistema ──────────────────────
             _SidebarItem(
               icon: _destinations[12].icon,
               label: _destinations[12].label,
               selected: selectedIndex == 12,
               onTap: () => onDestinationSelected(12),
             ),
+            const Divider(height: 1),
+            // ── Sistema / herramientas ────────
             _SidebarItem(
               icon: _destinations[13].icon,
               label: _destinations[13].label,
               selected: selectedIndex == 13,
               onTap: () => onDestinationSelected(13),
+            ),
+            _SidebarItem(
+              icon: _destinations[14].icon,
+              label: _destinations[14].label,
+              selected: selectedIndex == 14,
+              onTap: () => onDestinationSelected(14),
             ),
             // ── Spacer + version footer ───────
             const Spacer(),

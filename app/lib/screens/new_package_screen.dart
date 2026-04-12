@@ -6,10 +6,12 @@ import 'package:local_notifier/local_notifier.dart';
 import '../core/api_client.dart';
 import '../models/component_config.dart';
 import '../models/generate_result.dart';
+import '../models/options_model.dart';
 import '../models/package_config.dart';
 import '../models/package_history_entry.dart';
 import '../models/package_template.dart';
 import '../providers/history_provider.dart';
+import '../providers/options_provider.dart';
 import '../providers/package_form_provider.dart';
 import '../providers/templates_provider.dart';
 import '../widgets/component_detail_card.dart';
@@ -168,6 +170,7 @@ class _NewPackageScreenState extends ConsumerState<NewPackageScreen> {
       ambiente: formState.ambiente,
       iteracion: formState.iteracion,
       rutaPackages: formState.rutaPackages,
+      projectName: formState.projectNombre,
       componentes: buildComponentes(
         formState.selectedTypes,
         formState.instances,
@@ -227,6 +230,7 @@ class _NewPackageScreenState extends ConsumerState<NewPackageScreen> {
   @override
   Widget build(BuildContext context) {
     final formState = ref.watch(packageFormProvider);
+    final optionsAsync = ref.watch(optionsProvider);
     _initControllers(formState);
 
     final notifier = ref.read(packageFormProvider.notifier);
@@ -235,6 +239,10 @@ class _NewPackageScreenState extends ConsumerState<NewPackageScreen> {
 
     // F3: Validation warnings
     final warnings = notifier.validationWarnings;
+
+    // Project list from options
+    final projects = optionsAsync.valueOrNull?.projects ?? [];
+    final canGenerate = formState.projectNombre.isNotEmpty;
 
     return Scaffold(
       appBar: AppBar(
@@ -263,7 +271,68 @@ class _NewPackageScreenState extends ConsumerState<NewPackageScreen> {
               ),
               const SizedBox(height: 16),
 
-              // Ticket
+              // Proyecto — must be the first field
+              if (projects.isEmpty) ...[
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: colorScheme.errorContainer,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.info_outline,
+                        size: 18,
+                        color: colorScheme.onErrorContainer,
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          'No hay proyectos configurados. ',
+                          style: TextStyle(
+                            color: colorScheme.onErrorContainer,
+                            fontSize: 13,
+                          ),
+                        ),
+                      ),
+                      TextButton(
+                        onPressed: () => context.go(
+                          '/catalogos/proyectos',
+                          extra: '/new-package',
+                        ),
+                        child: Text(
+                          'Configurar',
+                          style: TextStyle(color: colorScheme.onErrorContainer),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ] else ...[
+                DropdownButtonFormField<ProjectEntry>(
+                  decoration: const InputDecoration(
+                    labelText: 'Proyecto *',
+                    border: OutlineInputBorder(),
+                  ),
+                  value: projects
+                      .where((p) => p.id == formState.projectId)
+                      .firstOrNull,
+                  hint: const Text('Seleccioná un proyecto'),
+                  items: projects.map((p) {
+                    return DropdownMenuItem<ProjectEntry>(
+                      value: p,
+                      child: Text(p.name),
+                    );
+                  }).toList(),
+                  onChanged: (p) {
+                    if (p != null) {
+                      notifier.setProject(p.id, p.name);
+                    }
+                  },
+                ),
+              ],
+              const SizedBox(height: 16),
               TextFormField(
                 controller: _ticketCtrl,
                 decoration: const InputDecoration(
@@ -330,6 +399,7 @@ class _NewPackageScreenState extends ConsumerState<NewPackageScreen> {
               // Package Name Preview
               PackageNamePreview(
                 ticket: formState.ticket,
+                projectNombre: formState.projectNombre,
                 ambiente: formState.ambiente,
                 iteracion: formState.iteracion,
               ),
@@ -442,21 +512,21 @@ class _NewPackageScreenState extends ConsumerState<NewPackageScreen> {
                 height: 56,
                 child: ElevatedButton.icon(
                   key: const Key('generate_button'),
-                  onPressed: _generate,
-                  icon: const Icon(
+                  onPressed: canGenerate ? _generate : null,
+                  icon: Icon(
                     Icons.rocket_launch_outlined,
-                    color: Colors.white,
+                    color: canGenerate ? Colors.white : null,
                   ),
-                  label: const Text(
+                  label: Text(
                     'Generar Package',
                     style: TextStyle(
-                      color: Colors.white,
+                      color: canGenerate ? Colors.white : null,
                       fontSize: 16,
                       fontWeight: FontWeight.w700,
                     ),
                   ),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: colorScheme.primary,
+                    backgroundColor: canGenerate ? colorScheme.primary : null,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),

@@ -1,6 +1,6 @@
 # Architecture — MGG-Packify
 
-Portal Retail Skandia México — generador de packages de instalación.  
+Generador de paquetes de instalación para múltiples proyectos y ambientes.  
 Windows 11 desktop app: Flutter UI + Python FastAPI backend (proceso hijo).
 
 > **Source of truth**: [`PROMPT_V3.md`](PROMPT_V3.md) (755 lines — authoritative for all domain rules).  
@@ -308,10 +308,10 @@ Flutter sends `{ tipo, instancias: [InstanceIn] }`. The API expands each instanc
 ## Package Name Format
 
 ```text
-{ticket}-PortalRetail_{AMBIENTE}-{iteracion.zfill(2)}
+{ticket}-{ProjectName}_{AMBIENTE}-{iteracion.zfill(2)}
 ```
 
-Example: `INC-1234-PortalRetail_QA-03`
+Example: `INC-1234-MiProyecto_QA-03`
 
 - `AMBIENTE` is always uppercase (normalized in the API)
 - `iteracion` is zero-padded to 2 digits
@@ -323,7 +323,7 @@ Example: `INC-1234-PortalRetail_QA-03`
 
 ```text
 {ruta_packages}/
-└── {package_name}/                   ← e.g. INC-1234-PortalRetail_QA-03/
+└── {package_name}/                   ← e.g. INC-1234-MiProyecto_QA-03/
     ├── Manual/                        ← always created
     └── Componentes/
         ├── API/                       ← api_iis + api_docker + apim all map here

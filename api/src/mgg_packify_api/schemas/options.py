@@ -9,6 +9,13 @@ from typing import Optional
 from pydantic import BaseModel, Field
 
 
+class ProjectEntry(BaseModel):
+    """Entrada del catálogo de proyectos."""
+
+    id: str
+    name: str
+
+
 class ApiIisServiceEntry(BaseModel):
     """Entrada del catálogo de servicios API IIS."""
 
@@ -125,3 +132,4 @@ class OptionsSchema(BaseModel):
     api_docker_services: list[ApiDockerServiceEntry] = []
     sql_databases: list[str] = []
     doc_templates: DocTemplatesSchema = Field(default_factory=DocTemplatesSchema)
+    projects: list[ProjectEntry] = []
