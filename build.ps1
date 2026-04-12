@@ -1,7 +1,7 @@
 <#
 .SYNOPSIS
     MGG Packify full build pipeline.
-    Produces: installer/Output/MGGPackify-3.5.0-Setup.exe
+    Produces: installer/Output/MGGPackify-3.7.0-Setup.exe
 
 .PREREQUISITES
     - Flutter SDK on PATH
@@ -24,7 +24,7 @@ param(
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
-$Version = "3.5.0"
+$Version = "3.7.0"
 $RepoRoot = $PSScriptRoot
 $FlutterRelease = Join-Path $RepoRoot "app\build\windows\x64\runner\Release"
 $ApiDist = Join-Path $RepoRoot "api\dist"
