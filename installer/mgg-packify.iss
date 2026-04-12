@@ -30,6 +30,9 @@ WizardStyle=modern
 ArchitecturesInstallIn64BitMode=x64compatible
 UninstallDisplayName={#AppName}
 UninstallDisplayIcon={app}\{#AppExeName}
+CloseApplications=yes
+CloseApplicationsFilter=mgg_packify.exe,mgg-packify-api.exe
+RestartIfNeededByRun=no
 
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"

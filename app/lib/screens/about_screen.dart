@@ -1,7 +1,5 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:http/http.dart' as http;
 import 'package:url_launcher/url_launcher.dart';
 import '../core/constants.dart';
 import '../providers/update_check_provider.dart';
@@ -14,30 +12,7 @@ class AboutScreen extends ConsumerStatefulWidget {
 }
 
 class _AboutScreenState extends ConsumerState<AboutScreen> {
-  String _apiVersion = '...';
   bool _checkingUpdate = false;
-
-  @override
-  void initState() {
-    super.initState();
-    _loadApiVersion();
-  }
-
-  Future<void> _loadApiVersion() async {
-    try {
-      final response = await http
-          .get(Uri.parse('$kBaseUrl/health'))
-          .timeout(const Duration(seconds: 5));
-      if (response.statusCode == 200) {
-        final json = jsonDecode(response.body) as Map<String, dynamic>;
-        setState(() => _apiVersion = json['version'] as String? ?? 'N/A');
-      } else {
-        setState(() => _apiVersion = 'N/A');
-      }
-    } catch (_) {
-      setState(() => _apiVersion = 'N/A');
-    }
-  }
 
   Future<void> _checkUpdates() async {
     setState(() => _checkingUpdate = true);
@@ -122,12 +97,6 @@ class _AboutScreenState extends ConsumerState<AboutScreen> {
                       icon: Icons.phone_android_outlined,
                       label: 'Versión app',
                       value: kAppVersion,
-                    ),
-                    const SizedBox(height: 8),
-                    _InfoRow(
-                      icon: Icons.api_outlined,
-                      label: 'Versión API',
-                      value: _apiVersion,
                     ),
                     const SizedBox(height: 24),
                     const Divider(),

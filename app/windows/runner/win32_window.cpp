@@ -144,6 +144,16 @@ bool Win32Window::Create(const std::wstring& title,
     return false;
   }
 
+  // Set small icon used by the Windows taskbar.
+  HICON small_icon = static_cast<HICON>(LoadImage(
+      GetModuleHandle(nullptr), MAKEINTRESOURCE(IDI_APP_ICON),
+      IMAGE_ICON, GetSystemMetrics(SM_CXSMICON),
+      GetSystemMetrics(SM_CYSMICON), LR_DEFAULTCOLOR));
+  if (small_icon) {
+    SendMessage(window, WM_SETICON, ICON_SMALL,
+                reinterpret_cast<LPARAM>(small_icon));
+  }
+
   UpdateTheme(window);
 
   return OnCreate();

@@ -9,7 +9,7 @@ import '../providers/server_status_provider.dart';
 class SplashScreen extends ConsumerStatefulWidget {
   const SplashScreen({
     super.key,
-    this.minDisplayDuration = const Duration(milliseconds: 1500),
+    this.minDisplayDuration = const Duration(milliseconds: 5000),
   });
 
   /// Minimum time the splash is shown before navigating to /dashboard.
@@ -99,8 +99,8 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
                       Theme.of(context).brightness == Brightness.dark;
                   Widget img = Image.asset(
                     'assets/branding/logo-full.png',
-                    width: 96,
-                    height: 96,
+                    width: 400,
+                    height: 450,
                     fit: BoxFit.contain,
                     errorBuilder: (_, __, ___) => Icon(
                       Icons.inventory_2,
@@ -120,14 +120,14 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
                   return img;
                 },
               ),
-              const SizedBox(height: 24),
+              const SizedBox(height: 4),
               Text(
                 'MGG-Packify',
                 style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                   fontWeight: FontWeight.w800,
                 ),
               ),
-              const SizedBox(height: 40),
+              const SizedBox(height: 10),
               if (status == ServerStatus.starting) ...[
                 CircularProgressIndicator(
                   color: Theme.of(context).colorScheme.primary,
