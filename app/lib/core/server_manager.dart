@@ -146,16 +146,20 @@ class ServerManager {
   }
 
   Future<void> stop() async {
-    if (_process != null) {
-      debugPrint('[ServerManager] Stopping server (pid: ${_process?.pid})');
-      _process!.kill();
-      try {
-        await _process!.exitCode.timeout(const Duration(seconds: 3));
-      } catch (_) {
-        // Timeout waiting for exit — process will be orphaned but we tried
-      }
-      _process = null;
+    if (_process == null) return;
+    final pid = _process!.pid;
+    AppLogger.i('[ServerManager] Stopping server (pid: $pid)');
+    if (Platform.isWindows) {
+      await Process.run('taskkill', ['/F', '/PID', '$pid']);
+    } else {
+      _process!.kill(ProcessSignal.sigkill);
     }
+    try {
+      await _process!.exitCode.timeout(const Duration(seconds: 3));
+    } catch (_) {
+      AppLogger.w('[ServerManager] Process did not exit within timeout');
+    }
+    _process = null;
   }
 }
 

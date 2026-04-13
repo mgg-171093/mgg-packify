@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:local_notifier/local_notifier.dart';
@@ -52,11 +54,9 @@ class _AppWithLifecycleState extends State<_AppWithLifecycle>
   }
 
   @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    if (state == AppLifecycleState.detached) {
-      // Kill the child process when the app is closing
-      widget.serverManager.stop();
-    }
+  Future<AppExitResponse> didRequestAppExit() async {
+    await widget.serverManager.stop();
+    return AppExitResponse.exit;
   }
 
   @override

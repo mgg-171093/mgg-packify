@@ -1,5 +1,5 @@
 {
-  "version": "3.9.1",
-  "url": "https://github.com/mgg-171093/mgg-packify/releases/download/v3.9.1-stable/MGGPackify-3.9.1-Setup.exe",
-  "release_notes": "Fix: el proceso Python ahora se cierra correctamente antes de instalar la actualización, evitando errores de 'Acceso denegado' durante el instalador."
+  "version": "3.9.2",
+  "url": "https://github.com/mgg-171093/mgg-packify/releases/download/v3.9.2-stable/MGGPackify-3.9.2-Setup.exe",
+  "release_notes": "Fix: ícono de barra de tareas y Alt+Tab ahora muestra el logo correcto de MGG Packify. Fix: el proceso Python se cierra correctamente al cerrar la app."
 }
