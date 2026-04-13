@@ -154,6 +154,16 @@ bool Win32Window::Create(const std::wstring& title,
                 reinterpret_cast<LPARAM>(small_icon));
   }
 
+  // Set big icon used by the taskbar and Alt+Tab switcher.
+  HICON big_icon = static_cast<HICON>(LoadImage(
+      GetModuleHandle(nullptr), MAKEINTRESOURCE(IDI_APP_ICON),
+      IMAGE_ICON, GetSystemMetrics(SM_CXICON),
+      GetSystemMetrics(SM_CYICON), LR_DEFAULTCOLOR));
+  if (big_icon) {
+    SendMessage(window, WM_SETICON, ICON_BIG,
+                reinterpret_cast<LPARAM>(big_icon));
+  }
+
   UpdateTheme(window);
 
   return OnCreate();
