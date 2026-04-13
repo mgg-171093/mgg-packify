@@ -6,7 +6,7 @@ from pathlib import Path
 
 from PIL import Image
 
-SOURCE = Path("app/assets/logo-mgg.png")
+SOURCE = Path("app/assets/branding/logo-mgg-packify-base-deep-orange-500.png")
 OUTPUT = Path("app/windows/runner/resources/app_icon.ico")
 SIZES = [(16, 16), (32, 32), (48, 48), (256, 256)]
 
