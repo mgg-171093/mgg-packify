@@ -56,6 +56,10 @@ TEST_*.docx
 api/build-pyinstaller/
 api/dist/
 
+# ===== Build artifacts =====
+staging/
+installer/Output/
+
 # ===== Misc =====
 *.log
 *.swp

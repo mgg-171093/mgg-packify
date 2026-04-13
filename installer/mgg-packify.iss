@@ -3,7 +3,7 @@
 ; Run: ISCC installer\mgg-packify.iss
 
 #define AppName "MGG Packify"
-#define AppVersion "3.9.1"
+#define AppVersion "3.9.2"
 #define AppPublisher "Manuel García González"
 #define AppURL "https://github.com/mgg-171093/mgg-packify"
 #define AppExeName "mgg_packify.exe"
