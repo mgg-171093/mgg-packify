@@ -1,5 +1,5 @@
 {
-  "version": "3.9.2",
-  "url": "https://github.com/mgg-171093/mgg-packify/releases/download/v3.9.2-stable/MGGPackify-3.9.2-Setup.exe",
-  "release_notes": "Fix: ícono de barra de tareas y Alt+Tab ahora muestra el logo correcto de MGG Packify. Fix: el proceso Python se cierra correctamente al cerrar la app."
+  "version": "3.9.3",
+  "url": "https://github.com/mgg-171093/mgg-packify/releases/download/v3.9.3-stable/MGGPackify-3.9.3-Setup.exe",
+  "release_notes": "Fix: la app vuelve a abrirse automáticamente después de completar una actualización."
 }
