@@ -120,13 +120,6 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
                   return img;
                 },
               ),
-              const SizedBox(height: 4),
-              Text(
-                'MGG-Packify',
-                style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                  fontWeight: FontWeight.w800,
-                ),
-              ),
               const SizedBox(height: 10),
               if (status == ServerStatus.starting) ...[
                 CircularProgressIndicator(
