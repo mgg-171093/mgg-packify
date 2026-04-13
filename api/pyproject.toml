@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "mgg-packify-api"
-version = "3.9.3"
+version = "3.9.4"
 description = "MGG-Packify API — FastAPI backend for package generation"
 requires-python = ">=3.12"
 dependencies = [

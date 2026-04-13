@@ -1,5 +1,5 @@
 {
-  "version": "3.9.3",
-  "url": "https://github.com/mgg-171093/mgg-packify/releases/download/v3.9.3-stable/MGGPackify-3.9.3-Setup.exe",
-  "release_notes": "Fix: la app vuelve a abrirse automáticamente después de completar una actualización."
+  "version": "3.9.4",
+  "url": "https://github.com/mgg-171093/mgg-packify/releases/download/v3.9.4-stable/MGGPackify-3.9.4-Setup.exe",
+  "release_notes": "UI: se ajustó el splash screen para quitar el texto redundante debajo del logo."
 }
