@@ -2,6 +2,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../../core/theme/theme_extensions.dart';
 import '../../models/options_model.dart';
 import '../../providers/options_provider.dart';
 
@@ -173,9 +174,43 @@ class _ServiciosScreenState extends ConsumerState<ServiciosScreen>
 
   // ── Build ───────────────────────────────────
 
+  InputDecoration _fieldDecoration({
+    required String hint,
+    String? label,
+    String? helper,
+  }) {
+    return InputDecoration(
+      labelText: label,
+      hintText: hint,
+      helperText: helper,
+      border: const OutlineInputBorder(),
+      isDense: true,
+      contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+    );
+  }
+
+  Widget _textEntryField({
+    required TextEditingController controller,
+    required InputDecoration decoration,
+    ValueChanged<String>? onSubmitted,
+    bool autofocus = false,
+  }) {
+    return MouseRegion(
+      cursor: SystemMouseCursors.text,
+      child: TextField(
+        controller: controller,
+        decoration: decoration,
+        onSubmitted: onSubmitted,
+        autofocus: autofocus,
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final optionsAsync = ref.watch(optionsProvider);
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
 
     return Scaffold(
       appBar: AppBar(
@@ -187,6 +222,14 @@ class _ServiciosScreenState extends ConsumerState<ServiciosScreen>
         title: const Text('Servicios API'),
         bottom: TabBar(
           controller: _tabController,
+          indicatorColor: colorScheme.primary,
+          indicatorWeight: 3,
+          labelColor: colorScheme.primary,
+          unselectedLabelColor: colorScheme.onSurfaceVariant,
+          labelStyle: theme.textTheme.labelLarge?.copyWith(
+            fontWeight: FontWeight.w700,
+          ),
+          unselectedLabelStyle: theme.textTheme.labelLarge,
           tabs: const [
             Tab(text: 'IIS'),
             Tab(text: 'Docker'),
@@ -207,6 +250,17 @@ class _ServiciosScreenState extends ConsumerState<ServiciosScreen>
   // ── IIS Tab ─────────────────────────────────
 
   Widget _buildIisTab(OptionsModel options) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final effects =
+        theme.extension<PremiumEffects>() ??
+        const PremiumEffects(
+          hoverDuration: Duration(milliseconds: 150),
+          focusRingWidth: 2,
+          actionCursor: SystemMouseCursors.click,
+          standardCurve: Curves.easeInOut,
+        );
+
     return SingleChildScrollView(
       padding: const EdgeInsets.all(24),
       child: Column(
@@ -224,9 +278,8 @@ class _ServiciosScreenState extends ConsumerState<ServiciosScreen>
               padding: const EdgeInsets.symmetric(vertical: 4),
               child: Text(
                 'Sin servicios',
-                style: TextStyle(
-                  color: Colors.grey.shade500,
-                  fontSize: 13,
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: colorScheme.onSurfaceVariant,
                   fontStyle: FontStyle.italic,
                 ),
               ),
@@ -243,47 +296,42 @@ class _ServiciosScreenState extends ConsumerState<ServiciosScreen>
                   return Row(
                     children: [
                       Expanded(
-                        child: TextField(
-                          controller: _iisEditNombreCtrl,
-                          decoration: const InputDecoration(
-                            hintText: 'Nombre...',
-                            border: OutlineInputBorder(),
-                            isDense: true,
-                            contentPadding: EdgeInsets.symmetric(
-                              horizontal: 12,
-                              vertical: 10,
-                            ),
+                        child: _textEntryField(
+                          controller: _iisEditNombreCtrl!,
+                          decoration: _fieldDecoration(
+                            label: 'Servicio',
+                            hint: 'Nombre...',
+                            helper: 'Editá y confirmá para guardar',
                           ),
                         ),
                       ),
                       const SizedBox(width: 8),
                       Expanded(
-                        child: TextField(
-                          controller: _iisEditRutaCtrl,
-                          decoration: const InputDecoration(
-                            hintText: 'Ruta...',
-                            border: OutlineInputBorder(),
-                            isDense: true,
-                            contentPadding: EdgeInsets.symmetric(
-                              horizontal: 12,
-                              vertical: 10,
-                            ),
+                        child: _textEntryField(
+                          controller: _iisEditRutaCtrl!,
+                          decoration: _fieldDecoration(
+                            label: 'Ruta .csproj',
+                            hint: 'Ruta...',
+                            helper: 'Podés pegar la ruta o buscar archivo',
                           ),
                         ),
                       ),
                       IconButton(
                         icon: const Icon(Icons.folder_open_outlined),
                         tooltip: 'Seleccionar .csproj',
+                        mouseCursor: effects.actionCursor,
                         onPressed: () => _pickIisRuta(_iisEditRutaCtrl!),
                       ),
                       IconButton(
-                        icon: const Icon(Icons.check, color: Colors.green),
+                        icon: Icon(Icons.check, color: colorScheme.primary),
                         tooltip: 'Confirmar',
+                        mouseCursor: effects.actionCursor,
                         onPressed: () => _confirmIisEdit(options),
                       ),
                       IconButton(
-                        icon: const Icon(Icons.close, color: Colors.red),
+                        icon: Icon(Icons.close, color: colorScheme.error),
                         tooltip: 'Cancelar',
+                        mouseCursor: effects.actionCursor,
                         onPressed: _cancelIisEdit,
                       ),
                     ],
@@ -305,9 +353,8 @@ class _ServiciosScreenState extends ConsumerState<ServiciosScreen>
                           if (entry.ruta.isNotEmpty)
                             Text(
                               entry.ruta,
-                              style: TextStyle(
-                                fontSize: 12,
-                                color: Colors.grey.shade600,
+                              style: theme.textTheme.bodySmall?.copyWith(
+                                color: colorScheme.onSurfaceVariant,
                               ),
                             ),
                         ],
@@ -316,12 +363,14 @@ class _ServiciosScreenState extends ConsumerState<ServiciosScreen>
                     IconButton(
                       icon: const Icon(Icons.edit_outlined, size: 18),
                       tooltip: 'Editar',
+                      mouseCursor: effects.actionCursor,
                       onPressed: () => _startIisEdit(index, entry),
                     ),
                     IconButton(
                       icon: const Icon(Icons.delete_outlined, size: 18),
-                      color: Colors.red.shade400,
+                      color: colorScheme.error,
                       tooltip: 'Eliminar',
+                      mouseCursor: effects.actionCursor,
                       onPressed: () {
                         final newList = List<ApiIisServiceEntry>.from(
                           options.apiIisServices,
@@ -338,32 +387,24 @@ class _ServiciosScreenState extends ConsumerState<ServiciosScreen>
           Row(
             children: [
               Expanded(
-                child: TextField(
+                child: _textEntryField(
                   controller: _iisNombreCtrl,
-                  decoration: const InputDecoration(
-                    hintText: 'Nombre...',
-                    border: OutlineInputBorder(),
-                    isDense: true,
-                    contentPadding: EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 10,
-                    ),
+                  decoration: _fieldDecoration(
+                    label: 'Servicio',
+                    hint: 'Nombre...',
+                    helper: 'Campo requerido',
                   ),
                   onSubmitted: (_) => _addIisEntry(options),
                 ),
               ),
               const SizedBox(width: 8),
               Expanded(
-                child: TextField(
+                child: _textEntryField(
                   controller: _iisRutaCtrl,
-                  decoration: const InputDecoration(
-                    hintText: 'Ruta...',
-                    border: OutlineInputBorder(),
-                    isDense: true,
-                    contentPadding: EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 10,
-                    ),
+                  decoration: _fieldDecoration(
+                    label: 'Ruta .csproj',
+                    hint: 'Ruta...',
+                    helper: 'Opcional',
                   ),
                   onSubmitted: (_) => _addIisEntry(options),
                 ),
@@ -372,6 +413,7 @@ class _ServiciosScreenState extends ConsumerState<ServiciosScreen>
               IconButton(
                 icon: const Icon(Icons.folder_open_outlined),
                 tooltip: 'Seleccionar .csproj',
+                mouseCursor: effects.actionCursor,
                 onPressed: () => _pickIisRuta(_iisRutaCtrl),
               ),
               const SizedBox(width: 4),
@@ -379,10 +421,7 @@ class _ServiciosScreenState extends ConsumerState<ServiciosScreen>
                 onPressed: () => _addIisEntry(options),
                 icon: const Icon(Icons.add),
                 tooltip: 'Agregar',
-                style: IconButton.styleFrom(
-                  backgroundColor: null,
-                  foregroundColor: Colors.white,
-                ),
+                mouseCursor: effects.actionCursor,
               ),
             ],
           ),
@@ -394,6 +433,17 @@ class _ServiciosScreenState extends ConsumerState<ServiciosScreen>
   // ── Docker Tab ───────────────────────────────
 
   Widget _buildDockerTab(OptionsModel options) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final effects =
+        theme.extension<PremiumEffects>() ??
+        const PremiumEffects(
+          hoverDuration: Duration(milliseconds: 150),
+          focusRingWidth: 2,
+          actionCursor: SystemMouseCursors.click,
+          standardCurve: Curves.easeInOut,
+        );
+
     return SingleChildScrollView(
       padding: const EdgeInsets.all(24),
       child: Column(
@@ -411,9 +461,8 @@ class _ServiciosScreenState extends ConsumerState<ServiciosScreen>
               padding: const EdgeInsets.symmetric(vertical: 4),
               child: Text(
                 'Sin servicios',
-                style: TextStyle(
-                  color: Colors.grey.shade500,
-                  fontSize: 13,
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: colorScheme.onSurfaceVariant,
                   fontStyle: FontStyle.italic,
                 ),
               ),
@@ -430,27 +479,25 @@ class _ServiciosScreenState extends ConsumerState<ServiciosScreen>
                   return Row(
                     children: [
                       Expanded(
-                        child: TextField(
-                          controller: _dockerEditNombreCtrl,
-                          decoration: const InputDecoration(
-                            hintText: 'Nombre...',
-                            border: OutlineInputBorder(),
-                            isDense: true,
-                            contentPadding: EdgeInsets.symmetric(
-                              horizontal: 12,
-                              vertical: 10,
-                            ),
+                        child: _textEntryField(
+                          controller: _dockerEditNombreCtrl!,
+                          decoration: _fieldDecoration(
+                            label: 'Servicio',
+                            hint: 'Nombre...',
+                            helper: 'Editá y confirmá para guardar',
                           ),
                         ),
                       ),
                       IconButton(
-                        icon: const Icon(Icons.check, color: Colors.green),
+                        icon: Icon(Icons.check, color: colorScheme.primary),
                         tooltip: 'Confirmar',
+                        mouseCursor: effects.actionCursor,
                         onPressed: () => _confirmDockerEdit(options),
                       ),
                       IconButton(
-                        icon: const Icon(Icons.close, color: Colors.red),
+                        icon: Icon(Icons.close, color: colorScheme.error),
                         tooltip: 'Cancelar',
+                        mouseCursor: effects.actionCursor,
                         onPressed: _cancelDockerEdit,
                       ),
                     ],
@@ -467,12 +514,14 @@ class _ServiciosScreenState extends ConsumerState<ServiciosScreen>
                     IconButton(
                       icon: const Icon(Icons.edit_outlined, size: 18),
                       tooltip: 'Editar',
+                      mouseCursor: effects.actionCursor,
                       onPressed: () => _startDockerEdit(index, entry),
                     ),
                     IconButton(
                       icon: const Icon(Icons.delete_outlined, size: 18),
-                      color: Colors.red.shade400,
+                      color: colorScheme.error,
                       tooltip: 'Eliminar',
+                      mouseCursor: effects.actionCursor,
                       onPressed: () {
                         final newList = List<ApiDockerServiceEntry>.from(
                           options.apiDockerServices,
@@ -490,16 +539,12 @@ class _ServiciosScreenState extends ConsumerState<ServiciosScreen>
           Row(
             children: [
               Expanded(
-                child: TextField(
+                child: _textEntryField(
                   controller: _dockerNombreCtrl,
-                  decoration: const InputDecoration(
-                    hintText: 'Nueva opción...',
-                    border: OutlineInputBorder(),
-                    isDense: true,
-                    contentPadding: EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 10,
-                    ),
+                  decoration: _fieldDecoration(
+                    label: 'Servicio',
+                    hint: 'Nueva opción...',
+                    helper: 'Campo requerido',
                   ),
                   onSubmitted: (_) => _addDockerEntry(options),
                 ),
@@ -509,10 +554,7 @@ class _ServiciosScreenState extends ConsumerState<ServiciosScreen>
                 onPressed: () => _addDockerEntry(options),
                 icon: const Icon(Icons.add),
                 tooltip: 'Agregar',
-                style: IconButton.styleFrom(
-                  backgroundColor: null,
-                  foregroundColor: Colors.white,
-                ),
+                mouseCursor: effects.actionCursor,
               ),
             ],
           ),

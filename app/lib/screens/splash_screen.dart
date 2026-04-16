@@ -84,8 +84,11 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
   @override
   Widget build(BuildContext context) {
     final status = ref.watch(serverStatusProvider);
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: colorScheme.surface,
       body: Center(
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 400),
@@ -128,18 +131,18 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
                 const SizedBox(height: 16),
                 Text(
                   'Iniciando servidor...',
-                  style: Theme.of(
-                    context,
-                  ).textTheme.bodyMedium?.copyWith(color: Colors.grey.shade600),
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: colorScheme.onSurfaceVariant,
+                  ),
                 ),
               ],
               if (status == ServerStatus.error) ...[
-                const Icon(Icons.error_outline, color: Colors.red, size: 48),
+                Icon(Icons.error_outline, color: colorScheme.error, size: 48),
                 const SizedBox(height: 12),
                 Text(
                   'No se pudo iniciar el servidor',
-                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                    color: Colors.red.shade700,
+                  style: theme.textTheme.bodyLarge?.copyWith(
+                    color: colorScheme.error,
                     fontWeight: FontWeight.w600,
                   ),
                 ),

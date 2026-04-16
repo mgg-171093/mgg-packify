@@ -68,16 +68,13 @@ class HistoryScreen extends ConsumerWidget {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(
-                    Icons.history,
-                    size: 64,
-                    color: colorScheme.outlineVariant,
-                  ),
+                  Icon(Icons.history, size: 72, color: colorScheme.primary),
                   const SizedBox(height: 16),
                   Text(
                     'No hay packages generados aún',
-                    style: theme.textTheme.bodyLarge?.copyWith(
+                    style: theme.textTheme.titleMedium?.copyWith(
                       color: colorScheme.onSurfaceVariant,
+                      fontWeight: FontWeight.w600,
                     ),
                   ),
                   const SizedBox(height: 4),

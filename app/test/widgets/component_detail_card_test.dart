@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mgg_packify/core/api_client.dart';
+import 'package:mgg_packify/core/theme/app_theme.dart';
+import 'package:mgg_packify/core/theme/theme_extensions.dart';
 import 'package:mgg_packify/models/component_config.dart';
 import 'package:mgg_packify/models/options_model.dart';
 import 'package:mgg_packify/providers/options_provider.dart';
@@ -44,6 +46,7 @@ Widget _buildCard({
   return ProviderScope(
     overrides: [apiClientProvider.overrideWithValue(_StubApiClient(opts))],
     child: MaterialApp(
+      theme: appTheme(Brightness.light),
       home: Scaffold(
         body: SingleChildScrollView(
           child: ComponentDetailCard(
@@ -109,7 +112,10 @@ Widget _buildCardWithRouter({
 
   return ProviderScope(
     overrides: [apiClientProvider.overrideWithValue(_StubApiClient(opts))],
-    child: MaterialApp.router(routerConfig: router),
+    child: MaterialApp.router(
+      theme: appTheme(Brightness.light),
+      routerConfig: router,
+    ),
   );
 }
 
@@ -278,6 +284,52 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text(ComponentType.sql.label), findsOneWidget);
+    });
+
+    testWidgets('card uses SurfaceTokens.cardElevated for surface color', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        _buildCard(
+          type: ComponentType.sql,
+          instances: [const ComponentInstanceState(scripts: [])],
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      final card = tester.widget<Card>(find.byType(Card).first);
+      final context = tester.element(find.byType(ComponentDetailCard));
+      final theme = Theme.of(context);
+      final surfaces =
+          theme.extension<SurfaceTokens>() ??
+          SurfaceTokens.fromColorScheme(theme.colorScheme);
+
+      expect(card.color, equals(surfaces.cardElevated));
+    });
+
+    testWidgets('header tap collapses and re-expands body', (tester) async {
+      await tester.pumpWidget(
+        _buildCard(
+          type: ComponentType.sql,
+          instances: [
+            const ComponentInstanceState(scripts: ['a.sql']),
+          ],
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      AnimatedRotation rotation = tester.widget(find.byType(AnimatedRotation));
+      expect(rotation.turns, 0);
+
+      await tester.tap(find.text(ComponentType.sql.label));
+      await tester.pump(const Duration(milliseconds: 300));
+      rotation = tester.widget(find.byType(AnimatedRotation));
+      expect(rotation.turns, -0.25);
+
+      await tester.tap(find.text(ComponentType.sql.label));
+      await tester.pump(const Duration(milliseconds: 300));
+      rotation = tester.widget(find.byType(AnimatedRotation));
+      expect(rotation.turns, 0);
     });
 
     // ── image-picker IconButton (Task 4.2) ────────

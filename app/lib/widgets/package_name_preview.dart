@@ -68,9 +68,11 @@ class PackageNamePreview extends StatelessWidget {
               onPressed: () {
                 Clipboard.setData(ClipboardData(text: name));
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
+                  SnackBar(
                     content: Text('Nombre copiado'),
                     duration: Duration(seconds: 2),
+                    behavior: SnackBarBehavior.floating,
+                    backgroundColor: colorScheme.primaryContainer,
                   ),
                 );
               },

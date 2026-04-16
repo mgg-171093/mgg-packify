@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../core/constants.dart';
+import '../core/theme/theme_extensions.dart';
 import '../core/server_manager.dart';
 import '../providers/server_status_provider.dart';
 
@@ -137,6 +138,16 @@ class _AppSidebar extends ConsumerWidget {
     final serverStatus = ref.watch(serverStatusProvider);
     final isHealthy = serverStatus == ServerStatus.ready;
 
+    Widget navItem(int index) {
+      return _SidebarItem(
+        itemIndex: index,
+        icon: _destinations[index].icon,
+        label: _destinations[index].label,
+        selected: selectedIndex == index,
+        onTap: () => onDestinationSelected(index),
+      );
+    }
+
     return SizedBox(
       width: 220,
       child: Material(
@@ -207,112 +218,38 @@ class _AppSidebar extends ConsumerWidget {
             ],
             const Divider(height: 1),
             // ── Main group ────────────────────
-            _SidebarItem(
-              icon: _destinations[0].icon,
-              label: _destinations[0].label,
-              selected: selectedIndex == 0,
-              onTap: () => onDestinationSelected(0),
-            ),
-            _SidebarItem(
-              icon: _destinations[1].icon,
-              label: _destinations[1].label,
-              selected: selectedIndex == 1,
-              onTap: () => onDestinationSelected(1),
-            ),
-            _SidebarItem(
-              icon: _destinations[2].icon,
-              label: _destinations[2].label,
-              selected: selectedIndex == 2,
-              onTap: () => onDestinationSelected(2),
-            ),
-            _SidebarItem(
-              icon: _destinations[3].icon,
-              label: _destinations[3].label,
-              selected: selectedIndex == 3,
-              onTap: () => onDestinationSelected(3),
-            ),
-            _SidebarItem(
-              icon: _destinations[4].icon,
-              label: _destinations[4].label,
-              selected: selectedIndex == 4,
-              onTap: () => onDestinationSelected(4),
-            ),
+            navItem(0),
+            navItem(1),
+            navItem(2),
+            navItem(3),
+            navItem(4),
             const Divider(height: 1),
             // ── Catálogos header ────────────────
             Padding(
               padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
               child: Text(
                 'CATÁLOGOS',
-                style: theme.textTheme.labelSmall?.copyWith(
-                  color: colorScheme.onSurfaceVariant,
-                  letterSpacing: 1.1,
+                style: theme.textTheme.labelMedium?.copyWith(
+                  color: colorScheme.primary,
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: 1.2,
                 ),
               ),
             ),
-            _SidebarItem(
-              icon: _destinations[5].icon,
-              label: _destinations[5].label,
-              selected: selectedIndex == 5,
-              onTap: () => onDestinationSelected(5),
-            ),
-            _SidebarItem(
-              icon: _destinations[6].icon,
-              label: _destinations[6].label,
-              selected: selectedIndex == 6,
-              onTap: () => onDestinationSelected(6),
-            ),
-            _SidebarItem(
-              icon: _destinations[7].icon,
-              label: _destinations[7].label,
-              selected: selectedIndex == 7,
-              onTap: () => onDestinationSelected(7),
-            ),
-            _SidebarItem(
-              icon: _destinations[8].icon,
-              label: _destinations[8].label,
-              selected: selectedIndex == 8,
-              onTap: () => onDestinationSelected(8),
-            ),
-            _SidebarItem(
-              icon: _destinations[9].icon,
-              label: _destinations[9].label,
-              selected: selectedIndex == 9,
-              onTap: () => onDestinationSelected(9),
-            ),
-            _SidebarItem(
-              icon: _destinations[10].icon,
-              label: _destinations[10].label,
-              selected: selectedIndex == 10,
-              onTap: () => onDestinationSelected(10),
-            ),
-            _SidebarItem(
-              icon: _destinations[11].icon,
-              label: _destinations[11].label,
-              selected: selectedIndex == 11,
-              onTap: () => onDestinationSelected(11),
-            ),
+            navItem(5),
+            navItem(6),
+            navItem(7),
+            navItem(8),
+            navItem(9),
+            navItem(10),
+            navItem(11),
             const Divider(height: 1),
             // ── Sistema ──────────────────────
-            _SidebarItem(
-              icon: _destinations[12].icon,
-              label: _destinations[12].label,
-              selected: selectedIndex == 12,
-              onTap: () => onDestinationSelected(12),
-            ),
+            navItem(12),
             const Divider(height: 1),
             // ── Sistema / herramientas ────────
-            _SidebarItem(
-              icon: _destinations[13].icon,
-              label: _destinations[13].label,
-              selected: selectedIndex == 13,
-              onTap: () => onDestinationSelected(13),
-            ),
-            _SidebarItem(
-              icon: _destinations[14].icon,
-              label: _destinations[14].label,
-              selected: selectedIndex == 14,
-              onTap: () => onDestinationSelected(14),
-            ),
+            navItem(13),
+            navItem(14),
             // ── Spacer + version footer ───────
             const Spacer(),
             Padding(
@@ -332,13 +269,16 @@ class _AppSidebar extends ConsumerWidget {
 }
 
 /// A single sidebar navigation item.
-class _SidebarItem extends StatelessWidget {
+class _SidebarItem extends StatefulWidget {
   const _SidebarItem({
+    required this.itemIndex,
     required this.icon,
     required this.label,
     required this.selected,
     required this.onTap,
   });
+
+  final int itemIndex;
 
   final IconData icon;
   final String label;
@@ -346,28 +286,108 @@ class _SidebarItem extends StatelessWidget {
   final VoidCallback onTap;
 
   @override
+  State<_SidebarItem> createState() => _SidebarItemState();
+}
+
+class _SidebarItemState extends State<_SidebarItem> {
+  bool _isHovered = false;
+  bool _isFocused = false;
+
+  @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-    return ListTile(
-      dense: true,
-      leading: Icon(
-        icon,
-        color: selected ? colorScheme.primary : colorScheme.onSurfaceVariant,
-        size: 20,
-      ),
-      title: Text(
-        label,
-        style: TextStyle(
-          fontSize: 13,
-          fontWeight: selected ? FontWeight.w600 : FontWeight.normal,
-          color: selected ? colorScheme.primary : colorScheme.onSurface,
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final effects =
+        theme.extension<PremiumEffects>() ??
+        const PremiumEffects(
+          hoverDuration: Duration(milliseconds: 150),
+          focusRingWidth: 2,
+          actionCursor: SystemMouseCursors.click,
+          standardCurve: Curves.easeInOut,
+        );
+    final surfaceTokens =
+        theme.extension<SurfaceTokens>() ??
+        SurfaceTokens.fromColorScheme(colorScheme);
+
+    final tileColor = widget.selected
+        ? surfaceTokens.sidebarActive
+        : _isHovered
+        ? colorScheme.surfaceContainerHighest.withAlpha(153)
+        : Colors.transparent;
+
+    final titleStyle = theme.textTheme.labelLarge?.copyWith(
+      fontWeight: widget.selected ? FontWeight.w700 : FontWeight.w500,
+      color: widget.selected ? colorScheme.primary : colorScheme.onSurface,
+    );
+
+    final marker = widget.selected
+        ? Container(
+            key: Key('sidebar-active-marker-${widget.itemIndex}'),
+            width: 4,
+            height: 28,
+            decoration: BoxDecoration(
+              color: colorScheme.primary,
+              borderRadius: BorderRadius.circular(999),
+            ),
+          )
+        : const SizedBox(width: 4);
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+      child: InkWell(
+        key: Key('sidebar-item-${widget.itemIndex}-inkwell'),
+        onTap: widget.onTap,
+        mouseCursor: effects.actionCursor,
+        onHover: (hovering) {
+          if (_isHovered != hovering) {
+            setState(() => _isHovered = hovering);
+          }
+        },
+        onFocusChange: (focused) {
+          if (_isFocused != focused) {
+            setState(() => _isFocused = focused);
+          }
+        },
+        borderRadius: BorderRadius.circular(10),
+        child: AnimatedContainer(
+          key: Key('sidebar-item-${widget.itemIndex}-container'),
+          duration: effects.hoverDuration,
+          curve: effects.standardCurve,
+          decoration: BoxDecoration(
+            color: tileColor,
+            borderRadius: BorderRadius.circular(10),
+            border: _isFocused
+                ? Border.all(
+                    color: colorScheme.primary,
+                    width: effects.focusRingWidth,
+                  )
+                : null,
+          ),
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
+          child: Row(
+            children: [
+              marker,
+              const SizedBox(width: 10),
+              Icon(
+                widget.icon,
+                color: widget.selected
+                    ? colorScheme.primary
+                    : colorScheme.onSurfaceVariant,
+                size: 20,
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Text(
+                  widget.label,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: titleStyle,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
-      selected: selected,
-      selectedTileColor: colorScheme.primaryContainer.withAlpha(128),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-      contentPadding: const EdgeInsets.symmetric(horizontal: 12),
-      onTap: onTap,
     );
   }
 }

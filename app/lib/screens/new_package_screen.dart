@@ -313,6 +313,7 @@ class _NewPackageScreenState extends ConsumerState<NewPackageScreen> {
                 DropdownButtonFormField<ProjectEntry>(
                   decoration: const InputDecoration(
                     labelText: 'Proyecto *',
+                    helperText: 'Obligatorio',
                     border: OutlineInputBorder(),
                   ),
                   value: projects
@@ -338,6 +339,7 @@ class _NewPackageScreenState extends ConsumerState<NewPackageScreen> {
                 decoration: const InputDecoration(
                   labelText: 'Ticket *',
                   hintText: 'MX01-274906',
+                  helperText: 'Obligatorio',
                   border: OutlineInputBorder(),
                 ),
                 validator: (v) => (v == null || v.trim().isEmpty)
@@ -353,6 +355,7 @@ class _NewPackageScreenState extends ConsumerState<NewPackageScreen> {
                 decoration: const InputDecoration(
                   labelText: 'Nombre HU / Fix / Spike',
                   hintText: 'Mejora login portal',
+                  helperText: 'Opcional',
                   border: OutlineInputBorder(),
                 ),
                 onChanged: notifier.updateHuNombre,
@@ -368,6 +371,7 @@ class _NewPackageScreenState extends ConsumerState<NewPackageScreen> {
                   ),
                   const SizedBox(width: 16),
                   SegmentedButton<String>(
+                    style: ButtonStyle(visualDensity: VisualDensity.compact),
                     segments: const [
                       ButtonSegment(value: 'QA', label: Text('QA')),
                       ButtonSegment(value: 'PROD', label: Text('PROD')),
@@ -387,6 +391,7 @@ class _NewPackageScreenState extends ConsumerState<NewPackageScreen> {
                 decoration: const InputDecoration(
                   labelText: 'Iteración *',
                   hintText: '01',
+                  helperText: 'Obligatorio',
                   border: OutlineInputBorder(),
                 ),
                 validator: (v) => (v == null || v.trim().isEmpty)
@@ -415,6 +420,7 @@ class _NewPackageScreenState extends ConsumerState<NewPackageScreen> {
                       decoration: const InputDecoration(
                         labelText: 'Ruta de packages *',
                         hintText: 'C:\\Packages',
+                        helperText: 'Obligatorio',
                         border: OutlineInputBorder(),
                       ),
                       validator: (v) => (v == null || v.trim().isEmpty)
@@ -444,6 +450,9 @@ class _NewPackageScreenState extends ConsumerState<NewPackageScreen> {
                   children: warnings
                       .map(
                         (w) => Chip(
+                          side: BorderSide(
+                            color: colorScheme.error.withValues(alpha: 0.5),
+                          ),
                           avatar: Icon(
                             Icons.warning_amber_rounded,
                             size: 16,
@@ -527,6 +536,7 @@ class _NewPackageScreenState extends ConsumerState<NewPackageScreen> {
                   ),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: canGenerate ? colorScheme.primary : null,
+                    foregroundColor: colorScheme.onPrimary,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),

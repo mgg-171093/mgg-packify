@@ -190,6 +190,8 @@ class _DocTemplatesScreenState extends ConsumerState<DocTemplatesScreen>
   @override
   Widget build(BuildContext context) {
     final optionsAsync = ref.watch(optionsProvider);
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
 
     return Scaffold(
       appBar: AppBar(
@@ -203,6 +205,14 @@ class _DocTemplatesScreenState extends ConsumerState<DocTemplatesScreen>
           controller: _tabController,
           isScrollable: true,
           tabAlignment: TabAlignment.start,
+          indicatorColor: colorScheme.primary,
+          indicatorWeight: 3,
+          labelColor: colorScheme.primary,
+          unselectedLabelColor: colorScheme.onSurfaceVariant,
+          labelStyle: theme.textTheme.labelLarge?.copyWith(
+            fontWeight: FontWeight.w700,
+          ),
+          unselectedLabelStyle: theme.textTheme.labelLarge,
           tabs: _kTabs.map((t) => Tab(text: t.$1)).toList(),
         ),
       ),

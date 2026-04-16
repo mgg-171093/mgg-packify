@@ -237,6 +237,12 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('Todavía no generaste ningún package'), findsOneWidget);
+      expect(
+        find.text(
+          'Cuando generes uno, lo vas a ver en el dashboard y en historial.',
+        ),
+        findsOneWidget,
+      );
     });
 
     testWidgets('shows "Nuevo Package" button in empty state', (tester) async {

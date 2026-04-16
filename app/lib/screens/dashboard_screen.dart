@@ -218,22 +218,31 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                       ] else ...[
                         Center(
                           child: Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 32),
+                            padding: const EdgeInsets.symmetric(vertical: 40),
                             child: Column(
                               children: [
                                 Icon(
                                   Icons.inventory_2_outlined,
-                                  size: 48,
-                                  color: colorScheme.outlineVariant,
+                                  size: 56,
+                                  color: colorScheme.primary,
                                 ),
-                                const SizedBox(height: 12),
+                                const SizedBox(height: 14),
                                 Text(
                                   'Todavía no generaste ningún package',
-                                  style: theme.textTheme.bodyMedium?.copyWith(
+                                  style: theme.textTheme.titleMedium?.copyWith(
                                     color: colorScheme.onSurfaceVariant,
+                                    fontWeight: FontWeight.w600,
                                   ),
                                 ),
-                                const SizedBox(height: 16),
+                                const SizedBox(height: 10),
+                                Text(
+                                  'Cuando generes uno, lo vas a ver en el dashboard y en historial.',
+                                  style: theme.textTheme.bodySmall?.copyWith(
+                                    color: colorScheme.outline,
+                                  ),
+                                  textAlign: TextAlign.center,
+                                ),
+                                const SizedBox(height: 18),
                                 FilledButton.icon(
                                   onPressed: () => context.go('/new-package'),
                                   icon: const Icon(Icons.add_box_outlined),
@@ -550,6 +559,7 @@ class _RecentPackageCard extends StatelessWidget {
     final colorScheme = theme.colorScheme;
 
     return Card(
+      elevation: 1,
       margin: const EdgeInsets.only(bottom: 8),
       child: InkWell(
         onTap: onTap,

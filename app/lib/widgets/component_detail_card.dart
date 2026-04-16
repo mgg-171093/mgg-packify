@@ -2,6 +2,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../core/theme/theme_extensions.dart';
 import '../models/component_config.dart';
 import '../models/options_model.dart';
 import '../providers/options_provider.dart';
@@ -74,9 +75,16 @@ class _ComponentDetailCardState extends State<ComponentDetailCard>
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final surfaces =
+        theme.extension<SurfaceTokens>() ??
+        SurfaceTokens.fromColorScheme(colorScheme);
+    final effects = theme.extension<PremiumEffects>();
+
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
       elevation: 2,
+      color: surfaces.cardElevated,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -84,6 +92,7 @@ class _ComponentDetailCardState extends State<ComponentDetailCard>
           // Header row
           InkWell(
             onTap: _toggle,
+            mouseCursor: effects?.actionCursor,
             borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
@@ -109,7 +118,10 @@ class _ComponentDetailCardState extends State<ComponentDetailCard>
                   AnimatedRotation(
                     turns: _isExpanded ? 0 : -0.25,
                     duration: const Duration(milliseconds: 250),
-                    child: const Icon(Icons.expand_more),
+                    child: Icon(
+                      Icons.expand_more,
+                      color: colorScheme.onSurfaceVariant,
+                    ),
                   ),
                 ],
               ),
@@ -176,20 +188,21 @@ class _InstanceHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     if (!canRemove && index == 0) return const SizedBox.shrink();
     return Row(
       children: [
         Text(
           'Instancia ${index + 1}',
-          style: Theme.of(
-            context,
-          ).textTheme.labelMedium?.copyWith(color: Colors.grey.shade600),
+          style: Theme.of(context).textTheme.labelMedium?.copyWith(
+            color: colorScheme.onSurfaceVariant,
+          ),
         ),
         const Spacer(),
         if (canRemove)
           IconButton(
             icon: const Icon(Icons.delete_outline, size: 18),
-            color: Colors.red.shade400,
+            color: colorScheme.error,
             tooltip: 'Eliminar instancia',
             onPressed: onRemove,
           ),
@@ -210,17 +223,28 @@ class _AddInstanceButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
     return SizedBox(
       width: double.infinity,
       child: ElevatedButton.icon(
         onPressed: onTap,
-        icon: const Icon(Icons.add, size: 18, color: Colors.white),
+        icon: Icon(
+          Icons.add,
+          size: 18,
+          color: colorScheme.onSecondaryContainer,
+        ),
         label: Text(
           '+ Agregar otro ${type.label}',
-          style: const TextStyle(color: Colors.white, fontSize: 13),
+          style: TextStyle(
+            color: colorScheme.onSecondaryContainer,
+            fontSize: 13,
+          ),
         ),
         style: ElevatedButton.styleFrom(
-          backgroundColor: Theme.of(context).colorScheme.secondary,
+          backgroundColor: colorScheme.secondaryContainer,
+          foregroundColor: colorScheme.onSecondaryContainer,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
           padding: const EdgeInsets.symmetric(vertical: 10),
         ),
@@ -742,7 +766,7 @@ class _InstanceFieldsState extends ConsumerState<_InstanceFields> {
                 const Text('Copiar', style: TextStyle(fontSize: 13)),
                 IconButton(
                   icon: const Icon(Icons.remove_circle_outline, size: 18),
-                  color: Colors.red.shade400,
+                  color: Theme.of(context).colorScheme.error,
                   onPressed: () {
                     final newScripts = List<String>.from(scripts)
                       ..removeAt(idx);
@@ -925,7 +949,7 @@ class _InstanceFieldsState extends ConsumerState<_InstanceFields> {
                 ),
                 IconButton(
                   icon: const Icon(Icons.remove_circle_outline, size: 18),
-                  color: Colors.red.shade400,
+                  color: Theme.of(context).colorScheme.error,
                   onPressed: () {
                     final newConfigs = List<ConfigEntry>.from(configs)
                       ..removeAt(idx);
@@ -1110,7 +1134,7 @@ class _InstanceFieldsState extends ConsumerState<_InstanceFields> {
                 ),
                 IconButton(
                   icon: const Icon(Icons.remove_circle_outline, size: 18),
-                  color: Colors.red.shade400,
+                  color: Theme.of(context).colorScheme.error,
                   onPressed: () {
                     final newConfigs = List<ConfigEntry>.from(configs)
                       ..removeAt(idx);
@@ -1197,7 +1221,7 @@ class _InstanceFieldsState extends ConsumerState<_InstanceFields> {
                     ),
                     IconButton(
                       icon: const Icon(Icons.remove_circle_outline, size: 18),
-                      color: Colors.red.shade400,
+                      color: Theme.of(context).colorScheme.error,
                       onPressed: () {
                         final newArchivos = List<FileEntry>.from(archivos)
                           ..removeAt(idx);
