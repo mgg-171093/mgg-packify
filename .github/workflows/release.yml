@@ -260,6 +260,7 @@ jobs:
           } else {
             "exists=false" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
             Write-Host "Release tag '$tag' does not exist. A new release will be created."
+            $global:LASTEXITCODE = 0
           }
 
       - name: Create stable GitHub release
