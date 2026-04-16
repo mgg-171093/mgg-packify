@@ -8,6 +8,7 @@ class AppearanceScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
     final themeModeAsync = ref.watch(themeModeProvider);
     final currentMode = themeModeAsync.valueOrNull ?? ThemeMode.system;
 
@@ -26,6 +27,27 @@ class AppearanceScreen extends ConsumerWidget {
             ),
             const SizedBox(height: 16),
             SegmentedButton<ThemeMode>(
+              style: ButtonStyle(
+                visualDensity: VisualDensity.compact,
+                side: WidgetStateProperty.resolveWith((states) {
+                  if (states.contains(WidgetState.selected)) {
+                    return BorderSide(color: colorScheme.primary, width: 1.4);
+                  }
+                  return BorderSide(color: colorScheme.outlineVariant);
+                }),
+                foregroundColor: WidgetStateProperty.resolveWith((states) {
+                  if (states.contains(WidgetState.selected)) {
+                    return colorScheme.onPrimaryContainer;
+                  }
+                  return colorScheme.onSurfaceVariant;
+                }),
+                backgroundColor: WidgetStateProperty.resolveWith((states) {
+                  if (states.contains(WidgetState.selected)) {
+                    return colorScheme.primaryContainer;
+                  }
+                  return colorScheme.surfaceContainerLow;
+                }),
+              ),
               segments: const [
                 ButtonSegment(
                   value: ThemeMode.light,
@@ -47,6 +69,13 @@ class AppearanceScreen extends ConsumerWidget {
               onSelectionChanged: (selection) {
                 ref.read(themeModeProvider.notifier).setMode(selection.first);
               },
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'El tema seleccionado se guarda automáticamente.',
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: colorScheme.onSurfaceVariant,
+              ),
             ),
           ],
         ),

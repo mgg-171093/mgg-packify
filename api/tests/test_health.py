@@ -4,6 +4,8 @@ Tests para GET /health
 
 from __future__ import annotations
 
+from importlib import metadata
+
 from fastapi.testclient import TestClient
 
 
@@ -14,8 +16,8 @@ def test_health_returns_200(client: TestClient) -> None:
 
 
 def test_health_body(client: TestClient) -> None:
-    """GET /health debe retornar {status: ok, version: 3.5.0}."""
+    """GET /health debe retornar {status: ok, version: package metadata}."""
     response = client.get("/health")
     body = response.json()
     assert body["status"] == "ok"
-    assert body["version"] == "3.5.0"
+    assert body["version"] == metadata.version("mgg-packify-api")

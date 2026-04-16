@@ -79,13 +79,17 @@ class _ServerFormState extends State<ServerForm> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
     final hasAny = _showApi || _showBd || _showBlob || _showLiferay;
     if (!hasAny) {
-      return const Padding(
-        padding: EdgeInsets.symmetric(vertical: 8),
+      return Padding(
+        padding: const EdgeInsets.symmetric(vertical: 8),
         child: Text(
           'Seleccioná al menos un componente para ver los campos de servidor.',
-          style: TextStyle(color: Colors.grey, fontSize: 13),
+          style: theme.textTheme.bodySmall?.copyWith(
+            color: colorScheme.onSurfaceVariant,
+          ),
         ),
       );
     }
@@ -94,54 +98,70 @@ class _ServerFormState extends State<ServerForm> {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         if (_showApi) ...[
-          TextField(
-            controller: _apiCtrl,
-            decoration: const InputDecoration(
-              labelText: 'Servidor de servicios/APIs',
-              hintText: '10.42.55.25',
-              border: OutlineInputBorder(),
-              isDense: true,
+          MouseRegion(
+            cursor: SystemMouseCursors.text,
+            child: TextField(
+              controller: _apiCtrl,
+              decoration: const InputDecoration(
+                labelText: 'Servidor de servicios/APIs',
+                hintText: '10.42.55.25',
+                helperText: 'Se aplica a API IIS, Docker y APIM',
+                border: OutlineInputBorder(),
+                isDense: true,
+              ),
+              onChanged: (_) => _notify(),
             ),
-            onChanged: (_) => _notify(),
           ),
           const SizedBox(height: 12),
         ],
         if (_showBd) ...[
-          TextField(
-            controller: _bdCtrl,
-            decoration: const InputDecoration(
-              labelText: 'Servidor de base de datos',
-              hintText: '10.42.55.26',
-              border: OutlineInputBorder(),
-              isDense: true,
+          MouseRegion(
+            cursor: SystemMouseCursors.text,
+            child: TextField(
+              controller: _bdCtrl,
+              decoration: const InputDecoration(
+                labelText: 'Servidor de base de datos',
+                hintText: '10.42.55.26',
+                helperText: 'Se aplica a componentes SQL',
+                border: OutlineInputBorder(),
+                isDense: true,
+              ),
+              onChanged: (_) => _notify(),
             ),
-            onChanged: (_) => _notify(),
           ),
           const SizedBox(height: 12),
         ],
         if (_showBlob) ...[
-          TextField(
-            controller: _blobCtrl,
-            decoration: const InputDecoration(
-              labelText: 'Azure Blob Storage (URL o cuenta)',
-              hintText: 'mystorageaccount.blob.core.windows.net',
-              border: OutlineInputBorder(),
-              isDense: true,
+          MouseRegion(
+            cursor: SystemMouseCursors.text,
+            child: TextField(
+              controller: _blobCtrl,
+              decoration: const InputDecoration(
+                labelText: 'Azure Blob Storage (URL o cuenta)',
+                hintText: 'mystorageaccount.blob.core.windows.net',
+                helperText: 'Se aplica a componentes Blob',
+                border: OutlineInputBorder(),
+                isDense: true,
+              ),
+              onChanged: (_) => _notify(),
             ),
-            onChanged: (_) => _notify(),
           ),
           const SizedBox(height: 12),
         ],
         if (_showLiferay) ...[
-          TextField(
-            controller: _liferayCtrl,
-            decoration: const InputDecoration(
-              labelText: 'Servidor Liferay',
-              hintText: '10.42.55.27',
-              border: OutlineInputBorder(),
-              isDense: true,
+          MouseRegion(
+            cursor: SystemMouseCursors.text,
+            child: TextField(
+              controller: _liferayCtrl,
+              decoration: const InputDecoration(
+                labelText: 'Servidor Liferay',
+                hintText: '10.42.55.27',
+                helperText: 'Se aplica a Liferay y Assets',
+                border: OutlineInputBorder(),
+                isDense: true,
+              ),
+              onChanged: (_) => _notify(),
             ),
-            onChanged: (_) => _notify(),
           ),
         ],
       ],

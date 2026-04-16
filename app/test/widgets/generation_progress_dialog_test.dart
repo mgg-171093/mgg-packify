@@ -78,6 +78,10 @@ void main() {
       expect(find.text('Paso dos'), findsOneWidget);
       expect(find.text('Paso tres'), findsOneWidget);
 
+      final dialog = tester.widget<Dialog>(find.byType(Dialog));
+      final theme = Theme.of(tester.element(find.byType(Dialog)));
+      expect(dialog.backgroundColor, theme.colorScheme.surface);
+
       // Clean up — complete the future to cancel the timer
       await _completeAndDrain(tester, completer, _okResult());
     });

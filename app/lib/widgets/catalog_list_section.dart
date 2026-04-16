@@ -97,6 +97,7 @@ class _CatalogListSectionState extends State<CatalogListSection> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -113,9 +114,8 @@ class _CatalogListSectionState extends State<CatalogListSection> {
             padding: const EdgeInsets.symmetric(vertical: 4),
             child: Text(
               widget.emptyMessage,
-              style: TextStyle(
-                color: Colors.grey.shade500,
-                fontSize: 13,
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: colorScheme.onSurfaceVariant,
                 fontStyle: FontStyle.italic,
               ),
             ),
@@ -132,27 +132,31 @@ class _CatalogListSectionState extends State<CatalogListSection> {
                 return Row(
                   children: [
                     Expanded(
-                      child: TextField(
-                        controller: _editCtrl,
-                        autofocus: true,
-                        decoration: const InputDecoration(
-                          border: OutlineInputBorder(),
-                          isDense: true,
-                          contentPadding: EdgeInsets.symmetric(
-                            horizontal: 12,
-                            vertical: 10,
+                      child: MouseRegion(
+                        cursor: SystemMouseCursors.text,
+                        child: TextField(
+                          controller: _editCtrl,
+                          autofocus: true,
+                          decoration: const InputDecoration(
+                            border: OutlineInputBorder(),
+                            isDense: true,
+                            helperText: 'Editá y confirmá para guardar',
+                            contentPadding: EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 10,
+                            ),
                           ),
+                          onSubmitted: (_) => _confirmEdit(),
                         ),
-                        onSubmitted: (_) => _confirmEdit(),
                       ),
                     ),
                     IconButton(
-                      icon: const Icon(Icons.check, color: Colors.green),
+                      icon: Icon(Icons.check, color: colorScheme.primary),
                       tooltip: 'Confirmar',
                       onPressed: _confirmEdit,
                     ),
                     IconButton(
-                      icon: const Icon(Icons.close, color: Colors.red),
+                      icon: Icon(Icons.close, color: colorScheme.error),
                       tooltip: 'Cancelar',
                       onPressed: _cancelEdit,
                     ),
@@ -175,7 +179,7 @@ class _CatalogListSectionState extends State<CatalogListSection> {
                   ),
                   IconButton(
                     icon: const Icon(Icons.delete_outlined, size: 18),
-                    color: Colors.red.shade400,
+                    color: colorScheme.error,
                     tooltip: 'Eliminar',
                     onPressed: () => _remove(index),
                   ),
@@ -187,18 +191,22 @@ class _CatalogListSectionState extends State<CatalogListSection> {
         Row(
           children: [
             Expanded(
-              child: TextField(
-                controller: _addCtrl,
-                decoration: InputDecoration(
-                  hintText: widget.addHint,
-                  border: const OutlineInputBorder(),
-                  isDense: true,
-                  contentPadding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 10,
+              child: MouseRegion(
+                cursor: SystemMouseCursors.text,
+                child: TextField(
+                  controller: _addCtrl,
+                  decoration: InputDecoration(
+                    hintText: widget.addHint,
+                    helperText: 'Presioná Enter o Agregar',
+                    border: const OutlineInputBorder(),
+                    isDense: true,
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 10,
+                    ),
                   ),
+                  onSubmitted: (_) => _add(),
                 ),
-                onSubmitted: (_) => _add(),
               ),
             ),
             const SizedBox(width: 8),
@@ -206,10 +214,6 @@ class _CatalogListSectionState extends State<CatalogListSection> {
               onPressed: _add,
               icon: const Icon(Icons.add),
               tooltip: widget.addLabel ?? 'Agregar',
-              style: IconButton.styleFrom(
-                backgroundColor: null,
-                foregroundColor: Colors.white,
-              ),
             ),
           ],
         ),

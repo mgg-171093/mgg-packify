@@ -27,8 +27,8 @@ class TemplatesScreen extends ConsumerWidget {
                 children: [
                   Icon(
                     Icons.bookmark_border,
-                    size: 64,
-                    color: colorScheme.outlineVariant,
+                    size: 72,
+                    color: colorScheme.primary,
                   ),
                   const SizedBox(height: 16),
                   Text(

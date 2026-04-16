@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../core/theme/theme_extensions.dart';
 import '../models/component_config.dart';
 
 class ComponentSelector extends StatelessWidget {
@@ -14,6 +15,11 @@ class ComponentSelector extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
+    final surfaces =
+        Theme.of(context).extension<SurfaceTokens>() ??
+        SurfaceTokens.fromColorScheme(colorScheme);
+    final effects = Theme.of(context).extension<PremiumEffects>();
+
     return Wrap(
       spacing: 8,
       runSpacing: 8,
@@ -23,16 +29,19 @@ class ComponentSelector extends StatelessWidget {
           label: Text(type.label),
           selected: isSelected,
           onSelected: (_) => onToggle(type),
-          selectedColor: colorScheme.primary,
-          checkmarkColor: colorScheme.onPrimary,
+          selectedColor: surfaces.chipSelected,
+          checkmarkColor: colorScheme.onPrimaryContainer,
           labelStyle: TextStyle(
-            color: isSelected ? colorScheme.onPrimary : null,
+            color: isSelected ? colorScheme.onPrimaryContainer : null,
             fontWeight: isSelected ? FontWeight.w600 : null,
           ),
-          backgroundColor: Colors.grey.shade100,
+          backgroundColor: surfaces.chipUnselected,
           side: BorderSide(
-            color: isSelected ? colorScheme.primary : Colors.grey.shade300,
+            color: isSelected
+                ? colorScheme.primary
+                : colorScheme.outlineVariant,
           ),
+          mouseCursor: effects?.actionCursor,
           showCheckmark: true,
         );
       }).toList(),

@@ -54,6 +54,9 @@ class _LogViewerScreenState extends ConsumerState<LogViewerScreen>
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Logs'),
@@ -79,21 +82,17 @@ class _LogViewerScreenState extends ConsumerState<LogViewerScreen>
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(
-                    Icons.error_outline,
-                    size: 48,
-                    color: Theme.of(context).colorScheme.error,
-                  ),
+                  Icon(Icons.error_outline, size: 48, color: colorScheme.error),
                   const SizedBox(height: 12),
                   Text(
                     'Error: $_error',
                     textAlign: TextAlign.center,
-                    style: TextStyle(
-                      color: Theme.of(context).colorScheme.error,
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      color: colorScheme.error,
                     ),
                   ),
                   const SizedBox(height: 16),
-                  ElevatedButton.icon(
+                  FilledButton.icon(
                     onPressed: _loadLogs,
                     icon: const Icon(Icons.refresh),
                     label: const Text('Reintentar'),
@@ -122,21 +121,28 @@ class _LogTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
     if (lines.isEmpty) {
       return Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(
-              Icons.article_outlined,
-              size: 48,
-              color: Theme.of(context).colorScheme.outlineVariant,
-            ),
-            const SizedBox(height: 12),
+            Icon(Icons.article_outlined, size: 56, color: colorScheme.primary),
+            const SizedBox(height: 14),
             Text(
               'Sin logs disponibles',
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: Theme.of(context).colorScheme.onSurfaceVariant,
+              style: theme.textTheme.titleMedium?.copyWith(
+                color: colorScheme.onSurfaceVariant,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Cuando haya actividad, vas a verla acá.',
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: colorScheme.outline,
               ),
             ),
           ],

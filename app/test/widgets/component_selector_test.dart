@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:mgg_packify/core/theme/app_theme.dart';
+import 'package:mgg_packify/core/theme/theme_extensions.dart';
 import 'package:mgg_packify/models/component_config.dart';
 import 'package:mgg_packify/widgets/component_selector.dart';
 
@@ -47,6 +49,7 @@ void main() {
     testWidgets('selected chip shows different style', (tester) async {
       await tester.pumpWidget(
         MaterialApp(
+          theme: appTheme(Brightness.light),
           home: Scaffold(
             body: ComponentSelector(
               selectedTypes: const {ComponentType.sql},
@@ -61,11 +64,25 @@ void main() {
         find.widgetWithText(FilterChip, 'SQL'),
       );
       expect(chip.selected, isTrue);
+
+      final context = tester.element(find.byType(ComponentSelector));
+      final theme = Theme.of(context);
+      final surfaces =
+          theme.extension<SurfaceTokens>() ??
+          SurfaceTokens.fromColorScheme(theme.colorScheme);
+
+      expect(chip.selectedColor, equals(surfaces.chipSelected));
+      expect(chip.checkmarkColor, equals(theme.colorScheme.onPrimaryContainer));
+      expect(
+        (chip.side as BorderSide).color,
+        equals(theme.colorScheme.primary),
+      );
     });
 
     testWidgets('unselected chip has selected=false', (tester) async {
       await tester.pumpWidget(
         MaterialApp(
+          theme: appTheme(Brightness.light),
           home: Scaffold(
             body: ComponentSelector(selectedTypes: const {}, onToggle: (_) {}),
           ),
@@ -76,6 +93,18 @@ void main() {
         find.widgetWithText(FilterChip, 'SQL'),
       );
       expect(chip.selected, isFalse);
+
+      final context = tester.element(find.byType(ComponentSelector));
+      final theme = Theme.of(context);
+      final surfaces =
+          theme.extension<SurfaceTokens>() ??
+          SurfaceTokens.fromColorScheme(theme.colorScheme);
+
+      expect(chip.backgroundColor, equals(surfaces.chipUnselected));
+      expect(
+        (chip.side as BorderSide).color,
+        equals(theme.colorScheme.outlineVariant),
+      );
     });
 
     testWidgets('chips appear in canonical order', (tester) async {

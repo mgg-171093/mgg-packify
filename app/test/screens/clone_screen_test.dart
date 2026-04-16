@@ -71,5 +71,15 @@ void main() {
         expect(find.byIcon(Icons.arrow_back), findsNothing);
       },
     );
+
+    testWidgets('AppBar uses theme surface color instead of hardcoded white', (
+      tester,
+    ) async {
+      await tester.pumpWidget(_buildApp());
+      await tester.pumpAndSettle();
+
+      final appBar = tester.widget<AppBar>(find.byType(AppBar));
+      expect(appBar.backgroundColor, isNull);
+    });
   });
 }

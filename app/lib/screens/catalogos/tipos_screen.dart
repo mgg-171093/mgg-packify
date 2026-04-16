@@ -32,6 +32,8 @@ class _TiposScreenState extends ConsumerState<TiposScreen>
   @override
   Widget build(BuildContext context) {
     final optionsAsync = ref.watch(optionsProvider);
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
 
     return Scaffold(
       appBar: AppBar(
@@ -43,6 +45,14 @@ class _TiposScreenState extends ConsumerState<TiposScreen>
         title: const Text('Tipos'),
         bottom: TabBar(
           controller: _tabController,
+          indicatorColor: colorScheme.primary,
+          indicatorWeight: 3,
+          labelColor: colorScheme.primary,
+          unselectedLabelColor: colorScheme.onSurfaceVariant,
+          labelStyle: theme.textTheme.labelLarge?.copyWith(
+            fontWeight: FontWeight.w700,
+          ),
+          unselectedLabelStyle: theme.textTheme.labelLarge,
           tabs: const [
             Tab(text: 'SQL'),
             Tab(text: 'Blob'),

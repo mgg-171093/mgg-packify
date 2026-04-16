@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'core/theme/app_theme.dart';
 import 'models/generate_result.dart';
 import 'providers/theme_mode_provider.dart';
 import 'screens/about_screen.dart';
@@ -172,54 +173,14 @@ final router = GoRouter(
 class App extends ConsumerWidget {
   const App({super.key});
 
-  ThemeData get _lightTheme => ThemeData(
-    useMaterial3: true,
-    colorScheme: ColorScheme.fromSeed(
-      seedColor: Colors.blue,
-      brightness: Brightness.light,
-    ),
-    inputDecorationTheme: InputDecorationTheme(
-      border: const OutlineInputBorder(),
-      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      filled: true,
-      fillColor: Colors.grey.shade50,
-    ),
-    cardTheme: CardThemeData(
-      elevation: 2,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-    ),
-    appBarTheme: const AppBarTheme(
-      centerTitle: false,
-      elevation: 0,
-      surfaceTintColor: Colors.transparent,
-    ),
-  );
-
-  ThemeData get _darkTheme => ThemeData(
-    useMaterial3: true,
-    colorScheme: ColorScheme.fromSeed(
-      seedColor: Colors.blue,
-      brightness: Brightness.dark,
-    ),
-    cardTheme: CardThemeData(
-      elevation: 2,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-    ),
-    appBarTheme: const AppBarTheme(
-      centerTitle: false,
-      elevation: 0,
-      surfaceTintColor: Colors.transparent,
-    ),
-  );
-
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final themeMode =
         ref.watch(themeModeProvider).valueOrNull ?? ThemeMode.system;
     return MaterialApp.router(
       title: 'MGG-Packify',
-      theme: _lightTheme,
-      darkTheme: _darkTheme,
+      theme: appTheme(Brightness.light),
+      darkTheme: appTheme(Brightness.dark),
       themeMode: themeMode,
       routerConfig: router,
       debugShowCheckedModeBanner: false,

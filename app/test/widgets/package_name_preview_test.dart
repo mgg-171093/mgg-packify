@@ -205,6 +205,11 @@ void main() {
       await tester.pump();
 
       expect(find.text('Nombre copiado'), findsOneWidget);
+
+      final snackBar = tester.widget<SnackBar>(find.byType(SnackBar));
+      final theme = Theme.of(tester.element(find.byType(Scaffold)));
+      expect(snackBar.behavior, SnackBarBehavior.floating);
+      expect(snackBar.backgroundColor, theme.colorScheme.primaryContainer);
     });
   });
 }

@@ -1,0 +1,335 @@
+name: Release
+
+on:
+  push:
+    branches:
+      - main
+    paths-ignore:
+      - latest.json
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    if: github.actor != 'github-actions[bot]' && !contains(github.event.head_commit.message, '[skip ci]')
+    runs-on: windows-latest
+    timeout-minutes: 90
+
+    defaults:
+      run:
+        shell: pwsh
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: 3.41.4
+          channel: stable
+          cache: true
+
+      - name: Install API dependencies
+        run: |
+          Set-StrictMode -Version Latest
+          $ErrorActionPreference = 'Stop'
+          python -m pip install --upgrade pip
+          python -m pip install -e "api[dev]"
+          python -m pip install pyinstaller==6.19.0
+
+      - name: Compute semantic version bump
+        id: semver
+        run: |
+          Set-StrictMode -Version Latest
+          $ErrorActionPreference = 'Stop'
+
+          function Get-Conventional-Bump([string]$Subject, [string]$Body) {
+            if ($Body -match '(?im)^BREAKING CHANGE\s*:') {
+              return 'major'
+            }
+
+            if ($Subject -match '^[a-zA-Z0-9_-]+(?:\([^\)]+\))?!:') {
+              return 'major'
+            }
+
+            if ($Subject -match '^feat(?:\([^\)]+\))?:') {
+              return 'minor'
+            }
+
+            return 'patch'
+          }
+
+          function Get-BumpRank([string]$Bump) {
+            switch ($Bump) {
+              'major' { return 3 }
+              'minor' { return 2 }
+              default { return 1 }
+            }
+          }
+
+          $before = '${{ github.event.before }}'
+          $after = '${{ github.sha }}'
+          $zeroSha = '0000000000000000000000000000000000000000'
+
+          if ($before -and $before -ne $zeroSha) {
+            $commitShas = @(git rev-list "$before..$after")
+            if ($commitShas.Count -eq 0) {
+              $commitShas = @($after)
+            }
+          } else {
+            $commitShas = @($after)
+          }
+
+          $bump = 'patch'
+          foreach ($sha in $commitShas) {
+            $subject = (git show -s --format=%s $sha).Trim()
+            $body = git show -s --format=%b $sha
+            $candidate = Get-Conventional-Bump -Subject $subject -Body $body
+
+            Write-Host "Commit $sha => $candidate ($subject)"
+
+            if ((Get-BumpRank $candidate) -gt (Get-BumpRank $bump)) {
+              $bump = $candidate
+            }
+          }
+
+          Write-Host "Resolved semver bump for push range: $bump"
+
+          "bump=$bump" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
+
+      - name: Increment canonical version in pubspec
+        id: versioning
+        run: |
+          Set-StrictMode -Version Latest
+          $ErrorActionPreference = 'Stop'
+
+          $pubspecPath = 'app/pubspec.yaml'
+          $content = Get-Content -Path $pubspecPath -Raw
+          $match = [regex]::Match($content, '(?m)^version:\s*(?<major>\d+)\.(?<minor>\d+)\.(?<patch>\d+)(?:\+(?<build>\d+))?\s*$')
+          if (-not $match.Success) {
+            throw 'Unable to parse canonical version from app/pubspec.yaml'
+          }
+
+          $major = [int]$match.Groups['major'].Value
+          $minor = [int]$match.Groups['minor'].Value
+          $patch = [int]$match.Groups['patch'].Value
+          $currentBuild = if ($match.Groups['build'].Success) { [int]$match.Groups['build'].Value } else { 0 }
+
+          $bump = '${{ steps.semver.outputs.bump }}'
+          switch ($bump) {
+            'major' {
+              $major += 1
+              $minor = 0
+              $patch = 0
+            }
+            'minor' {
+              $minor += 1
+              $patch = 0
+            }
+            default {
+              $patch += 1
+            }
+          }
+
+          $newBuild = $currentBuild + 1
+          $newVersionWithBuild = "$major.$minor.$patch+$newBuild"
+          $newSemver = "$major.$minor.$patch"
+          $newTag = "v$newSemver-stable"
+
+          $updated = [regex]::Replace($content, '(?m)^version:\s*\d+\.\d+\.\d+(?:\+\d+)?\s*$', "version: $newVersionWithBuild")
+          if ($updated -eq $content) {
+            throw 'Version increment produced no changes in app/pubspec.yaml'
+          }
+
+          [System.IO.File]::WriteAllText($pubspecPath, $updated, [System.Text.UTF8Encoding]::new($false))
+
+          Write-Host "Canonical version bumped: $newVersionWithBuild"
+          Write-Host "Release semver: $newSemver"
+
+          "version=$newSemver" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
+          "version_with_build=$newVersionWithBuild" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
+          "tag=$newTag" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
+
+      - name: Install Flutter dependencies
+        working-directory: app
+        run: flutter pub get
+
+      - name: Ensure Inno Setup is available
+        run: |
+          Set-StrictMode -Version Latest
+          $ErrorActionPreference = 'Stop'
+          $isccPath = 'C:\Program Files (x86)\Inno Setup 6\ISCC.exe'
+          if (-not (Test-Path $isccPath)) {
+            choco install innosetup -y --no-progress
+          }
+          if (-not (Test-Path $isccPath)) {
+            throw "Inno Setup not available at '$isccPath'"
+          }
+
+      - name: Synchronize canonical version
+        run: |
+          Set-StrictMode -Version Latest
+          $ErrorActionPreference = 'Stop'
+          .\scripts\sync-version.ps1
+
+      - name: Verify synchronization touches only expected files
+        run: |
+          Set-StrictMode -Version Latest
+          $ErrorActionPreference = 'Stop'
+
+          $allowed = @(
+            'app/pubspec.yaml',
+            'api/pyproject.toml',
+            'app/lib/core/constants.dart',
+            'installer/mgg-packify.iss',
+            'build.ps1',
+            'latest.json'
+          )
+
+          $changed = @(git diff --name-only)
+          if ($changed.Count -eq 0) {
+            Write-Host 'No version file updates were needed.'
+            exit 0
+          }
+
+          $unexpected = @($changed | Where-Object { $_ -notin $allowed })
+          if ($unexpected.Count -gt 0) {
+            Write-Host 'Unexpected files changed during version sync:' -ForegroundColor Red
+            $unexpected | ForEach-Object { Write-Host " - $_" -ForegroundColor Red }
+            throw 'Sync step touched unexpected files'
+          }
+
+          Write-Host 'Version sync changed expected files only:'
+          $changed | ForEach-Object { Write-Host " - $_" }
+
+      - name: Run Flutter test suite
+        working-directory: app
+        run: flutter test
+
+      - name: Run Python test suite
+        working-directory: api
+        run: python -m pytest
+
+      - name: Build installer on Windows
+        env:
+          MGG_VERSION: ${{ steps.versioning.outputs.version }}
+        run: |
+          Set-StrictMode -Version Latest
+          $ErrorActionPreference = 'Stop'
+          .\build.ps1
+
+      - name: Resolve installer artifact path
+        id: installer
+        run: |
+          Set-StrictMode -Version Latest
+          $ErrorActionPreference = 'Stop'
+          $version = '${{ steps.versioning.outputs.version }}'
+          $installerPath = "installer/Output/MGGPackify-$version-Setup.exe"
+          if (-not (Test-Path $installerPath)) {
+            throw "Installer not found at $installerPath"
+          }
+          "path=$installerPath" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
+
+      - name: Detect existing release tag
+        id: existing
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          Set-StrictMode -Version Latest
+          $ErrorActionPreference = 'Stop'
+          $tag = '${{ steps.versioning.outputs.tag }}'
+
+          if (gh release view $tag --repo $env:GITHUB_REPOSITORY 1>$null 2>$null) {
+            "exists=true" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
+            Write-Host "Release tag '$tag' already exists. Reusing existing release."
+          } else {
+            "exists=false" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
+            Write-Host "Release tag '$tag' does not exist. A new release will be created."
+          }
+
+      - name: Create stable GitHub release
+        if: steps.existing.outputs.exists == 'false'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          Set-StrictMode -Version Latest
+          $ErrorActionPreference = 'Stop'
+          gh release create '${{ steps.versioning.outputs.tag }}' '${{ steps.installer.outputs.path }}' --repo $env:GITHUB_REPOSITORY --title 'MGG Packify ${{ steps.versioning.outputs.version }}' --notes 'Automated stable release generated by GitHub Actions.'
+
+      - name: Upload installer to existing release if missing
+        if: steps.existing.outputs.exists == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          Set-StrictMode -Version Latest
+          $ErrorActionPreference = 'Stop'
+
+          $tag = '${{ steps.versioning.outputs.tag }}'
+          $assetName = "MGGPackify-${{ steps.versioning.outputs.version }}-Setup.exe"
+          $assetPath = '${{ steps.installer.outputs.path }}'
+
+          $assetsJson = gh release view $tag --repo $env:GITHUB_REPOSITORY --json assets
+          $assets = $assetsJson | ConvertFrom-Json
+          $exists = @($assets.assets | Where-Object { $_.name -eq $assetName }).Count -gt 0
+
+          if ($exists) {
+            Write-Host "Asset '$assetName' already exists in release '$tag'. Skipping upload."
+          } else {
+            gh release upload $tag $assetPath --repo $env:GITHUB_REPOSITORY
+            Write-Host "Uploaded missing asset '$assetName' to release '$tag'."
+          }
+
+      - name: Update latest.json metadata
+        run: |
+          Set-StrictMode -Version Latest
+          $ErrorActionPreference = 'Stop'
+          $version = '${{ steps.versioning.outputs.version }}'
+          $tag = '${{ steps.versioning.outputs.tag }}'
+          $assetName = "MGGPackify-$version-Setup.exe"
+
+          $latest = Get-Content -Path 'latest.json' -Raw | ConvertFrom-Json
+          $latest.version = $version
+          $latest.url = "https://github.com/mgg-171093/mgg-packify/releases/download/$tag/$assetName"
+          $latest.release_notes = "Automated stable release $tag"
+
+          $latest | ConvertTo-Json -Depth 10 | Set-Content -Path 'latest.json' -Encoding UTF8
+
+      - name: Commit synchronized release metadata when changed
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          Set-StrictMode -Version Latest
+          $ErrorActionPreference = 'Stop'
+
+          $versionFiles = @(
+            'app/pubspec.yaml',
+            'api/pyproject.toml',
+            'app/lib/core/constants.dart',
+            'installer/mgg-packify.iss',
+            'build.ps1',
+            'latest.json'
+          )
+
+          if (-not (git diff --quiet -- $versionFiles)) {
+            git config user.name 'github-actions[bot]'
+            git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+            git add $versionFiles
+            git commit -m "chore(release): bump version to ${{ steps.versioning.outputs.version }} [skip ci]"
+            git push origin HEAD:main
+            Write-Host 'Pushed synchronized version metadata to main.'
+          } else {
+            Write-Host 'Synchronized version metadata already up to date. No commit created.'
+          }

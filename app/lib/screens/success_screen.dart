@@ -14,6 +14,7 @@ class SuccessScreen extends ConsumerWidget {
   final GenerateResult result;
 
   Future<void> _openFolder(BuildContext context) async {
+    final colorScheme = Theme.of(context).colorScheme;
     final uri = Uri.file(result.packageDir);
     if (await canLaunchUrl(uri)) {
       await launchUrl(uri);
@@ -22,7 +23,8 @@ class SuccessScreen extends ConsumerWidget {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('No se pudo abrir la carpeta: ${result.packageDir}'),
-            backgroundColor: Colors.orange,
+            backgroundColor: colorScheme.secondaryContainer,
+            behavior: SnackBarBehavior.floating,
           ),
         );
       }
@@ -30,13 +32,18 @@ class SuccessScreen extends ConsumerWidget {
   }
 
   Future<void> _openSubfolder(BuildContext context, String subdir) async {
+    final colorScheme = Theme.of(context).colorScheme;
     final path = p.join(result.packageDir, subdir);
     final dir = Directory(path);
     if (!dir.existsSync()) {
       if (context.mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('Carpeta no encontrada: $path')));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Carpeta no encontrada: $path'),
+            backgroundColor: colorScheme.secondaryContainer,
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
       }
       return;
     }
@@ -45,21 +52,30 @@ class SuccessScreen extends ConsumerWidget {
       await launchUrl(uri);
     } else {
       if (context.mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('No se pudo abrir: $path')));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('No se pudo abrir: $path'),
+            backgroundColor: colorScheme.secondaryContainer,
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
       }
     }
   }
 
   Future<void> _openInVsCode(BuildContext context) async {
+    final colorScheme = Theme.of(context).colorScheme;
     final uri = Uri.parse('vscode://file/${result.packageDir}');
     if (await canLaunchUrl(uri)) {
       await launchUrl(uri);
     } else {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('No se pudo abrir VS Code')),
+          SnackBar(
+            content: const Text('No se pudo abrir VS Code'),
+            backgroundColor: colorScheme.secondaryContainer,
+            behavior: SnackBarBehavior.floating,
+          ),
         );
       }
     }
@@ -148,9 +164,11 @@ class SuccessScreen extends ConsumerWidget {
                             ClipboardData(text: result.packageName),
                           );
                           ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
+                            SnackBar(
                               content: Text('Nombre copiado al portapapeles'),
                               duration: Duration(seconds: 2),
+                              backgroundColor: colorScheme.primaryContainer,
+                              behavior: SnackBarBehavior.floating,
                             ),
                           );
                         },
@@ -202,9 +220,9 @@ class SuccessScreen extends ConsumerWidget {
                       padding: const EdgeInsets.all(16),
                       child: Row(
                         children: [
-                          const Icon(
+                          Icon(
                             Icons.folder_open_outlined,
-                            color: Colors.amber,
+                            color: colorScheme.secondary,
                             size: 22,
                           ),
                           const SizedBox(width: 12),
@@ -289,11 +307,11 @@ class SuccessScreen extends ConsumerWidget {
                 // Copy errors — only shown when non-empty
                 if (result.copyErrors.isNotEmpty) ...[
                   Card(
-                    color: const Color(0xFFFFF8E1),
+                    color: colorScheme.secondaryContainer,
                     elevation: 0,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8),
-                      side: const BorderSide(color: Color(0xFFFFB300)),
+                      side: BorderSide(color: colorScheme.secondary),
                     ),
                     child: Padding(
                       padding: const EdgeInsets.all(16),
@@ -302,9 +320,9 @@ class SuccessScreen extends ConsumerWidget {
                         children: [
                           Row(
                             children: [
-                              const Icon(
+                              Icon(
                                 Icons.warning_amber_rounded,
-                                color: Color(0xFFFFB300),
+                                color: colorScheme.onSecondaryContainer,
                                 size: 20,
                               ),
                               const SizedBox(width: 8),
@@ -312,7 +330,7 @@ class SuccessScreen extends ConsumerWidget {
                                 '⚠️ Errores de copia manual',
                                 style: theme.textTheme.titleSmall?.copyWith(
                                   fontWeight: FontWeight.w700,
-                                  color: const Color(0xFF7A5300),
+                                  color: colorScheme.onSecondaryContainer,
                                 ),
                               ),
                             ],
@@ -321,7 +339,7 @@ class SuccessScreen extends ConsumerWidget {
                           Text(
                             'Los siguientes scripts deben copiarse manualmente:',
                             style: theme.textTheme.bodySmall?.copyWith(
-                              color: const Color(0xFF7A5300),
+                              color: colorScheme.onSecondaryContainer,
                             ),
                           ),
                           const SizedBox(height: 8),
@@ -331,17 +349,21 @@ class SuccessScreen extends ConsumerWidget {
                               child: Row(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  const Icon(
+                                  Icon(
                                     Icons.error_outline,
                                     size: 16,
-                                    color: Color(0xFFFFB300),
+                                    color: colorScheme.onSecondaryContainer,
                                   ),
                                   const SizedBox(width: 8),
                                   Expanded(
                                     child: Text(
                                       errMsg,
                                       style: theme.textTheme.bodySmall
-                                          ?.copyWith(fontFamily: 'monospace'),
+                                          ?.copyWith(
+                                            fontFamily: 'monospace',
+                                            color: colorScheme
+                                                .onSecondaryContainer,
+                                          ),
                                     ),
                                   ),
                                 ],
@@ -357,13 +379,9 @@ class SuccessScreen extends ConsumerWidget {
                 // Buttons
                 ElevatedButton.icon(
                   onPressed: () => _openFolder(context),
-                  icon: const Icon(Icons.folder_open, color: Colors.white),
-                  label: const Text(
-                    'Abrir carpeta',
-                    style: TextStyle(color: Colors.white),
-                  ),
+                  icon: const Icon(Icons.folder_open),
+                  label: const Text('Abrir carpeta'),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: colorScheme.primary,
                     padding: const EdgeInsets.symmetric(vertical: 14),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10),

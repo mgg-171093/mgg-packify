@@ -75,6 +75,15 @@ void main() {
 
       expect(find.byIcon(Icons.history), findsOneWidget);
     });
+
+    testWidgets('empty state icon uses semantic primary color', (tester) async {
+      await tester.pumpWidget(_buildApp());
+      await tester.pumpAndSettle();
+
+      final icon = tester.widget<Icon>(find.byIcon(Icons.history));
+      final theme = Theme.of(tester.element(find.byIcon(Icons.history)));
+      expect(icon.color, theme.colorScheme.primary);
+    });
   });
 
   group('HistoryScreen — with entries', () {

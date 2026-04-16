@@ -45,12 +45,16 @@ class _CloneScreenState extends ConsumerState<CloneScreen> {
       _selectedPackage?.path ?? _sourcePathCtrl.text.trim();
 
   Future<void> _continue() async {
+    final colorScheme = Theme.of(context).colorScheme;
     final sourcePath = _effectivePath;
     if (sourcePath.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Seleccioná o ingresá el path del package a clonar'),
-          backgroundColor: Colors.orange,
+        SnackBar(
+          content: const Text(
+            'Seleccioná o ingresá el path del package a clonar',
+          ),
+          backgroundColor: colorScheme.secondaryContainer,
+          behavior: SnackBarBehavior.floating,
         ),
       );
       return;
@@ -59,9 +63,10 @@ class _CloneScreenState extends ConsumerState<CloneScreen> {
     final newIteracion = _iteracionCtrl.text.trim();
     if (newIteracion.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('La iteración es obligatoria'),
-          backgroundColor: Colors.orange,
+        SnackBar(
+          content: const Text('La iteración es obligatoria'),
+          backgroundColor: colorScheme.secondaryContainer,
+          behavior: SnackBarBehavior.floating,
         ),
       );
       return;
@@ -82,7 +87,8 @@ class _CloneScreenState extends ConsumerState<CloneScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Error al clonar: $e'),
-            backgroundColor: Colors.red.shade700,
+            backgroundColor: colorScheme.errorContainer,
+            behavior: SnackBarBehavior.floating,
           ),
         );
       }
@@ -96,14 +102,10 @@ class _CloneScreenState extends ConsumerState<CloneScreen> {
     final settings = ref.watch(settingsProvider).valueOrNull;
     final lastUsedPath = settings?.lastUsed?.rutaPackages ?? '';
     final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Clonar Package'),
-        backgroundColor: Colors.white,
-        foregroundColor: Theme.of(context).colorScheme.secondary,
-        elevation: 1,
-      ),
+      appBar: AppBar(title: const Text('Clonar Package')),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(24),
         child: Column(
@@ -157,7 +159,7 @@ class _CloneScreenState extends ConsumerState<CloneScreen> {
               Text(
                 lastUsedPath,
                 style: theme.textTheme.bodySmall?.copyWith(
-                  color: Colors.grey.shade600,
+                  color: colorScheme.onSurfaceVariant,
                   fontFamily: 'monospace',
                 ),
               ),
@@ -206,21 +208,14 @@ class _CloneScreenState extends ConsumerState<CloneScreen> {
                     ? const SizedBox(
                         width: 18,
                         height: 18,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2,
-                          color: Colors.white,
-                        ),
+                        child: CircularProgressIndicator(strokeWidth: 2),
                       )
-                    : const Icon(Icons.arrow_forward, color: Colors.white),
+                    : const Icon(Icons.arrow_forward),
                 label: Text(
                   _isSubmitting ? 'Clonando...' : 'Continuar',
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.w600,
-                  ),
+                  style: const TextStyle(fontWeight: FontWeight.w600),
                 ),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Theme.of(context).colorScheme.secondary,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10),
                   ),
@@ -252,6 +247,8 @@ class _PackageList extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final listAsync = ref.watch(cloneListProvider(baseDir));
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
 
     return listAsync.when(
       loading: () => const Center(
@@ -262,29 +259,29 @@ class _PackageList extends ConsumerWidget {
       ),
       error: (e, _) => Text(
         'Error al cargar lista: $e',
-        style: const TextStyle(color: Colors.red),
+        style: TextStyle(color: colorScheme.error),
       ),
       data: (packages) {
         if (packages.isEmpty) {
-          return const Text(
+          return Text(
             'No se encontraron packages en esta carpeta',
-            style: TextStyle(color: Colors.grey),
+            style: theme.textTheme.bodyMedium?.copyWith(
+              color: colorScheme.onSurfaceVariant,
+            ),
           );
         }
         return Column(
           children: packages.map((pkg) {
             final isSelected = pkg.path == selectedPath;
             return Card(
-              color: isSelected
-                  ? Theme.of(context).colorScheme.secondaryContainer
-                  : null,
+              color: isSelected ? colorScheme.secondaryContainer : null,
               margin: const EdgeInsets.only(bottom: 8),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(8),
                 side: BorderSide(
                   color: isSelected
-                      ? Theme.of(context).colorScheme.secondary
-                      : Colors.grey.shade200,
+                      ? colorScheme.secondary
+                      : colorScheme.outlineVariant,
                   width: isSelected ? 2 : 1,
                 ),
               ),
@@ -298,8 +295,8 @@ class _PackageList extends ConsumerWidget {
                       Icon(
                         pkg.hasMeta ? Icons.inventory_2 : Icons.folder,
                         color: pkg.hasMeta
-                            ? Theme.of(context).colorScheme.primary
-                            : Colors.grey,
+                            ? colorScheme.primary
+                            : colorScheme.onSurfaceVariant,
                         size: 20,
                       ),
                       const SizedBox(width: 10),
@@ -317,9 +314,9 @@ class _PackageList extends ConsumerWidget {
                             if (pkg.createdAt != null)
                               Text(
                                 _formatDate(pkg.createdAt!),
-                                style: TextStyle(
+                                style: theme.textTheme.bodySmall?.copyWith(
                                   fontSize: 11,
-                                  color: Colors.grey.shade500,
+                                  color: colorScheme.onSurfaceVariant,
                                 ),
                               ),
                           ],
@@ -328,7 +325,7 @@ class _PackageList extends ConsumerWidget {
                       if (pkg.hasMeta)
                         Icon(
                           Icons.check_circle,
-                          color: Theme.of(context).colorScheme.primary,
+                          color: colorScheme.primary,
                           size: 16,
                         ),
                     ],

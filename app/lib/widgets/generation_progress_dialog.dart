@@ -150,7 +150,7 @@ class _GenerationProgressDialogState extends State<GenerationProgressDialog> {
 
     return Dialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      backgroundColor: Colors.white,
+      backgroundColor: colorScheme.surface,
       child: Padding(
         padding: const EdgeInsets.all(24),
         child: ConstrainedBox(
@@ -222,9 +222,9 @@ class _GenerationProgressDialogState extends State<GenerationProgressDialog> {
               // ── Progress text ──
               Text(
                 '$completed / $total pasos',
-                style: Theme.of(
-                  context,
-                ).textTheme.bodySmall?.copyWith(color: Colors.grey.shade600),
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  color: colorScheme.onSurfaceVariant,
+                ),
                 textAlign: TextAlign.center,
               ),
             ],
@@ -256,10 +256,10 @@ class _GenerationProgressDialogState extends State<GenerationProgressDialog> {
                   step.label,
                   style: TextStyle(
                     color: switch (step.status) {
-                      StepStatus.pending => Colors.grey.shade500,
-                      StepStatus.inProgress => Colors.black87,
-                      StepStatus.done => Colors.black87,
-                      StepStatus.error => Colors.red.shade700,
+                      StepStatus.pending => colorScheme.onSurfaceVariant,
+                      StepStatus.inProgress => colorScheme.onSurface,
+                      StepStatus.done => colorScheme.onSurface,
+                      StepStatus.error => colorScheme.error,
                     },
                     fontSize: 14,
                   ),
@@ -269,7 +269,7 @@ class _GenerationProgressDialogState extends State<GenerationProgressDialog> {
                   const SizedBox(height: 4),
                   Text(
                     step.errorMessage!,
-                    style: TextStyle(color: Colors.red.shade600, fontSize: 11),
+                    style: TextStyle(color: colorScheme.error, fontSize: 11),
                   ),
                 ],
               ],
@@ -284,7 +284,7 @@ class _GenerationProgressDialogState extends State<GenerationProgressDialog> {
     return switch (status) {
       StepStatus.pending => Icon(
         Icons.radio_button_unchecked,
-        color: Colors.grey.shade400,
+        color: colorScheme.outline,
         size: 20,
       ),
       StepStatus.inProgress => CircularProgressIndicator(
@@ -298,7 +298,7 @@ class _GenerationProgressDialogState extends State<GenerationProgressDialog> {
       ),
       StepStatus.error => Icon(
         Icons.cancel,
-        color: Colors.red.shade700,
+        color: colorScheme.error,
         size: 20,
       ),
     };
