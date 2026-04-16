@@ -56,6 +56,20 @@
 - `flutter test test/screens/dashboard_screen_test.dart test/screens/history_screen_test.dart test/screens/clone_screen_test.dart test/screens/log_viewer_screen_test.dart test/widgets/generation_progress_dialog_test.dart test/widgets/package_name_preview_test.dart` ✅
 - `flutter test` (full app suite) ✅
 
+## Follow-up Batch (post-verify, non-blocking)
+
+- Replaced residual hardcoded amber accents in `app/lib/screens/success_screen.dart` with semantic theme tokens:
+  - Folder row leading icon: `colorScheme.secondary`
+  - Copy-errors warning + row icons: `colorScheme.onSecondaryContainer`
+- Added focused widget tests for previously under-covered surfaces:
+  - `app/test/screens/success_screen_test.dart` — verifies semantic warning/folder accents on `SuccessScreen`
+  - `app/test/screens/splash_screen_test.dart` — verifies semantic primary progress emphasis on `SplashScreen`
+  - `app/test/screens/about_screen_test.dart` — verifies key `AboutScreen` surface renders and update action presence
+  - `app/test/screens/templates_screen_test.dart` — verifies semantic empty-state icon emphasis on `TemplatesScreen`
+- Follow-up validation executed:
+  - `flutter test test/screens/success_screen_test.dart test/screens/splash_screen_test.dart test/screens/about_screen_test.dart test/screens/templates_screen_test.dart` ✅
+  - `flutter test` (full app suite) ✅
+
 ## Remaining Tasks
 
 - None for this change scope.

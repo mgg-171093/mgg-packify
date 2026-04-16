@@ -220,9 +220,9 @@ class SuccessScreen extends ConsumerWidget {
                       padding: const EdgeInsets.all(16),
                       child: Row(
                         children: [
-                          const Icon(
+                          Icon(
                             Icons.folder_open_outlined,
-                            color: Colors.amber,
+                            color: colorScheme.secondary,
                             size: 22,
                           ),
                           const SizedBox(width: 12),
@@ -320,9 +320,9 @@ class SuccessScreen extends ConsumerWidget {
                         children: [
                           Row(
                             children: [
-                              const Icon(
+                              Icon(
                                 Icons.warning_amber_rounded,
-                                color: Colors.amber,
+                                color: colorScheme.onSecondaryContainer,
                                 size: 20,
                               ),
                               const SizedBox(width: 8),
@@ -349,10 +349,10 @@ class SuccessScreen extends ConsumerWidget {
                               child: Row(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  const Icon(
+                                  Icon(
                                     Icons.error_outline,
                                     size: 16,
-                                    color: Colors.amber,
+                                    color: colorScheme.onSecondaryContainer,
                                   ),
                                   const SizedBox(width: 8),
                                   Expanded(
