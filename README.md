@@ -1,13 +1,15 @@
 ![MGG Packify](docs/branding/banner.png)
 
-[![Version](https://img.shields.io/badge/Version-3.5.0-blue?style=flat-square)](./latest.json)
+[![Release](https://img.shields.io/github/v/release/mgg-171093/mgg-packify?display_name=tag&sort=semver&style=flat-square)](https://github.com/mgg-171093/mgg-packify/releases)
+[![CI](https://github.com/mgg-171093/mgg-packify/actions/workflows/ci.yml/badge.svg?branch=develop)](https://github.com/mgg-171093/mgg-packify/actions/workflows/ci.yml)
+[![Release Pipeline](https://github.com/mgg-171093/mgg-packify/actions/workflows/release.yml/badge.svg?branch=main)](https://github.com/mgg-171093/mgg-packify/actions/workflows/release.yml)
 [![Python](https://img.shields.io/badge/Python-%E2%89%A53.12-3776AB?style=flat-square&logo=python&logoColor=white)](https://www.python.org/)
 [![Flutter](https://img.shields.io/badge/Flutter-3.41.4-02569B?style=flat-square&logo=flutter&logoColor=white)](https://flutter.dev/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.110+-009688?style=flat-square&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
 [![License](https://img.shields.io/badge/License-MIT-yellow?style=flat-square)](./LICENSE)
 [![Platform](https://img.shields.io/badge/Platform-Windows%2011-0078D4?style=flat-square&logo=windows&logoColor=white)](https://www.microsoft.com/windows/windows-11)
-[![API Tests](https://img.shields.io/badge/API%20Tests-120%20passing-brightgreen?style=flat-square)](./api/)
-[![Flutter Tests](https://img.shields.io/badge/Flutter%20Tests-211%20passing-brightgreen?style=flat-square)](./app/)
+[![API Tests](https://img.shields.io/badge/API%20Tests-passing-brightgreen?style=flat-square)](./api/)
+[![Flutter Tests](https://img.shields.io/badge/Flutter%20Tests-passing-brightgreen?style=flat-square)](./app/)
 
 Windows 11 desktop app that generates installation packages (`.docx` document + folder structure) for multiple projects and environments. Covers all 8 component types: SQL scripts, API IIS/Docker services, Blob Storage, Liferay builds, Assets, and API Management.
 
@@ -47,7 +49,7 @@ graph TB
 
 > **Prerequisites**: nothing. The installer bundles everything.
 
-1. Download `MGGPackify-3.5.0-Setup.exe` from [Releases](https://github.com/mgg-171093/mgg-packify/releases)
+1. Download the latest stable `MGGPackify-x.y.z-Setup.exe` from [Releases](https://github.com/mgg-171093/mgg-packify/releases)
 2. Run the installer — **no admin / UAC required**
 3. The app installs to `%LOCALAPPDATA%\MGG Packify\`
 4. Launch **MGG Packify** from the Start Menu or Desktop shortcut
@@ -66,7 +68,7 @@ See [Development Quick Start](#development-quick-start) below.
 
 ## Building the Installer
 
-To produce `MGGPackify-3.5.0-Setup.exe` from source you need the full dev environment plus two build tools.
+To produce `MGGPackify-x.y.z-Setup.exe` from source you need the full dev environment plus two build tools.
 
 ### Prerequisites
 
@@ -109,7 +111,7 @@ The script:
 1. Builds the Flutter Windows release → `app/build/windows/x64/runner/Release/`
 2. Bundles the Python API with PyInstaller → `api/dist/mgg-packify-api.exe` (single-file, ~50 MB)
 3. Assembles a `staging/` directory with Flutter output
-4. Runs Inno Setup → `installer/Output/MGGPackify-3.5.0-Setup.exe`
+4. Runs Inno Setup → `installer/Output/MGGPackify-x.y.z-Setup.exe`
 
 > **Note**: PyInstaller + Python 3.12+ may trigger Windows Defender on first run (false positive on bundled executables). This is expected — no code signing is applied yet.
 
@@ -127,6 +129,25 @@ Release versioning is automatic on `main` based on the latest conventional commi
 - `BREAKING CHANGE` footer or `type!:` commit header → **major** bump
 - `feat:` commit header → **minor** bump
 - any other commit type (`fix`, `chore`, `docs`, etc.) → **patch** bump
+
+### Day-to-day workflow
+
+This is the normal flow now:
+
+1. Work on `develop` (or branches that merge into `develop`)
+2. GitHub Actions runs CI automatically on `develop` pushes and pull requests
+3. When the code is ready, merge or push `develop` into `main`
+4. GitHub Actions automatically:
+   - computes the semantic version bump from conventional commits
+   - updates `app/pubspec.yaml` as the canonical version source
+   - synchronizes all version-bearing files
+   - runs Flutter + Python tests again on the release runner
+   - builds the Windows installer
+   - creates the GitHub Release and uploads the `.exe`
+   - updates `latest.json`
+   - commits the synchronized release metadata back to `main` with `[skip ci]`
+
+In other words: **you no longer edit version files manually for normal releases**.
 
 After bumping `app/pubspec.yaml`, the workflow synchronizes all version consumers and commits them together (`app/pubspec.yaml`, `api/pyproject.toml`, `app/lib/core/constants.dart`, `installer/mgg-packify.iss`, `build.ps1`, `latest.json`).
 
@@ -155,6 +176,7 @@ Expected behavior:
 - The script reads canonical version from `app/pubspec.yaml` (`X.Y.Z+N` → `X.Y.Z`)
 - It updates only the five consumer files listed above
 - Running it repeatedly without a version change is idempotent (no further diffs)
+- Pushes created by the release workflow are ignored by CI/release guards, preventing infinite loops
 
 ---
 

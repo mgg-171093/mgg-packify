@@ -79,7 +79,7 @@ Line length: 100 chars (configured in `pyproject.toml`).
 
 | Method | Path | Description |
 |--------|------|-------------|
-| `GET` | `/health` | Liveness check — returns `{"status": "ok", "version": "3.5.0"}` |
+| `GET` | `/health` | Liveness check — returns `{"status": "ok", "version": "<installed package version>"}` |
 | `GET` | `/settings` | Get server config (QA/PROD hosts) + last-used form values |
 | `PUT` | `/settings` | Save server config and last-used values |
 | `GET` | `/settings/options` | Get configurable option lists (estatus, SQL tipo, Blob tipo, etc.) |
