@@ -115,6 +115,49 @@ The script:
 
 ---
 
+## GitHub Actions Release Automation
+
+This repository includes CI/CD workflows:
+
+- `ci.yml` runs on pull requests and pushes to `develop`
+- `release.yml` runs on pushes to `main`
+
+Release versioning is automatic on `main` based on the latest conventional commit:
+
+- `BREAKING CHANGE` footer or `type!:` commit header → **major** bump
+- `feat:` commit header → **minor** bump
+- any other commit type (`fix`, `chore`, `docs`, etc.) → **patch** bump
+
+After bumping `app/pubspec.yaml`, the workflow synchronizes all version consumers and commits them together (`app/pubspec.yaml`, `api/pyproject.toml`, `app/lib/core/constants.dart`, `installer/mgg-packify.iss`, `build.ps1`, `latest.json`).
+
+### Required repository setting
+
+For release automation to push synchronized version metadata and create releases using `GITHUB_TOKEN`, set:
+
+**Settings → Actions → General → Workflow permissions → Read and write permissions**
+
+If this is not enabled, `release.yml` will fail with a permissions error by design.
+
+### Local dry-run for version synchronization script
+
+```powershell
+# From repo root
+pwsh -NoProfile -File .\scripts\sync-version.ps1
+
+# Verify only expected files changed (or no-op)
+git diff -- api/pyproject.toml app/lib/core/constants.dart installer/mgg-packify.iss build.ps1 latest.json
+
+# Revert local changes if you were only validating
+git checkout -- api/pyproject.toml app/lib/core/constants.dart installer/mgg-packify.iss build.ps1 latest.json
+```
+
+Expected behavior:
+- The script reads canonical version from `app/pubspec.yaml` (`X.Y.Z+N` → `X.Y.Z`)
+- It updates only the five consumer files listed above
+- Running it repeatedly without a version change is idempotent (no further diffs)
+
+---
+
 ## Development Quick Start
 
 ### 1 — Clone the repo

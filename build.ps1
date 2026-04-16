@@ -24,13 +24,13 @@ param(
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
-$Version = "3.9.4"
+$Version = if ($env:MGG_VERSION -and $env:MGG_VERSION.Trim()) { $env:MGG_VERSION.Trim() } else { "3.9.4" }
 $RepoRoot = $PSScriptRoot
 $FlutterRelease = Join-Path $RepoRoot "app\build\windows\x64\runner\Release"
 $ApiDist = Join-Path $RepoRoot "api\dist"
 $StagingDir = Join-Path $RepoRoot "staging"
 $InnoSetup = "C:\Program Files (x86)\Inno Setup 6\ISCC.exe"
-$PythonExe = "C:\Users\manue\AppData\Local\Python\bin\python.exe"
+$PythonExe = $null
 
 function Write-Step($msg) {
     Write-Host "`n==> $msg" -ForegroundColor Cyan
@@ -52,10 +52,14 @@ if (-not $SkipFlutter) {
 }
 
 if (-not $SkipApi) {
-    if (-not (Test-Path $PythonExe)) {
-        Write-Host "ERROR: Python not found at $PythonExe" -ForegroundColor Red
+    try {
+        $PythonExe = (Get-Command python -ErrorAction Stop).Source
+    } catch {
+        Write-Host "ERROR: Python executable not found in PATH." -ForegroundColor Red
+        Write-Host "  Install Python >=3.12 and ensure 'python' is available in PATH." -ForegroundColor Yellow
         exit 1
     }
+
     & $PythonExe -m PyInstaller --version 2>$null
     if ($LASTEXITCODE -ne 0) {
         Write-Host "ERROR: PyInstaller not installed. Run: pip install pyinstaller==6.19.0" -ForegroundColor Red
