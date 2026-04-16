@@ -24,7 +24,7 @@ param(
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
-$Version = if ($env:MGG_VERSION -and $env:MGG_VERSION.Trim()) { $env:MGG_VERSION.Trim() } else { "3.9.5" }
+$Version = if ($env:MGG_VERSION -and $env:MGG_VERSION.Trim()) { $env:MGG_VERSION.Trim() } else { "3.9.6" }
 $RepoRoot = $PSScriptRoot
 $FlutterRelease = Join-Path $RepoRoot "app\build\windows\x64\runner\Release"
 $ApiDist = Join-Path $RepoRoot "api\dist"
