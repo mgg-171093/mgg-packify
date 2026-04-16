@@ -252,7 +252,9 @@ jobs:
           $ErrorActionPreference = 'Stop'
           $tag = '${{ steps.versioning.outputs.tag }}'
 
-          if (gh release view $tag --repo $env:GITHUB_REPOSITORY 1>$null 2>$null) {
+          gh release view $tag --repo $env:GITHUB_REPOSITORY 1>$null 2>$null
+
+          if ($LASTEXITCODE -eq 0) {
             "exists=true" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
             Write-Host "Release tag '$tag' already exists. Reusing existing release."
           } else {
